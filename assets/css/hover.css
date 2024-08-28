@@ -1,0 +1,77 @@
+.dynamic-hover {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+  height: 300px;
+  overflow: hidden;
+}
+
+.default-image, .hover-image {
+  position: absolute;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.hover-image {
+  opacity: 0;
+}
+
+.dynamic-hover:hover .default-image {
+  opacity: 0;
+}
+
+.dynamic-hover:hover .hover-image {
+  opacity: 1;
+}
+
+.info-hover {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.info-hover::after {
+  content: "Work in Progress: Contact for Info";
+  visibility: hidden;
+  width: 200px;
+  background-color: #ff681d;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.3s, visibility 0.3s;
+  font-weight: normal;
+  font-size: 14px;
+}
+
+.info-hover::before {
+  content: "";
+  visibility: hidden;
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+  opacity: 0;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.info-hover:hover::after, .info-hover:hover::before {
+  visibility: visible;
+  opacity: 1;
+}
+
