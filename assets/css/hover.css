@@ -83,7 +83,7 @@
 }
 
 .custom-link::after {
-  content: "Learn More";
+  content: "Read Paper";
   width: 200px;
   background-color: #ff681d;
   color: #fff;
