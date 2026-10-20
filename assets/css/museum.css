@@ -1,0 +1,61 @@
+/* Gallery theme: white cube, black type, works shown bare */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
+
+:root { --ink:#111; --grey:#8c8c8c; --rule:#e6e6e6; --sans:'Inter',-apple-system,'Helvetica Neue',Helvetica,Arial,sans-serif; }
+
+html, body { background:#fff !important; }
+body { color:var(--ink); font-family:var(--sans); font-weight:300; font-size:15px; line-height:1.75; letter-spacing:-0.005em; -webkit-font-smoothing:antialiased; }
+.fw-lighter, .fw-light { font-weight:300 !important; }
+strong, b { font-weight:500; }
+a { color:var(--ink); text-decoration:none; border-bottom:1px solid var(--rule); transition:border-color .2s; }
+a:hover { color:var(--ink); border-bottom-color:var(--ink); }
+.navbar a, .tile a, .site-footer a { border-bottom:none; }
+
+/* Navigation */
+.navbar { background:#fff !important; padding:2.5rem 0 2rem; }
+.navbar > .container-fluid { max-width:1240px; margin:0 auto; padding:0 2rem; }
+.navbar-brand { font-size:0.95rem; font-weight:500; letter-spacing:-0.01em; color:var(--ink) !important; }
+.navbar-nav { margin-left:auto; gap:0.5rem; }
+.navbar .nav-link { font-size:0.95rem; font-weight:300; color:var(--grey) !important; transition:color .2s; }
+.navbar .nav-link:hover, .navbar .nav-link[aria-current="page"] { color:var(--ink) !important; }
+.navbar-toggler { border:none; box-shadow:none !important; padding:0.25rem; }
+
+.container { max-width:1240px; padding-left:2rem; padding-right:2rem; }
+
+/* Gallery grid: bare works */
+.gallery { --bs-gutter-x:3rem; row-gap:4.5rem; padding:2rem 0 6rem; }
+.tile { text-align:left !important; }
+.tile .frame { position:relative; aspect-ratio:1/1; width:100%; display:flex; align-items:center; justify-content:center; overflow:hidden; background:#fff; }
+.tile .frame img { width:100%; height:100%; object-fit:contain; transition:opacity .5s ease; }
+.tile .frame .default-image, .tile .frame .hover-image { position:absolute; inset:0; max-width:none; max-height:none; }
+.tile .frame .hover-image { opacity:0; }
+.tile:hover .frame .hover-image { opacity:1; }
+.tile:hover .frame .default-image { opacity:0; }
+.tile .frame .default-image[src*="lr_image"] { image-rendering:pixelated; }
+
+.label { margin-top:1rem; display:flex; flex-direction:column; gap:0.15rem; }
+.label h6 { font-size:0.95rem; font-weight:400; line-height:1.4; margin:0; color:var(--ink); text-align:left !important; }
+.label .meta { font-size:0.8rem; font-weight:300; color:var(--grey); line-height:1.5; margin:0; text-align:left !important; }
+.label .ext { color:var(--grey); font-size:0.85em; margin-left:0.15em; }
+
+/* Project pages */
+body.exhibit .container { max-width:760px; }
+body.exhibit h1 { font-size:clamp(1.9rem,4vw,2.6rem); font-weight:500; line-height:1.12; letter-spacing:-0.03em; margin:2.5rem 0 1.5rem; }
+body.exhibit h1 strong { font-weight:500; }
+body.exhibit h3 { font-size:0.95rem; font-weight:500; letter-spacing:-0.01em; margin:3.5rem 0 0.75rem; }
+body.exhibit img.img-fluid { display:block; margin:2.5rem auto; }
+body.exhibit ul { padding-left:1.1rem; }
+body.exhibit li { margin-bottom:0.35rem; }
+body.exhibit .ratio { margin-top:0.75rem; }
+
+/* Biography */
+body.about .bio-text p { max-width:38rem; }
+body.about .bio-text p:first-child { font-size:1.45rem; font-weight:300; line-height:1.45; letter-spacing:-0.02em; }
+body.about .bio-text p:first-child strong { font-weight:500; }
+body.about .bio-text em { font-style:normal; }
+body.about img.portrait { max-width:100%; height:auto; }
+
+/* Footer */
+.site-footer { max-width:1240px; margin:4rem auto 0; padding:1.5rem 2rem 3rem; display:flex; flex-wrap:wrap; gap:.5rem 2rem; justify-content:space-between; font-size:0.8rem; color:var(--grey); }
+
+@media (max-width:575px) { .navbar { padding:1.5rem 0 1rem; } .gallery { row-gap:3rem; } .container, .navbar > .container-fluid, .site-footer { padding-left:1.25rem; padding-right:1.25rem; } }
