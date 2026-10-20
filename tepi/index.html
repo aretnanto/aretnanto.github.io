@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TEPI Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap">
+  <link rel="stylesheet" href="style.css?v=89">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+<body>
+  <header>
+    <h1><a href="#" id="home-link" title="Back to the title slide">Tucson Equity Priority Index</a></h1>
+    <button class="btn sorter-btn" id="sorter-open" title="All slides (G)">▦ Slides</button>
+    <nav class="toggle" role="tablist">
+      <!-- slides (class slide-tab) are in the page sequence but not shown as tabs -->
+      <button role="tab" class="slide-tab" data-view="titleview" data-section="Approach" aria-selected="true">Title</button>
+      <button role="tab" class="slide-tab" data-view="qview" data-section="Approach" aria-selected="false">Questions</button>
+      <button role="tab" class="slide-tab" data-view="dataview" data-section="Approach" aria-selected="false">Data</button>
+      <button role="tab" class="slide-tab" data-view="spview" data-section="Approach" aria-selected="false">Exploration: boundaries</button>
+      <button role="tab" class="slide-tab" data-view="prepview" data-section="Approach" aria-selected="false">Exploration: TEPI vs ACS</button>
+      <button role="tab" class="slide-tab" data-view="ppview" data-section="Approach" aria-selected="false">Data preprocessing</button>
+      <button role="tab" class="slide-tab" data-view="methodview" data-section="Approach" aria-selected="false">Methods</button>
+      <button role="tab" class="slide-tab" data-view="encview" data-section="Approach" aria-selected="false">Marks and channels</button>
+      <button role="tab" class="slide-tab" data-view="view1" data-section="Workflow" aria-selected="false">What-if</button>
+      <button role="tab" data-view="mapview" data-section="Workflow" aria-selected="false">1 · TEPI &amp; ACS dashboard</button>
+      <button role="tab" class="slide-tab" data-view="moranview" data-section="Workflow" aria-selected="false">Global Moran's I</button>
+      <button role="tab" data-view="nbview" data-section="Workflow" aria-selected="false" title="Block groups as a network of neighbours: hot spots">2 · Neighbours</button>
+      <!-- Political analysis (mayoral elections), folded into Random maps; kept but not shown -->
+      <button role="tab" data-view="distview" aria-selected="false" hidden>Political analysis</button>
+      <button role="tab" class="slide-tab" data-view="redistview" data-section="Workflow" aria-selected="false">Tucson has been redistricted</button>
+      <button role="tab" data-view="ensview" data-section="Workflow" aria-selected="false" title="District lines of 2001, 2011 and 2021 against thousands of random, neutral plans">3 · Redistricting</button>
+      <button role="tab" class="slide-tab" data-view="dpview" data-section="Workflow" aria-selected="false">Why differential privacy?</button>
+      <button role="tab" class="slide-tab" data-view="dpmechview" data-section="Workflow" aria-selected="false">How differential privacy works</button>
+      <button role="tab" data-view="privview" data-section="Workflow" aria-selected="false" title="Perturb the census inputs the way the Census Bureau protects privacy, and see how TEPI changes">4 · Privacy</button>
+      <button role="tab" class="slide-tab" data-view="aiview" data-section="Reflection" aria-selected="false">AI-assisted development</button>
+      <button role="tab" class="slide-tab" data-view="aireflectview" data-section="Reflection" aria-selected="false">AI reflection</button>
+      <!-- Project 1's ML comparison page, kept but not shown in Project 2 -->
+      <button role="tab" data-view="view2" aria-selected="false" hidden>Expert vs. ML</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="titleview" class="view" role="tabpanel">
+      <div class="title-slide">
+        <div class="title-text">
+          <p class="title-kicker">CSC 596 · Project 2</p>
+          <h2 class="title-main">Tucson Equity Priority Index</h2>
+          <p class="title-sub">A visual analytics system for TEPI and Census data, 1990 to 2020–24</p>
+          <p class="title-meta"><strong>Aditya Retnanto</strong><br>October 19, 2026</p>
+        </div>
+        <figure class="title-figure">
+          <svg id="title-map" role="img" aria-label="Pima County block groups coloured by TEPI priority tier"></svg>
+          <figcaption id="title-legend"></figcaption>
+        </figure>
+      </div>
+    </section>
+    <section id="qview" class="view" role="tabpanel" hidden>
+      <div class="slide">
+        <h2 class="slide-h">Five questions</h2>
+        <p class="slide-lead">TEPI ranks Pima County's 718 block groups for equity priority. Do similar block groups sit together? Were its high-priority areas served over time? Is it tied to geography? How do district lines treat them? And would it survive privacy protection?</p>
+        <ol class="q-list">
+          <li><span class="q-tag">T1 · Similarity</span><span class="q-text">Do block groups with similar profiles sit near each other?</span><span class="q-how">Similarity view (UMAP / PCA) linked to the map · Dashboard</span></li>
+          <li><span class="q-tag">T2 · Temporal</span><span class="q-text">If TEPI had existed since 1990, were high-priority areas targeted?</span><span class="q-how">TEPI recomputed for 1990–2024, economic indicators, time curves and gap chart · Dashboard</span></li>
+          <li><span class="q-tag">T3 · Geospatial</span><span class="q-text">Is there a geographical relationship in TEPI values?</span><span class="q-how">Block groups as a network of neighbours, global and local Moran's I, by decade · Neighbours</span></li>
+          <li><span class="q-tag">T4 · Redistricting</span><span class="q-text">Did redistricting move or gather high-priority neighbourhoods?</span><span class="q-how">Legislative lines of 2001, 2011, 2021 as a network; who moved, by tier · Redistricting</span></li>
+          <li><span class="q-tag">T5 · Privacy</span><span class="q-text">Would TEPI survive census-style differential privacy?</span><span class="q-how">Noise on the counts, then hot spots and PCA re-checked · Privacy</span></li>
+        </ol>
+      </div>
+    </section>
+    <section id="dataview" class="view" role="tabpanel" hidden>
+      <div class="slide">
+        <h2 class="slide-h">Data</h2>
+        <ul class="src-bullets">
+          <li><strong>TEPI</strong> <span class="src-meta">City of Tucson, pilot index, July 2024</span>
+            <ul><li>718 block groups</li><li>12 indicators in 2 domains (Economic, Personal)</li><li>Percentile ranks, 5 tiers</li></ul>
+          </li>
+          <li><strong>1990 – 2000</strong> <span class="src-meta">Decennial census long form</span>
+            <ul><li>1990 (STF3A, Census FTP) and 2000 (SF3, Census API)</li><li>No health insurance or disability question</li></ul>
+          </li>
+          <li><strong>2009–13 – 2020–24</strong> <span class="src-meta">American Community Survey, 5-year estimates (Census API)</span>
+            <ul><li>12 releases, with margins of error</li><li>TEPI matches the 2019–23 release for 9 of its 12 indicators</li></ul>
+          </li>
+          <li><strong>Boundaries</strong> <span class="src-meta">Census TIGERweb and boundary files</span>
+            <ul><li>Block groups of 1990, 2000, 2010 and 2020</li><li>State legislative districts of 2001, 2011 and 2021</li></ul>
+          </li>
+        </ul>
+        <p class="slide-lead">Everything before 2016–20 is moved onto today's 2020 block groups by area, so it is an estimate. All of it is one table: <code>tepi_timeseries.csv</code>, 718 block groups × 14 releases.</p>
+      </div>
+    </section>
+    <section id="spview" class="view" role="tabpanel" hidden>
+      <div class="panel map-controls">
+        <span class="ctl sp-slider-ctl"><strong id="sp-left">2010</strong>
+          <input type="range" id="sp-swipe" min="0" max="100" step="0.5" value="50" aria-label="Swipe between 2010 and 2020 block groups">
+          <strong id="sp-right">2020</strong></span>
+        <span class="sub working-note" id="sp-summary"></span>
+        <span class="info" title="Census block groups in Pima County. ACS 5-year releases up to 2015-19 use the 2010 block groups; from 2016-20 on, the 2020 block groups (TEPI's), which is why this system uses the 2016-20 to 2020-24 releases. Drag the slider (or the line on the map) to compare. Pinch or Ctrl/⌘ + scroll to zoom, drag to pan. Source: Census TIGERweb.">ⓘ</span>
+      </div>
+      <div class="panel view-panel sp-panel">
+        <svg id="sp-map"></svg>
+      </div>
+    </section>
+    <section id="prepview" class="view" role="tabpanel" hidden>
+      <div class="panel map-controls">
+        <span class="ctl">ACS release
+          <span class="seg-btns" id="prep-year"></span>
+        </span>
+        <span class="sub working-note">The 12 indicators rebuilt from the raw ACS against TEPI's published values. 9 match the 2019–23 release; unemployment, children and seniors match no release. A block group "matches" within 0.15 points (TEPI rounds to 2 decimals).</span>
+      </div>
+      <div class="prep-grid">
+        <div class="panel view-panel">
+          <div class="vhead"><h2>Our ACS value vs TEPI's published value, by indicator</h2>
+            <span class="info" title="Each dot is a block group: x = our value from the selected ACS release, y = TEPI's published value. Dashed line: y = x. Blue = matches (within 0.15 points), grey = does not. Hover a dot to find the block group in every panel. Switch the release to see which one TEPI used.">ⓘ</span></div>
+          <svg id="prep-sm"></svg>
+        </div>
+      </div>
+    </section>
+    <section id="mapview" class="view" role="tabpanel" hidden>
+      <div class="panel map-controls" id="map-controls">
+        <label class="ctl map-year-ctl">Release <input type="range" id="map-year" step="1"> <span id="map-year-out"></span></label>
+        <span class="ctl tools">Select into
+          <span class="grp-chip"><button class="tool grp-btn grp-a" data-group="A" aria-pressed="true" title="Clicks and lasso add to Group A">Group A <span class="grp-n" id="grp-n-A"></span></button><button class="tool grp-clear" data-clear="A" title="Clear Group A">✕</button></span>
+          <span class="grp-chip"><button class="tool grp-btn grp-b" data-group="B" aria-pressed="false" title="Clicks and lasso add to Group B">Group B <span class="grp-n" id="grp-n-B"></span></button><button class="tool grp-clear" data-clear="B" title="Clear Group B">✕</button></span>
+        </span>
+        <span class="ctl tools">
+          <button class="tool" data-tool="pan" aria-pressed="true" title="Drag to pan, pinch or Ctrl/⌘ + scroll to zoom, click to select">Pan &amp; click</button>
+          <button class="tool" data-tool="lasso" aria-pressed="false" title="Drag to draw a selection; Shift-drag or Shift-click adds">Lasso</button>
+          <button class="tool" id="map-reset" title="Reset map zoom">Reset zoom</button>
+        </span>
+        <label class="ctl"><input type="checkbox" id="map-poi"> Landmarks</label>
+        <span class="finding-btns"><button class="btn tour-btn finding-btn" data-tour="T1" title="Replay the analytical finding in this interface">▶ Finding T1 · similar profiles</button><button class="btn tour-btn finding-btn" data-tour="T2" title="Replay the analytical finding in this interface">▶ Finding T2 · since 1990</button></span>
+      </div>
+      <div class="map-grid">
+        <div class="panel view-panel map-main">
+          <div class="vhead"><h2>Map: TEPI by block group</h2>
+            <span class="info" title="Pima County block groups. TEPI recomputed from the Census data for the selected ACS 5-year release (2020–2024) and median household income in 2024 dollars. Hover for details; click to put a block group in the active group, Shift-click to add more. Pinch or Ctrl/⌘ + scroll to zoom, drag to pan.">ⓘ</span></div>
+          <svg id="map"></svg>
+          <div id="map-legend" class="legend"></div>
+        </div>
+        <div class="mid-col">
+          <div class="panel view-panel tc-main">
+            <div class="vhead"><h2 id="tc-title">Time curves</h2>
+              <span class="info" title="One dot per ACS 5-year release; each dot aggregates all block groups in the group (each indicator = total numerator ÷ total denominator). Dots are placed by classical MDS so similar profiles sit close, and joined in time order (Bach et al., Time Curves, 2016). Long curve = big change; fold back = reversal. Hover a segment to see what changed; click a dot to show that release on the map.">ⓘ</span>
+              <span class="vhead-ctl seg">
+                <select id="tc-span" aria-label="Time span"></select>
+                <label><input type="radio" name="tc-layout" value="separate" checked> Each curve</label>
+                <label><input type="radio" name="tc-layout" value="shared"> Shared space</label>
+                <label title="Line chart: Group A minus Group B (or minus the county) for each indicator, release by release"><input type="radio" name="tc-layout" value="gap"> A − B gap</label>
+              </span>
+            </div>
+            <svg id="tc"></svg>
+            <div class="legend" id="tc-legend"></div>
+          </div>
+          <div class="panel view-panel dr-main">
+            <div class="vhead"><h2>Similarity</h2>
+              <span class="info" title="Each dot is a block group in the map's ACS release, placed so that block groups with similar indicator profiles sit close together; colour = TEPI tier. Drag to lasso into the active group (Shift adds); click a dot to select it. UMAP is the default; PCA is the linear baseline from Project 1.">ⓘ</span>
+              <span class="vhead-ctl">
+                <select id="dr-method" aria-label="Projection method"></select>
+                <label class="ctl dr-param" data-method="tsne">Perplexity <input type="range" id="dr-perplexity" min="5" max="50" step="1"> <span id="dr-perplexity-out"></span></label>
+                <label class="ctl dr-param" data-method="tsne">Iter. <input type="range" id="dr-iterations" min="100" max="1000" step="50"> <span id="dr-iterations-out"></span></label>
+                <label class="ctl dr-param" data-method="umap">Neighbours <input type="range" id="dr-neighbors" min="3" max="50" step="1"> <span id="dr-neighbors-out"></span></label>
+                <label class="ctl dr-param" data-method="umap">Min dist <input type="range" id="dr-mindist" min="0" max="1" step="0.05"> <span id="dr-mindist-out"></span></label>
+                <details class="model-drawer">
+                  <summary title="Indicators, definitions, units and distance used by the similarity view and the time curves">⚙ Model</summary>
+                  <div class="drawer-body">
+                    <div class="tc-ctl">
+                      <span class="ctl" title="TEPI's definitions divide some household counts by population and leave Hispanic white residents out of people of color. The standard definitions do not.">Definitions
+                        <label><input type="radio" name="tc-def" value="tepi" checked> TEPI's</label>
+                        <label><input type="radio" name="tc-def" value="std"> Standard</label>
+                      </span>
+                    </div>
+                    <div class="tc-ctl">
+                      <label class="ctl">Time-curve units <select id="tc-scaling"></select></label>
+                      <label class="ctl">Time-curve distance <select id="tc-metric"></select></label>
+                    </div>
+                    <div class="tc-ctl"><span class="sub">Indicators <button class="linkbtn" id="tc-all">TEPI's 12</button> <button class="linkbtn" data-domain="Economic" title="TEPI's Economic domain: poverty, unemployment, both cost burdens, no insurance, no vehicle">Economic</button> <button class="linkbtn" data-domain="Personal" title="TEPI's Personal (social) domain: low English, education, disability, people of color, children, seniors">Personal (social)</button></span></div>
+                    <div id="tc-vars"></div>
+                  </div>
+                </details>
+              </span>
+            </div>
+            <svg id="dr"></svg>
+            <div class="legend"><span id="dr-legend"></span><span class="dr-geo" id="dr-geo"></span><span class="dr-status"><span id="dr-status"></span> <button class="linkbtn" id="dr-stop" hidden>Stop</button></span><button class="linkbtn" id="dr-reset">Reset zoom</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="moranview" class="view" role="tabpanel" hidden>
+      <div class="moran-slide">
+        <div class="moran-text">
+          <h2 class="slide-h">Global Moran's I</h2>
+          <p class="moran-lead">Do neighbouring areas have similar values?</p>
+          <p class="moran-def">Compare each area with the average of its neighbours, and sum over the map. <span class="formula">I = Σ z<sub>i</sub> · lag<sub>i</sub> ÷ Σ z<sub>i</sub>²</span></p>
+          <div class="seg-btns" id="toy-preset">
+            <button class="tool" data-preset="cluster" aria-pressed="true">Clustered</button><button class="tool" data-preset="random" aria-pressed="false">Random</button><button class="tool" data-preset="checker" aria-pressed="false">Checkerboard</button>
+          </div>
+          <p class="sub">Click a square to flip it.</p>
+          <svg id="toy-scale"></svg>
+        </div>
+        <svg id="toy-map"></svg>
+      </div>
+    </section>
+    <section id="nbview" class="view" role="tabpanel" hidden>
+      <div class="panel map-controls">
+        <span class="seg-btns" id="nb-mode" hidden><button class="tool" data-mode="lisa" aria-pressed="true">Hot spots</button></span>
+        <label class="ctl nb-lisa">Variable <select id="nb-var"></select></label>
+        <label class="ctl nb-lisa">Significance <select id="nb-alpha"><option value="0.05" selected>p &lt; 0.05</option><option value="0.01">p &lt; 0.01</option></select></label>
+        <span class="ctl">Decade <span class="seg-btns" id="nb-year"></span></span>
+        <span class="ctl">Show
+          <span class="seg-btns" id="nb-show">
+            <button class="tool" data-show="poly" aria-pressed="true">Polygons</button><button class="tool" data-show="net" aria-pressed="false">Network</button>
+          </span>
+        </span>
+        <span class="ctl tools" title="Groups A and B are shared with the dashboard (page 4)">Select into
+          <span class="grp-chip"><button class="tool grp-btn grp-a" data-group="A" aria-pressed="true">Group A <span class="grp-n nb-n" data-n="A"></span></button><button class="tool grp-clear" data-nbclear="A" title="Clear Group A">✕</button></span>
+          <span class="grp-chip"><button class="tool grp-btn grp-b" data-group="B" aria-pressed="false">Group B <span class="grp-n nb-n" data-n="B"></span></button><button class="tool grp-clear" data-nbclear="B" title="Clear Group B">✕</button></span>
+        </span>
+        <span class="ctl tools">
+          <button class="tool" data-nbtool="pan" aria-pressed="true" title="Drag to pan; click a block group to see its neighbours; Shift-click adds it to the active group">Pan &amp; click</button><button class="tool" data-nbtool="lasso" aria-pressed="false" title="Drag to draw a selection into the active group; Shift-drag adds">Lasso</button>
+        </span>
+        <span class="finding-btns"><button class="btn tour-btn finding-btn" data-tour="T3" title="Replay the analytical finding in this interface">▶ Finding T3 · hot spots</button></span>
+      </div>
+      <div class="nb-grid">
+        <div class="panel view-panel">
+          <div class="vhead"><h2 id="nb-map-title">Block groups and their neighbours</h2>
+            <span class="info" title="Each block group is a node; two block groups are joined when their boundaries share a line (rook contiguity, 1,928 edges, about 5 neighbours each). Network view: nodes at block-group centres, sized by population. Hover for details; click a block group to show its neighbours. Pinch or Ctrl/⌘ + scroll to zoom, drag to pan.">ⓘ</span>
+            <button class="linkbtn" id="nb-reset" style="margin-left:auto">Reset zoom</button></div>
+          <svg id="nb-map"></svg>
+          <div id="nb-legend" class="legend"></div>
+          <p class="sub note" id="nb-sel"></p>
+        </div>
+        <div class="nb-right">
+          <div class="panel view-panel">
+            <div class="vhead"><h2 id="nb-top-title"></h2><span class="info" id="nb-top-info">ⓘ</span></div>
+            <svg id="nb-top"></svg>
+          </div>
+          <div class="panel view-panel">
+            <div class="vhead"><h2 id="nb-bot-title"></h2><span class="info" id="nb-bot-info">ⓘ</span></div>
+            <svg id="nb-bot"></svg>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="distview" class="view" role="tabpanel" hidden>
+      <div class="panel map-controls">
+        <span class="ctl">State legislative districts drawn in
+          <span class="seg-btns" id="dist-cycle">
+            <button class="tool" data-cycle="2001" title="2001 redistricting (Arizona's first commission maps), used 2002–2010">2001</button><button class="tool" data-cycle="2011" title="2011 redistricting, used 2012–2020">2011</button><button class="tool" data-cycle="2021" aria-pressed="true" title="2021 redistricting, used 2022–">2021</button>
+          </span>
+        </span>
+        <span class="ctl">Colour by <span class="seg-btns" id="dist-race"></span></span>
+        <label class="ctl" title="Each block group's share for the Democratic mayoral candidate minus the previous election's (2019 vs 2011, 2023 vs 2019)"><input type="checkbox" id="dist-change" disabled> Change from previous election</label>
+        <span class="sub working-note">Descriptive only <span class="info" title="District lines are drawn by Arizona's Independent Redistricting Commission (2001 lines used 2002–2010, 2011 lines 2012–2020, 2021 lines from 2022); the Voting Rights Act can require majority-minority districts, so concentration is not evidence of intent. Mayoral elections: 2011 (City Clerk precinct canvasses joined to Census 2010 voting districts), 2019 (ArcGIS layer with results) and 2023 (City Clerk precinct canvass). 2015 is left out: the mayor ran unopposed. Precinct totals are split by area into block groups, so they are estimates; City contests only cover City precincts, and the City's boundary changed between elections. TEPI tiers are held fixed (the dashboard's ACS release) so that only the vote changes. Results describe places, not how any person or group voted.">ⓘ</span></span>
+      </div>
+      <div class="dist-grid">
+        <div class="panel view-panel">
+          <div class="vhead"><h2>Block groups and district lines</h2>
+            <span class="info" title="Block groups coloured by TEPI tier (recomputed for the dashboard's ACS release) or by a local contest's share for the reference choice. Thick lines: district boundaries of the selected redistricting (Census TIGERweb). Each block group is assigned to the district covering most of its area. Click a block group or a district bar to select its district. Pinch or Ctrl/⌘ + scroll to zoom, drag to pan.">ⓘ</span>
+            <button class="linkbtn" id="dmap-reset" style="margin-left:auto">Reset zoom</button></div>
+          <svg id="dmap"></svg>
+          <div id="dmap-legend" class="legend"></div>
+        </div>
+        <div class="dist-right">
+          <div class="panel view-panel">
+            <div class="vhead"><h2 id="dtrend-title">Mayoral vote by TEPI tier, 2011 → 2023</h2>
+              <span class="info" title="Share of the mayoral vote for the Democratic candidate (Rothschild in 2011, Romero in 2019 and 2023) among City block groups in each TEPI tier (tier from the dashboard's ACS release, held fixed). Votes summed over the tier's block groups. Grey dashed line: all City block groups. With a district selected, only its block groups count. Click an election to colour the map by it.">ⓘ</span></div>
+            <svg id="dtrend"></svg>
+          </div>
+          <div class="panel view-panel">
+            <div class="vhead"><h2>Each district: residents by TEPI tier, and the mayoral vote</h2>
+              <span class="info" title="Pima County part of each district: residents by the TEPI tier of their block group. 'Of county High': the district's share of all county residents in High-priority block groups. Last column: the selected mayoral election's share for the Democratic candidate among votes cast in the district's City precincts (or the change from the previous election). Click a district to select it; click again to clear.">ⓘ</span></div>
+            <svg id="dbars"></svg>
+          </div>
+          <div class="panel view-panel">
+            <div class="vhead"><h2 id="dlow-title">TEPI distribution in the selected district</h2>
+              <span class="info" title="The Pima County part of the clicked district: residents by the TEPI percentile of their block group (5-point bins); bar colour = tier. Dashed line: what an even spread across the county would look like.">ⓘ</span></div>
+            <svg id="dhist"></svg>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="ppview" class="view" role="tabpanel" hidden>
+      <div class="slide">
+        <h2 class="slide-h">Data preprocessing</h2>
+        <ul class="src-bullets">
+          <li><strong>Rebuild TEPI's 12 indicators</strong> from raw Census tables, with TEPI's own definitions
+            <ul><li>Found by testing alternatives: some divide household counts by total population; people of color excludes Hispanic white residents; no insurance counts the uninsured under 65 only</li><li>Check: 9 of 12 come from the 2019–23 release: 8 match TEPI exactly, poverty in 78% of block groups (r = 0.999)</li></ul>
+          </li>
+          <li><strong>Fill the 3 TEPI-only indicators</strong> (unemployment, children, seniors)
+            <ul><li>They match no ACS release (likely Esri estimates): TEPI's published values are used for every ACS release</li><li>1990 and 2000 use that census's own values</li></ul>
+          </li>
+          <li><strong>Remap releases older than 2016–20</strong> onto today's 2020 block groups
+            <ul><li>From 1990, 2000 and 2010 block groups by area: a spatial join of the old and new boundaries</li><li>Check: at the seam (2015–19 vs 2016–20) rates still correlate 0.80–0.90 across block groups</li></ul>
+          </li>
+          <li><strong>Handle what is missing or different</strong>
+            <ul><li>1990 and 2000 have no insurance or disability question: TEPI is recomputed without them</li><li>Income in 2024 dollars (CPI-U); margins of error carried through for the ACS</li></ul>
+          </li>
+          <li><strong>Recompute TEPI for all 14 releases</strong>
+            <ul><li>Percentile ranks, averaged up TEPI's tree, cut into 5 tiers</li><li>Check: the 2019–23 recompute matches the published TEPI (ρ = 1.00, 98.5% same tier)</li></ul>
+          </li>
+        </ul>
+        <p class="slide-lead">Output: one table, <code>tepi_timeseries.csv</code> (718 block groups × 14 releases), plus a network of neighbouring block groups for Moran's I.</p>
+      </div>
+    </section>
+    <section id="methodview" class="view" role="tabpanel" hidden>
+      <div class="slide">
+        <h2 class="slide-h">Methods</h2>
+        <ul class="src-bullets">
+          <li><strong>What-if scoring</strong> <span class="src-meta">What-if</span>
+            <ul><li>Re-scores a block group with TEPI's own formula after its inputs change</li><li>Change any of the 12 indicators and the reference release</li></ul>
+          </li>
+          <li><strong>Time curves · gap chart</strong> <span class="src-meta">T2 · Dashboard</span>
+            <ul><li>One point per release, placed by MDS so similar profiles sit close, joined in time order (Bach et al. 2016)</li><li>Change the groups, indicators, units, distance and time span</li></ul>
+          </li>
+          <li><strong>UMAP · t-SNE · PCA</strong> <span class="src-meta">T1, T5 · Dashboard, Privacy</span>
+            <ul><li>Places block groups with similar indicator profiles close together</li><li>Change the method, neighbours, minimum distance, perplexity and indicators</li></ul>
+          </li>
+          <li><strong>Moran's I</strong> <span class="src-meta">T3, T5 · Neighbours, Privacy</span>
+            <ul><li>Tests whether neighbouring block groups have similar values; the local version finds hot and cold spots (Anselin 1995)</li><li>Change the variable, significance level and release</li></ul>
+          </li>
+          <li><strong>District network</strong> <span class="src-meta">T4 · Redistricting</span>
+            <ul><li>Block groups as nodes, districts as Voronoi regions, animated over the 2001, 2011 and 2021 lines; who moved, by tier</li><li>Change the cycle, hover a bar to find its block groups</li></ul>
+          </li>
+          <li><strong>Differential privacy (Laplace)</strong> <span class="src-meta">T5 · Privacy</span>
+            <ul><li>Noise on every count, TEPI recomputed, Moran's I and PCA re-run</li><li>Change the privacy budget ε and the PCA inputs</li></ul>
+          </li><li>Change the district lines (2001, 2011, 2021) and the plan shown</li></ul>
+          </li>
+        </ul>
+        <p class="slide-lead">Neighbours = block groups sharing a boundary line (1,928 links). Selections (Groups A and B) are shared by every view on the Dashboard and Neighbours pages.</p>
+      </div>
+    </section>
+    <section id="encview" class="view" role="tabpanel" hidden>
+      <div class="slide">
+        <h2 class="slide-h">Marks and channels</h2>
+        <p class="slide-lead">One colour rule across the system: <strong>luminance</strong> (light → dark blue) is always TEPI tier; <strong>hue</strong> is always a category (group, class, district, indicator); <strong>dotted</strong> is always an interpolated release.</p>
+        <table class="method-table enc-table">
+          <thead><tr><th>Page</th><th>View</th><th>Marks</th><th>Channels</th></tr></thead>
+          <tbody>
+            <tr><td class="enc-page">1 · Dashboard</td><td><strong>Map</strong></td><td>Areas (block groups); pins</td><td>Luminance (5 blues) = TEPI tier · outline hue = Group A (orange) / B (black, dashed) · position = geography</td></tr>
+            <tr><td class="enc-page"></td><td><strong>Time curves</strong></td><td>Points (releases) + lines (time order)</td><td>Position = MDS of group profiles (distance = change) · luminance = time (light → dark) · hue = County / A / B · dotted = interpolated release</td></tr>
+            <tr><td class="enc-page"></td><td><strong>A − B gap</strong></td><td>Lines + points</td><td>x = release year · y = gap in points (A − B) · hue = indicator · dotted = interpolated release · 0 line = no gap</td></tr>
+            <tr><td class="enc-page"></td><td><strong>Similarity</strong></td><td>Points; bars (PCA loadings)</td><td>Position = UMAP / t-SNE / PCA (near = similar profile) · luminance = TEPI tier · outline = group · bar length = loading, hue = sign</td></tr>
+            <tr><td class="enc-page">2 · Neighbours</td><td><strong>Hot-spot map</strong></td><td>Areas, or nodes + links</td><td>Hue = local Moran class (red High–High, blue Low–Low, orange / light blue outliers, grey not significant) · node size = population</td></tr>
+            <tr><td class="enc-page"></td><td><strong>Moran scatterplot</strong></td><td>Points + regression line</td><td>x = block group (z) · y = neighbours' mean (z) · hue = class · slope = global Moran's I</td></tr>
+            <tr><td class="enc-page"></td><td><strong>Hot spots by decade</strong></td><td>Stacked bars</td><td>Length = number of block groups · hue = class · label = share of hot spots kept</td></tr>
+            <tr><td class="enc-page">3 · Redistricting</td><td><strong>District network</strong></td><td>Points + links + Voronoi areas (pieces)</td><td>Core vs margin: fill = times moved (grey, light / dark orange) · deltas: dashed line = old border · solid line = new border · area hue = new district · fill strength = piece moved / stayed · orange outline = selected piece · dot size = moved · dot luminance = TEPI tier</td></tr>
+            <tr><td class="enc-page"></td><td><strong>Who moved?</strong></td><td>Stacked bars</td><td>Length = share (moved, stayed) or count (per moved piece, old → new) · luminance = TEPI tier · highlighted row = selected piece</td></tr>
+            <tr><td class="enc-page">4 · Privacy</td><td><strong>Moran's I, neighbours kept</strong></td><td>Points (runs), tick, line</td><td>x = ε (ordinal) · y = statistic · tick = median · dashed = without noise</td></tr>
+            <tr><td class="enc-page"></td><td><strong>PCA under noise</strong></td><td>Points + rings</td><td>Position = noise-free PCA · luminance = TEPI tier · ring size = average move under noise</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section id="view1" class="view" role="tabpanel" hidden>
+      <div class="v1-grid">
+        <div class="panel">
+          <h2>How TEPI turns 12 census indicators into a priority tier</h2>
+          <p class="sub">Hover a box to trace what feeds into it and what it feeds. Line width = that input's share of the final average. Box values (P) are for the what-if block group below.</p>
+          <svg id="pipeline"></svg>
+        </div>
+        <div class="panel" id="whatif">
+          <div class="wi-head">
+            <div>
+              <h2>What-if: set a block group's indicator values</h2>
+              <p class="sub">Values are percentages of residents or households. Each one is ranked against the real block groups, exactly as TEPI does, and the diagram updates.</p>
+            </div>
+            <label class="wi-load">Start from
+              <select id="whatif-load"><option value="median">County median</option></select>
+            </label>
+            <label class="wi-load">Rank against
+              <select id="whatif-ref">
+                <option value="published" selected>TEPI as published (2019–23 ACS + Esri)</option>
+                <option value="2020">ACS 2016–20 release</option>
+                <option value="2021">ACS 2017–21 release</option>
+                <option value="2022">ACS 2018–22 release</option>
+                <option value="2023">ACS 2019–23 release</option>
+                <option value="2024">ACS 2020–24 release</option>
+              </select>
+            </label>
+          </div>
+          <p id="whatif-result" class="wi-result"></p>
+          <p id="whatif-published" class="sub"></p>
+          <div id="whatif-inputs"></div>
+        </div>
+        <aside class="panel" id="steps">
+          <h2>Construction steps</h2>
+          <ol>
+            <li data-step="0"><strong>Select indicators.</strong> 12 block-group percentages (Esri Business Analyst / ACS). Chosen from a review of existing vulnerability indices, limited to demographic variables, and revised by a community survey. Every one is read as "higher % = more vulnerable".</li>
+            <li data-step="0"><strong>Percentile-rank each indicator</strong> across all block groups:<br><code>P = (rank − 1) / (n − 1) × 100</code><br>Chosen to reduce outlier influence and keep rank, not magnitude. Ties share the lowest rank, so 0% gets P = 0.</li>
+            <li data-step="1"><strong>Sub-index</strong> = mean of its inputs' percentiles, then re-ranked. Five sub-indices; Age (children, seniors) is nested inside Physical.</li>
+            <li data-step="2"><strong>Theme</strong> = mean of its sub-index percentiles: Economic (3) and Personal (2), then re-ranked.</li>
+            <li data-step="3"><strong>TEPI</strong> = mean of the Economic and Personal percentiles, then re-ranked. The mean is compensatory: a high value on one input can offset a low one.</li>
+            <li data-step="4"><strong>Decision heuristic:</strong> the TEPI percentile is cut into quintiles, giving five tiers of about 143 block groups each. "High" priority = the top 20%.</li>
+          </ol>
+          <p class="note">Equal weights at each level do <em>not</em> give equal weights overall. Because the tree is uneven, low English proficiency and education each carry 12.5% of the final average, while children and seniors carry 4.2%.</p>
+        </aside>
+      </div>
+    </section>
+    <section id="view2" class="view" role="tabpanel" hidden>
+      <div class="v2-grid">
+        <div class="panel" id="ml-controls">
+          <div class="mlc-head">
+            <h2>Build the ML pipeline</h2>
+            <div class="mlc-presets">
+              <button class="btn" data-preset="novice">Novice default</button>
+              <button class="btn" data-preset="tepi">TEPI's choices</button>
+            </div>
+          </div>
+          <div class="mlc-grid">
+            <div class="mlc-group mlc-vars">
+              <h3>1. Variables <button class="linkbtn" id="ml-all">select all</button></h3>
+              <div id="ml-vars"></div>
+            </div>
+            <div class="mlc-group">
+              <h3>2. Missing values</h3>
+              <label><input type="radio" name="missing" value="median"> Fill with median</label>
+              <label><input type="radio" name="missing" value="drop"> Drop block group</label>
+            </div>
+            <div class="mlc-group">
+              <h3>3. Scaling</h3>
+              <select id="ml-scaling">
+                <option value="standard">StandardScaler (z-score)</option>
+                <option value="minmax">Min-max (0–1)</option>
+                <option value="log">log(1 + x), then z-score</option>
+                <option value="percentile">Percentile rank (TEPI)</option>
+              </select>
+            </div>
+            <div class="mlc-group">
+              <h3>4. k-means clusters: <span id="ml-k-out"></span></h3>
+              <input type="range" id="ml-k" min="2" max="6" step="1">
+            </div>
+          </div>
+          <p id="ml-msg" class="mlc-msg"></p>
+        </div>
+        <div class="panel">
+          <h2 id="scatter-title">ML clusters on the first two PCA components</h2>
+          <p class="sub" id="ml-sub"></p>
+          <div class="v2-controls">
+            <span>Color by</span>
+            <label><input type="radio" name="colorby" value="cluster" checked> ML cluster</label>
+            <label><input type="radio" name="colorby" value="tier"> TEPI tier</label>
+            <span class="hint">Drag to lasso-select (Shift to add) · click a point for details · click empty space to clear</span>
+          </div>
+          <svg id="scatter"></svg>
+          <div id="scatter-legend" class="legend"></div>
+        </div>
+        <div class="panel">
+          <h2>Expert tiers vs. ML clusters</h2>
+          <p class="sub" id="hm-sub">Block groups per combination. Click a cell, a row or a column to select it; Shift-click to add more.</p>
+          <svg id="heatmap"></svg>
+        </div>
+        <div class="panel detail" id="detail"></div>
+      </div>
+    </section>
+    <section id="dpview" class="view" role="tabpanel" hidden>
+      <div class="slide">
+        <h2 class="slide-h">Why differential privacy?</h2>
+        <ul class="src-bullets">
+          <li><strong>Published tables can be turned back into people</strong>
+            <ul><li>The Census Bureau rebuilt person records (block, sex, age, race, ethnicity) from 6.2 billion statistics in the 2010 Census tables</li><li>Exactly right for 46% of the population; linked to commercial data, about 52 million identities confirmed</li></ul>
+          </li>
+          <li><strong>The response: noise on purpose</strong>
+            <ul><li>Since the 2020 Census, every published count carries calibrated random noise (differential privacy, the TopDown algorithm)</li><li>The ACS does not use it today; the decennial census does</li></ul>
+          </li>
+          <li><strong>TEPI is exposed</strong>
+            <ul><li>Built from the smallest published geography, block groups</li><li>About small groups: the unemployed, households without a vehicle, often only 20–25 people in a block group</li></ul>
+          </li>
+          <li><strong>Our question:</strong> if TEPI's inputs were protected this way, would its answers survive?
+            <ul><li>Hot spots on the neighbour network (T3) and the similarity view (PCA, T1)</li></ul>
+          </li>
+        </ul>
+        <p class="src-meta muted">Source: M. Hawes, U.S. Census Bureau (2020), database reconstruction experiment on the 2010 Census.</p>
+      </div>
+    </section>
+    <section id="dpmechview" class="view" role="tabpanel" hidden>
+      <div class="slide">
+        <h2 class="slide-h">How differential privacy works</h2>
+        <div class="slide-cols dp-cols">
+          <ul class="src-bullets">
+            <li><strong>The guarantee</strong>
+              <ul><li>Any output is almost as likely with or without any one person:<br><span class="dp-eq">P[M(D) ∈ S] ≤ e<sup>ε</sup> · P[M(D′) ∈ S]</span></li><li>Smaller ε = stronger privacy = more noise; budgets add up over everything published</li></ul>
+            </li>
+            <li><strong>The Laplace mechanism</strong>
+              <ul><li>One person changes a count by at most 1</li><li>So add noise η ~ Laplace(0, 1/ε): typical size √2/ε people, whatever the count</li><li>Round back to whole counts, 0 ≤ numerator ≤ denominator</li></ul>
+            </li>
+            <li><strong>In our system</strong>
+              <ul><li>Noise on every numerator and denominator behind TEPI's 12 inputs (2019–23), TEPI recomputed, Moran's I and PCA re-run; 20 runs per ε</li><li>Per-count ε: far stricter than the Census, whose 2020 redistricting data split a total ε = 19.61 (17.14 persons + 2.47 housing units) over all tables and levels, with discrete Gaussian noise</li></ul>
+            </li>
+          </ul>
+          <div class="dp-chart">
+            <div class="dp-chart-head"><strong>The same noise, different counts</strong>
+              <span class="seg-btns" id="dp-eps"><button class="tool" data-eps="10" aria-pressed="false">ε = 10</button><button class="tool" data-eps="1" aria-pressed="true">ε = 1</button><button class="tool" data-eps="0.1" aria-pressed="false">ε = 0.1</button></span></div>
+            <svg id="dp-noise"></svg>
+            <p class="dp-note muted" id="dp-note"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="privview" class="view" role="tabpanel" hidden>
+      <div class="panel map-controls">
+        <label class="ctl">Privacy budget ε <input type="range" id="priv-eps" min="0" max="6" step="1" value="3"> <strong id="priv-eps-out"></strong></label>
+        <span class="ctl">PCA inputs
+          <span class="seg-btns" id="priv-feat"><button class="tool" data-feat="all" aria-pressed="true">TEPI's 12</button><button class="tool" data-feat="Economic" aria-pressed="false" title="TEPI's Economic domain: poverty, unemployment, both cost burdens, no insurance, no vehicle">Economic</button><button class="tool" data-feat="Personal" aria-pressed="false" title="TEPI's Personal (social) domain: low English, education, disability, people of color, children, seniors">Personal (social)</button></span>
+        </span>
+        <span class="sub working-note" id="priv-status"></span>
+        <span class="finding-btns"><button class="btn tour-btn finding-btn" data-tour="T5" title="Replay the analytical finding in this interface">▶ Finding T5 · privacy</button></span>
+        <span class="info" title="Each run adds Laplace noise of scale 1/ε to every count behind TEPI's 12 inputs for 2019–23 (numerators and denominators), rounds back to whole non-negative counts, recomputes TEPI with its own formula, and re-checks two results: global Moran's I on the neighbour network and the PCA projection. 20 runs per ε. ε here is per count, so it is stricter than the Census's total budget, which is split across many tables.">ⓘ</span>
+      </div>
+      <div class="priv3-grid">
+        <div class="panel view-panel priv3-wide">
+          <div class="vhead"><h2>PCA under noise: how far do block groups move at the chosen ε?</h2>
+            <span class="info" title="Dots: block groups in the noise-free PCA plot of the chosen inputs (TEPI's 12, Economic or Personal), coloured by TEPI tier. Orange ring: how far the block group moves on average under noise at the chosen ε.">ⓘ</span></div>
+          <svg id="priv-pca"></svg>
+          <div id="priv-pca-legend" class="legend"></div>
+        </div>
+        <div class="panel view-panel">
+          <div class="vhead"><h2>Is the clustering robust? Global Moran's I under noise</h2>
+            <span class="info" title="Each orange dot is one noisy run: noise on every count, TEPI recomputed, then global Moran's I of the TEPI percentile on the neighbour network. Black bar: the median at that ε; dashed line: the value without noise. The axis spans 0 (no spatial pattern) to 1. Click a column to choose that ε.">ⓘ</span></div>
+          <svg id="priv-moran"></svg>
+        </div>
+        <div class="panel view-panel">
+          <div class="vhead"><h2>Is the dimensionality reduction robust? PCA neighbours kept</h2>
+            <span class="info" title="For 150 sampled block groups: the share of their 10 nearest neighbours in the noise-free PCA plot that are still among their 10 nearest after noise (each run projected on the noise-free axes). 100% = the similarity structure is untouched.">ⓘ</span></div>
+          <svg id="priv-knn"></svg>
+        </div>
+      </div>
+    </section>
+    <section id="aiview" class="view" role="tabpanel" hidden>
+      <div class="slide">
+        <h2 class="slide-h">AI-assisted development</h2>
+        <p class="slide-lead">Claude Code wrote the code: 20 Python scripts and 17 D3 modules. I steered it: of my 199 messages over five days, 103 asked for a change; the rest said go ahead. Half of those changes (51) were about display or interaction.</p>
+        <div class="ai-split">
+          <div class="ai-col ai-chart">
+            <h3>My 103 change requests, by kind <span class="src-meta">a message can count twice</span></h3>
+            <div class="ai-bar"><span class="ai-bar-l">Display and visual design</span><span class="ai-bar-track"><span class="ai-bar-fill" style="width:100%"></span></span><span class="ai-bar-n">34</span><span class="ai-bar-note">which view, which encoding, what to cut</span></div>
+            <div class="ai-bar"><span class="ai-bar-l">Analysis direction, domain ideas</span><span class="ai-bar-track"><span class="ai-bar-fill" style="width:91%"></span></span><span class="ai-bar-n">31</span><span class="ai-bar-note">the questions and methods</span></div>
+            <div class="ai-bar"><span class="ai-bar-l">Scope and narrative</span><span class="ai-bar-track"><span class="ai-bar-fill" style="width:71%"></span></span><span class="ai-bar-n">24</span><span class="ai-bar-note">what to keep, drop, merge</span></div>
+            <div class="ai-bar"><span class="ai-bar-l">Interaction</span><span class="ai-bar-track"><span class="ai-bar-fill" style="width:59%"></span></span><span class="ai-bar-n">20</span><span class="ai-bar-note">selection, linking, replay, navigation</span></div>
+            <div class="ai-bar"><span class="ai-bar-l">Correcting AI errors or misreadings</span><span class="ai-bar-track"><span class="ai-bar-fill" style="width:44%"></span></span><span class="ai-bar-n">15</span><span class="ai-bar-note">wrong output or a misunderstood request</span></div>
+          </div>
+          <div class="ai-col">
+            <h3>What the AI brought</h3>
+            <ul>
+              <li>The data pipeline: Census API, 1990 and 2000 long form, remapping onto 2020 block groups</li>
+              <li>Reverse-engineering TEPI's definitions by scoring candidates; TEPI reproduced (ρ = 1.00)</li>
+              <li>Fast builds of methods I named: ReCom, ALARM, Laplace noise, Moran's I</li>
+              <li>Measures that make claims testable: geography check, neighbours kept, gap chart</li>
+            </ul>
+          </div>
+          <div class="ai-col ai-me">
+            <h3>What I brought</h3>
+            <ul>
+              <li>The questions: redistricting, differential privacy, polygons as a network, every DR method, core vs margin</li>
+              <li>The design: which view answers which question, encodings (no TEPI blues for districts, PCA first)</li>
+              <li>The interactions: shift-click, two groups, finding replays, slide sorter, clickable pieces</li>
+              <li>Interpretation: Voting Rights Act, the 2008 recession, overlapping releases</li>
+            </ul>
+          </div>
+        </div>
+        <p class="ai-lessons"><strong>Blind baseline.</strong> A fresh session given only the rubric and the CSV proposed a broad, textbook plan (hot spots, weight sliders, a random forest; 12 views, untested hypotheses) and none of the questions above. It did catch one point I had only noted: compare ACS releases that do not overlap.</p>
+      </div>
+    </section>
+    <section id="aireflectview" class="view" role="tabpanel" hidden>
+      <div class="slide">
+        <h2 class="slide-h">AI reflection: one view, six rounds</h2>
+        <div class="ai-example">
+          <span class="ai-ex-title">Example: the redistricting view</span>
+          <ol class="ai-flow ai-flow6">
+            <li><strong>Asked</strong>Legislative lines of 2001, 2011, 2021 over TEPI: who moved?</li>
+            <li><strong>Produced</strong>Maps coloured by TEPI; a force graph that collapsed into a ball</li>
+            <li><strong>Evaluated</strong>"Don't use TEPI colours"; "you don't get it: drag a node"</li>
+            <li><strong>Produced</strong>Voronoi districts over the network, with islands; bars I could not read</li>
+            <li><strong>Refined (mine)</strong>A redistricting is a delta: old × new lines make clickable pieces</li>
+            <li><strong>Refined (mine)</strong>All three plans: a stable core and the margins that move</li>
+          </ol>
+        </div>
+        <div class="ai-split2">
+          <div class="ai-col">
+            <h3>Mistakes I caught</h3>
+            <ul>
+              <li>Time curves built per block group, not per group (I read the paper)</li>
+              <li>A map slider running backwards; district shapes not aligned between years</li>
+              <li>A Moran's I axis zoomed so tight that noise looked large</li>
+              <li>District hues in TEPI blue; tooltips off the screen; a slow hot-spot page</li>
+              <li>Unverified facts: a privacy budget quoted from memory; Laplace called the Census's mechanism</li>
+            </ul>
+          </div>
+          <div class="ai-col">
+            <h3>How I checked</h3>
+            <ul>
+              <li>Every number against something independent: published TEPI, the official canvass, the seam between block-group vintages</li>
+              <li>Every view by using it on a question: if I could not read the answer, it was redone</li>
+              <li>Claims sourced or cut: the ε of 19.61 checked against the Census Bureau's release</li>
+            </ul>
+          </div>
+        </div>
+        <p class="ai-lessons"><strong>Lessons.</strong> The AI raised the floor, not the ceiling. It was fast and good at checking numbers, but it optimised what existed: it never proposed the questions, and its first visual design was usually cluttered or ambiguous. The design work, which view, which encoding, which interaction, stayed mine. What helped: naming the method or paper, asking it to prove claims against data, and a fresh agent for critique.</p>
+      </div>
+    </section>
+    <section id="redistview" class="view" role="tabpanel" hidden>
+      <div class="slide">
+        <h2 class="slide-h">Tucson has been redistricted</h2>
+        <p class="slide-lead">State legislative lines were redrawn after every census: 2001, 2011 and 2021. Bold: each redistricting's districts; dashed: the lines they replaced.</p>
+        <div class="ens3-maps" id="ens-maps"></div>
+        <div id="ens-legend" class="legend"></div>
+      </div>
+    </section>
+    <section id="ensview" class="view" role="tabpanel" hidden>
+      <div class="panel map-controls"><span class="sub">State legislative districts, 2001 · 2011 · 2021, over TEPI of each era</span><span class="finding-btns"><button class="btn tour-btn finding-btn" data-tour="T4" title="Replay the analytical finding in this interface">▶ Finding T4 · redistricting</button></span></div>
+      <div class="ens4">
+        <div class="panel view-panel" id="ens-net-panel">
+          <div class="vhead"><h2 id="ens-net-title">Districts as a network: who stays, who moves</h2>
+            <span class="info" title="Each redistricting is a delta between two layers: the old lines (dashed) and the new lines (solid). Their intersection cuts the county into pieces, block groups that share an old and a new district. Strongly filled pieces moved to another district (hue: new district, matched to the old one that shares the most residents); faint pieces stayed. Each dot is a block group, linked to its neighbours and placed by rank so the dense city opens up; moved block groups are coloured by their TEPI tier. Click a piece (or its bar) to select it.">ⓘ</span>
+            <span class="seg-btns" id="ens-net-cycle" style="margin-left:auto"></span></div>
+          <svg id="ens-net"></svg>
+          <div id="ens-net-legend" class="legend"></div>
+          <p class="ens-piece-note" id="ens-piece-note"></p>
+        </div>
+        <div class="panel view-panel">
+          <div class="vhead"><h2 id="ens-sm-title">Who moved?</h2>
+            <span class="info" title="Block groups whose district changed at this redistricting (moved), by TEPI tier of the time. Top: moved vs stayed, each as 100% by tier: do the moves fall on high or low priority areas? Below: the block groups moved into each new district. Hover a bar segment to find those block groups in the network; hover a dot to find its segment.">ⓘ</span></div>
+          <svg id="ens-sm"></svg>
+          <div class="legend" id="ens-sm-legend"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="sorter" class="sorter" hidden role="dialog" aria-label="All slides">
+    <div class="sorter-head"><h2>All slides</h2><span class="sub">Click to jump · G or Esc to close</span><button class="btn" id="sorter-close">✕</button></div>
+    <div id="sorter-body"></div>
+  </div>
+  <div id="tour-bar" class="tour-bar" hidden role="status" aria-live="polite">
+    <span class="tour-title" id="tour-title"></span>
+    <span class="tour-caption" id="tour-caption"></span>
+    <span class="tour-count" id="tour-count"></span>
+    <button class="btn" id="tour-pause" title="Pause / play">⏸</button>
+    <button class="btn page-next" id="tour-next" title="Next step (→)">Next →</button>
+    <button class="btn" id="tour-close" title="End (Esc)">✕</button>
+  </div>
+
+  <div id="tooltip" class="tooltip" hidden></div>
+
+  <script src="data/tepi_values.js?v=21"></script>
+  <script src="main.js?v=22"></script>
+  <script src="ml_engine.js?v=20"></script>
+  <script src="ml_view.js?v=20"></script>
+  <script src="data/map_data.js?v=14"></script>
+  <script src="data/tepi_years.js?v=3"></script>
+  <script src="map_view.js?v=37"></script>
+  <script src="timecurve_view.js?v=26"></script>
+  <!-- DruidJS (Cutura et al., 2020): t-SNE and UMAP for the similarity view -->
+  <script src="https://cdn.jsdelivr.net/npm/@saehrimnir/druidjs@0.7.3/dist/druid.min.js"></script>
+  <script src="dr_view.js?v=12"></script>
+  <script src="data/district_data.js?v=1"></script>
+  <script src="data/election_data.js?v=1"></script>
+  <script src="data/local_data.js?v=1"></script>
+  <script src="data/adjacency.js"></script>
+  <script src="network_view.js?v=9"></script>
+  <script src="moran_view.js?v=4"></script>
+  <script src="dp_slide.js?v=4"></script>
+  <script src="districts_view.js?v=16"></script>
+  <script src="data/boundary_change.js?v=1"></script>
+  <script src="prep_view.js?v=6"></script>
+  <script src="spatial_view.js?v=3"></script>
+  <script src="title_view.js?v=2"></script>
+  <script src="data/ensemble.js?v=3"></script>
+  <script src="data/wards.js?v=1"></script>
+  <script src="data/ens_layout.js?v=1"></script>
+  <script src="ensemble_view.js?v=32"></script>
+  <script src="privacy_view.js?v=7"></script>
+  <script src="tour.js?v=21"></script>
+  <script src="page_nav.js?v=7"></script>
+</body>
+</html>
