@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Website2024V2</title>
+    <title>CARDinality | Aditya Retnanto</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/hover.css">
     <link rel="stylesheet" href="assets/css/Projects-Grid-images.css">
@@ -23,23 +23,58 @@
         </div>
     </nav>
     <div class="container">
-        <h1><strong>CARDinality</strong> Interactive Card-shaped Robots with Locomotion and Haptics using Vibration</h1>
-        <p><strong><span style="color: rgb(38, 38, 38);">Aditya Retnanto</span></strong><span style="color: rgb(38, 38, 38);">*, Emilie Faracci*, Anup Sathya*, Yu-Kai (Kain) Hung, Ken Nakagaki</span></p>
+        <h1><strong>CARDinality</strong>: Interactive Card-shaped Robots with Locomotion and Haptics using Vibration</h1>
+        <p><strong>Aditya Retnanto</strong>*, Emilie Faracci*, Anup Sathya*, Yu-Kai (Kain) Hung, Ken Nakagaki<br>
+            <span class="fw-lighter">University of Chicago &amp; National Taiwan University · UIST '24, Pittsburgh, PA · *equal contribution</span></p>
+        <p><a href="https://dl.acm.org/doi/10.1145/3654777.3676421">ACM DL</a> · <a href="https://arxiv.org/abs/2409.05203">arXiv</a> · <a href="https://axlab.cs.uchicago.edu/projects/cardinality">AxLab project page</a></p>
     </div>
-    <div class="container"><img class="img-fluid" src="assets/img/cardinality_teaser.png"></div>
+    <div class="container"><img class="img-fluid" src="assets/img/cardinality_teaser.png" alt="CARDinality card-shaped robots"></div>
     <div class="container">
         <h3>About</h3>
-        <p><span style="color: rgb(var(--color_15)); background-color: transparent;">CARDinality a novel approach to interactive robots by leveraging the form-factor of cards to create thin robots equipped with vibrational capabilities for locomotion and haptic feedback. The system is composed of flat-shaped robots with on-device sensing and wireless control, which offer lightweight portability and scalability. This research introduces a hardware prototype to explore the possibility of ‘vibration-based omni-directional sliding locomotion'. Applications include augmented card playing, educational tools, and assistive technology, which showcase CARDinality's versatility in tangible interaction.&nbsp;</span><br><br><span style="color: rgb(38, 38, 38);">Contribution:</span>&nbsp;Fabrication of CARDinality including 3D Printing and Soldering, Locomotion Training, Sensing Pipeline and Algorithm, Bluetooth Networking, Experiment Design<br><br>Paper Link:&nbsp;https://dl.acm.org/doi/10.1145/3654777.3676421</p>
+        <p>CARDinality is a new approach to interactive robots that borrows the form factor of a playing card. Each robot is a thin, flat device that uses vibration both to slide across a surface in any direction and to give haptic feedback. With on-device sensing and wireless control, the robots are light, portable, and scalable, and they open up tangible interactions for card games, learning tools, and everyday objects.</p>
+        <p><strong>My contributions:</strong> fabrication (3D printing and soldering), locomotion training, the sensing pipeline and algorithms, Bluetooth networking, and experiment design.</p>
     </div>
     <div class="container">
-        <h3>Future Works</h3>
-        <p></p>
+        <h3>Hardware</h3>
+        <ul>
+            <li>A 0.3 mm semi-flexible PCB measuring 56 × 89 mm, close to a standard 63 × 89 mm playing card. The robot is 1.3 mm at its thinnest point and 4.7 mm at its thickest.</li>
+            <li>Four surface-mount eccentric rotating mass (ERM) vibration motors, each driven in both directions by two dual-channel motor drivers.</li>
+            <li>A Seeed Studio XIAO nRF52840 Sense for BLE, an onboard 6-axis IMU, and USB-C charging.</li>
+            <li>A 180 mAh LiPo battery that lasts about 35 minutes at full intensity and more than two days in standby.</li>
+        </ul>
     </div>
     <div class="container">
-        <h3>UIST Talk</h3><iframe allowfullscreen="" frameborder="0" width="560" height="315" src="https://www.youtube.com/embed/fr3uubmarkc?si=F2iRfsdXw_8IWLuz&amp;amp;controls=0"></iframe>
+        <h3>Vibration-based Omni-directional Locomotion</h3>
+        <p>Turning four motor intensities into a direction of travel is hard to model, so each robot learns its own motion patterns. In a camera-tracked "robot school" arena with ArUco markers, a grid search runs 625 motor-intensity combinations and measures the resulting motion. The best patterns cover 36 headings at 10° steps, plus clockwise and counter-clockwise rotation. All 76 patterns are stored in firmware, so a single 1-byte BLE command can trigger any of them.</p>
     </div>
     <div class="container">
-        <h3>Project Video</h3><iframe allowfullscreen="" frameborder="0" width="560" height="315" src="https://www.youtube.com/embed/6xlXmgwoFB4?si=caT1nPohnIzA5B3F"></iframe>
+        <h3>Sensing</h3>
+        <ul>
+            <li><strong>State:</strong> face-up or face-down on a table, or held in the hand, detected from accelerometer orientation.</li>
+            <li><strong>Gestures:</strong> taps and slides on the table, and shakes and flicks in the hand, classified with logistic regression.</li>
+            <li><strong>Surface texture:</strong> the robot vibrates one of its own motors and reads the response with its IMU through an FFT. It identifies the surface it is on with 74–95% accuracy across table, rubber, felt, and card-mat surfaces.</li>
+        </ul>
+        <p>A Flask-based control interface handles omni-directional driving, haptic presets, and camera-based closed-loop targeting. One laptop has run up to 10 robots at the same time.</p>
+    </div>
+    <div class="container">
+        <h3>Applications</h3>
+        <ul>
+            <li><strong>Augmented card games:</strong> monster duels in which cards buzz, move to stage collisions, and rotate to show who won, plus a haptic matching game.</li>
+            <li><strong>Actuated flashcards:</strong> vocabulary cards that prompt the learner and sort themselves into "known" and "review" zones.</li>
+            <li><strong>Everyday cards:</strong> a credit card that confirms payments through haptics and slides away during impulse purchases, and a key card that reports lock status and can slide under a door.</li>
+        </ul>
+    </div>
+    <div class="container">
+        <h3>Limitations &amp; Future Work</h3>
+        <p>Motion patterns depend on the individual device and the surface. A model transferred from one robot to another performs poorly, and sleeves or textured bases call for retraining. Next steps include onboard localization in place of the external camera, thinner replacements for the rigid components that cover about 22% of the board, and patterns that generalize across devices and surfaces.</p>
+    </div>
+    <div class="container">
+        <h3>UIST Talk</h3>
+        <div class="ratio ratio-16x9" style="max-width:560px"><iframe allowfullscreen src="https://www.youtube.com/embed/fr3uubmarkc"></iframe></div>
+    </div>
+    <div class="container">
+        <h3>Project Video</h3>
+        <div class="ratio ratio-16x9" style="max-width:560px"><iframe allowfullscreen src="https://www.youtube.com/embed/6xlXmgwoFB4"></iframe></div>
     </div>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
