@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <rect width="300" height="300" fill="#f7f4ec"/>
+  <g fill="none" stroke-linecap="round">
+    <path d="M40 210 H150" stroke="#d8c9a3" stroke-width="10"/>
+    <path d="M150 210 C200 210 240 180 245 140 C250 100 220 75 190 85" stroke="#d8c9a3" stroke-width="10"/>
+    <path d="M40 220 H150 C205 220 252 186 256 140" stroke="#b9a678" stroke-width="3"/>
+  </g>
+  <g fill="#7fb3d5" opacity="0.8">
+    <circle cx="80" cy="120" r="6"/><circle cx="110" cy="95" r="4"/><circle cx="135" cy="135" r="5"/>
+    <circle cx="65" cy="80" r="3.5"/><circle cx="160" cy="110" r="3"/>
+  </g>
+  <text x="150" y="268" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#6b5f45">humidity → curvature</text>
+</svg>

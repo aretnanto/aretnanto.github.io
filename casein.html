@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Casein Metamaterials | Aditya Retnanto</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/hover.css">
+    <link rel="stylesheet" href="assets/css/Projects-Grid-images.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md bg-body">
+        <div class="container-fluid"><a class="navbar-brand" href="index.html">aditya retnanto's portfolio</a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse fw-lighter" id="navcol-1">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link active" href="bio.html">biography</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="index.html">portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="prototypes.html">prototypes</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <h1><strong>Casein Metamaterials</strong>: Programmable Bio-Actuated Proteins for 4D Fabrication</h1>
+        <p><strong>Aditya Retnanto</strong><br>
+            <span class="fw-lighter">Individual final project · HTGAA (How to Grow Almost Anything) 2026 · Proposal</span></p>
+        <p><a href="https://pages.htgaa.org/2026a/aditya-retnanto/projects/individual-final-project/index.html">HTGAA project page</a></p>
+    </div>
+    <!-- Add a teaser image here, e.g. <div class="container"><img class="img-fluid" src="assets/img/casein.png" alt="..."></div> -->
+    <div class="container">
+        <h3>About</h3>
+        <p>Desktop fabrication relies mostly on PLA and ABS, which are static and slow to degrade. This project asks whether motion can be designed into the material itself, all the way down at the level of protein sequence. The idea is to program casein, the main protein in milk, so that thin films made from it <em>bend, twist, or bloom</em> in a designed way when humidity changes. The result would be biodegradable, shape-changing material for 4D fabrication.</p>
+    </div>
+    <div class="container">
+        <h3>Concept</h3>
+        <p>Shape-changing films usually work like a bilayer: one side swells with moisture while the other stays stiff, so the film curls. Here, both behaviors would be designed into a single protein:</p>
+        <ul>
+            <li><strong>Active side:</strong> casein already attracts water. Adding repeating motifs inspired by <em>resilin</em>, the elastic protein in insect wings, is meant to strengthen this response.</li>
+            <li><strong>Passive side:</strong> motifs inspired by <em>keratin</em>, the protein in hair and nails, add crosslinking points that are meant to stiffen the opposing region.</li>
+            <li>The mismatch in swelling between the two sides should turn a change in humidity into a designed curvature.</li>
+        </ul>
+    </div>
+    <div class="container">
+        <h3>Computational Design</h3>
+        <ul>
+            <li>Designed variants of β-casein, from the unmodified protein to a resilin + keratin chimera.</li>
+            <li>Ran hydrophobicity (Kyte-Doolittle) and water-binding analyses. These estimate about 36% more water binding for the resilin variant and about 48% more for the chimera, relative to native casein.</li>
+            <li>Predicted structures with ESMFold, and built a small "codon-jitter" tool that varies synonymous codons so repeated segments can be synthesized as DNA.</li>
+        </ul>
+    </div>
+    <div class="container">
+        <h3>Status &amp; Next Steps</h3>
+        <p>The project is currently a proposal backed by computational analysis. The predicted gains have not yet been confirmed by physical experiments. Next steps:</p>
+        <ul>
+            <li>Produce the designed proteins, cast films from them, and compare their humidity response with plain casein films.</li>
+            <li>Build a library of validated "actuation primitives" (bend, twist, bloom) that designers can combine.</li>
+            <li>Integrate these primitives with CAD tools, so that motion can be specified in the design environment the way geometry is today.</li>
+        </ul>
+        <p>The project connects my interests in fabrication and shape-changing interfaces with bio-based materials.</p>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
+
+</html>
