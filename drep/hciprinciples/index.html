@@ -325,6 +325,10 @@ ol.bul li::marker { font-weight: 700 }
 .room-list button { border: 0; background: none; color: var(--text-muted); cursor: pointer; font-size: 13px }
 @media (max-width: 800px) { .room-form { grid-template-columns: minmax(0,1fr) } }
 
+/* physical bar chart */
+#pins { width: 100%; height: auto; display: block; background: #f6f5f2; border-radius: 8px; touch-action: none; cursor: ns-resize }
+.pin-msg { min-height: 64px; margin-top: 10px; font-size: 16px; color: #0b0b0b; font-weight: 400; display: flex; flex-direction: column; gap: 8px; align-items: flex-start }
+
 /* demo: dashboard look */
 .dash-head { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 12px 16px }
 .dash-head h2 { margin-right: auto }
@@ -795,6 +799,91 @@ analogWrite(LED, v / 4); <span class="d">// </span><b id="ard-w">128</b></div>
   </div>
 </section>
 
+<section class="step" data-sec="debate" id="recap" hidden>
+  <p class="eyebrow">Recap before the debate</p>
+  <h2>Two schools so far</h2>
+  <div class="cols">
+    <div><h3 class="colh">Direct manipulation · Shneiderman 1983</h3>
+      <ul class="bul">
+        <li><strong>The idea:</strong> you do it yourself, by grabbing and moving things on screen.</li>
+        <li><strong>Principles:</strong> keep objects visible, act don’t type, small undoable steps.</li>
+        <li><strong>Strengths:</strong> easy to learn, predictable, you feel in control.</li>
+        <li><strong>Struggles:</strong> scale, repetition, things you can’t see, and you do every step.</li>
+        <li><strong>In our demos:</strong> lasso and sliders on the TEPI map.</li>
+      </ul></div>
+    <div><h3 class="colh">Interface agents · Maes 1994</h3>
+      <ul class="bul">
+        <li><strong>The idea:</strong> software does the task for you, like an assistant.</li>
+        <li><strong>How:</strong> it learns by watching you, and acts once it is confident enough.</li>
+        <li><strong>Strengths:</strong> handles overload and repetitive work.</li>
+        <li><strong>Struggles:</strong> slow start, new situations, silent mistakes, hidden choices.</li>
+        <li><strong>In our demos:</strong> the email agent and the TEPI agent.</li>
+      </ul></div>
+  </div>
+  <p class="plain">In 1997 the two authors met on stage to argue it out. Which one should we build?</p>
+</section>
+
+<section class="step" data-sec="debate" id="debate" hidden>
+  <p class="eyebrow">IUI ’97 and CHI ’97</p>
+  <h2>The debate: Shneiderman vs. Maes</h2>
+  <div class="cols">
+    <div><h3 class="colh">Shneiderman: keep people in charge</h3>
+      <ul class="bul">
+        <li><strong>Control.</strong> People want to feel they did it, not that something did it for them.</li>
+        <li><strong>Predictability.</strong> An agent that changes as it learns is hard to anticipate.</li>
+        <li><strong>Responsibility.</strong> When an agent errs, who is accountable?</li>
+        <li><strong>Fake people fail.</strong> Talking, human-like interfaces such as Microsoft Bob flopped.</li>
+      </ul></div>
+    <div><h3 class="colh">Maes: people need help</h3>
+      <ul class="bul">
+        <li><strong>Overload.</strong> There is too much information to handle by hand.</li>
+        <li><strong>Not a replacement.</strong> Agents sit beside direct manipulation; you can still do it yourself.</li>
+        <li><strong>Not a person.</strong> An agent doesn’t need a face or a human personality.</li>
+        <li><strong>Trust is earned.</strong> It learns from you, explains itself, and you set how much it may do.</li>
+      </ul></div>
+  </div>
+  <p class="cite">Shneiderman, B. &amp; Maes, P. (1997). Direct manipulation vs. interface agents. <i>Interactions</i> 4(6).</p>
+</section>
+
+<section class="step" data-sec="debate" id="debate-table" hidden>
+  <p class="eyebrow">Side by side</p>
+  <h2>Where they really disagree</h2>
+  <div class="tablewrap"><table class="today">
+    <thead><tr><th>Question</th><th>Shneiderman</th><th>Maes</th></tr></thead>
+    <tbody>
+      <tr><td>Who acts?</td><td>You, through visible controls.</td><td>You, or the agent when you allow it.</td></tr>
+      <tr><td>What makes it trustworthy?</td><td>Being predictable and easy to understand.</td><td>A track record you can watch and correct.</td></tr>
+      <tr><td>What about scale?</td><td>Better visualizations of the data.</td><td>Delegate the repetitive parts.</td></tr>
+      <tr><td>Who is responsible?</td><td>The user, clearly.</td><td>The user, who set the thresholds.</td></tr>
+      <tr><td>Should it look human?</td><td>No.</td><td>Not necessarily.</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="bul bul2" style="margin-top:8px">
+    <li><strong>They agree</strong> that users must stay in control.</li>
+    <li><strong>They disagree</strong> on whether handing work over can keep you in control.</li>
+  </ul>
+</section>
+
+<section class="step" data-sec="debate" id="stand" hidden>
+  <p class="eyebrow">Your turn</p>
+  <h2>Where do you stand?</h2>
+  <p class="lede">For each task, slide toward doing it yourself or handing it to an agent.</p>
+  <div class="stand" id="stand-list"></div>
+  <p class="ex-sub" id="stand-sum"></p>
+</section>
+
+<section class="step" data-sec="debate" id="debate-q" hidden>
+  <p class="eyebrow">Discussion</p>
+  <h2>Your project and the debate</h2>
+  <ol class="qs">
+    <li><div><b>In your project, what does the person do directly, and what does the system do for them?</b><span>Draw the line between the two.</span></div></li>
+    <li><div><b>If you handed one step of your project to an agent, which step would it be?</b><span>What would it get wrong first?</span></div></li>
+    <li><div><b>Would your users rather feel in control, or have the work taken off their hands?</b><span>Shneiderman or Maes. How do you know?</span></div></li>
+    <li><div><b>Does your project need to be predictable, or can it adapt as it learns?</b><span>What breaks if it changes behaviour?</span></div></li>
+    <li><div><b>When your system gets something wrong, who is responsible?</b><span>The user, you as the designer, or the system?</span></div></li>
+  </ol>
+</section>
+
 <section class="step" data-sec="mixed" id="mi" hidden>
   <p class="eyebrow">Horvitz · 1999 · today’s reading</p>
   <h2>Stop choosing sides</h2>
@@ -952,8 +1041,29 @@ analogWrite(LED, v / 4); <span class="d">// </span><b id="ard-w">128</b></div>
     <li><strong>“Allow this action?”</strong> AI agents that pause and ask before doing something risky.</li>
     <li><strong>Clarifying questions.</strong> A chatbot that asks what you meant before answering.</li>
     <li><strong>Driver assistance.</strong> The car keeps its lane, and hands control back to you when unsure.</li>
-    <li><strong>Clippy, the counter-example.</strong> Interrupted at the wrong time with unwanted help.</li>
+    <li><strong>Clippy, the counter-example.</strong> Interrupted at the wrong time with unwanted help. <a href="https://en.wikipedia.org/wiki/Office_Assistant" target="_blank" rel="noopener">See what it looked like ↗</a></li>
   </ul>
+</section>
+
+<section class="step" data-sec="mixed" id="rebuild" hidden>
+  <p class="eyebrow">Today</p>
+  <h2>AI is rebuilding these paradigms from scratch</h2>
+  <div class="cols">
+    <div><h3 class="colh">Three moves</h3>
+      <ol class="bul">
+        <li><strong>The command line came back.</strong> ChatGPT (2022) and assistants like Claude: you type a request in plain English instead of code, and it prints text back.</li>
+        <li><strong>With an agent inside.</strong> Plain English is ambiguous, so the system has to guess what you meant. That guessing is Maes’s agent.</li>
+        <li><strong>Agents learned direct manipulation.</strong> AI agents now click buttons and fill forms in apps built for people.</li>
+        <li><strong>Direct manipulation is being rebuilt around AI.</strong> Accept a suggestion with Tab, edit the document it wrote, undo one step.</li>
+      </ol></div>
+    <div><h3 class="colh">The question</h3>
+      <ul class="bul">
+        <li><strong>Is the future pure Maes, or mixed initiative?</strong></li>
+        <li><strong>Mixed initiative assumes direct manipulation won.</strong> Agents are relearning how to let you grab things.</li>
+        <li><strong>Who decides where each task sits,</strong> and who controls what you see?</li>
+      </ul>
+      <p class="cite" style="margin-top:16px">This page was built by talking to one of these assistants, in a chat window.</p></div>
+  </div>
 </section>
 
 <section class="step" data-sec="mixed" id="vis2026" hidden>
@@ -982,6 +1092,7 @@ analogWrite(LED, v / 4); <span class="d">// </span><b id="ard-w">128</b></div>
     <li><div><b>Did the tools you built with carry one of these ideas into your project?</b><span>A charting library’s brushing, an AI coding assistant, an autocomplete.</span></div></li>
     <li><div><b>How has AI changed how you built your project, or how people will use it?</b><span>More delegation, less, or a new kind of mix?</span></div></li>
     <li><div><b>Does your project help people act on data, or help a system act on people?</b><span>Zhu-Tian Chen’s question from VIS 2026.</span></div></li>
+    <li><div><b>What part of your project should live on a flat screen, and what should come into the real world?</b><span>What would a physical version make easier, and what harder?</span></div></li>
   </ol>
 </section>
 
@@ -1000,64 +1111,7 @@ analogWrite(LED, v / 4); <span class="d">// </span><b id="ard-w">128</b></div>
   <p class="cite">Nothing is saved: this list clears when the page is reloaded.</p>
 </section>
 
-<section class="step" data-sec="debate" id="debate" hidden>
-  <p class="eyebrow">Appendix · IUI ’97 and CHI ’97</p>
-  <h2>The debate: Shneiderman vs. Maes</h2>
-  <div class="cols">
-    <div><h3 class="colh">Shneiderman: keep people in charge</h3>
-      <ul class="bul">
-        <li><strong>Control.</strong> People want to feel they did it, not that something did it for them.</li>
-        <li><strong>Predictability.</strong> An agent that changes as it learns is hard to anticipate.</li>
-        <li><strong>Responsibility.</strong> When an agent errs, who is accountable?</li>
-        <li><strong>Fake people fail.</strong> Talking, human-like interfaces such as Microsoft Bob flopped.</li>
-      </ul></div>
-    <div><h3 class="colh">Maes: people need help</h3>
-      <ul class="bul">
-        <li><strong>Overload.</strong> There is too much information to handle by hand.</li>
-        <li><strong>Not a replacement.</strong> Agents sit beside direct manipulation; you can still do it yourself.</li>
-        <li><strong>Not a person.</strong> An agent doesn’t need a face or a human personality.</li>
-        <li><strong>Trust is earned.</strong> It learns from you, explains itself, and you set how much it may do.</li>
-      </ul></div>
-  </div>
-  <p class="cite">Shneiderman, B. &amp; Maes, P. (1997). Direct manipulation vs. interface agents. <i>Interactions</i> 4(6).</p>
-</section>
-<section class="step" data-sec="debate" id="debate-table" hidden>
-  <p class="eyebrow">Appendix · Side by side</p>
-  <h2>Where they really disagree</h2>
-  <div class="tablewrap"><table class="today">
-    <thead><tr><th>Question</th><th>Shneiderman</th><th>Maes</th></tr></thead>
-    <tbody>
-      <tr><td>Who acts?</td><td>You, through visible controls.</td><td>You, or the agent when you allow it.</td></tr>
-      <tr><td>What makes it trustworthy?</td><td>Being predictable and easy to understand.</td><td>A track record you can watch and correct.</td></tr>
-      <tr><td>What about scale?</td><td>Better visualizations of the data.</td><td>Delegate the repetitive parts.</td></tr>
-      <tr><td>Who is responsible?</td><td>The user, clearly.</td><td>The user, who set the thresholds.</td></tr>
-      <tr><td>Should it look human?</td><td>No.</td><td>Not necessarily.</td></tr>
-    </tbody>
-  </table></div>
-  <ul class="bul bul2" style="margin-top:8px">
-    <li><strong>They agree</strong> that users must stay in control.</li>
-    <li><strong>They disagree</strong> on whether handing work over can keep you in control.</li>
-  </ul>
-</section>
-<section class="step" data-sec="debate" id="stand" hidden>
-  <p class="eyebrow">Appendix · Your turn</p>
-  <h2>Where do you stand?</h2>
-  <p class="lede">For each task, slide toward doing it yourself or handing it to an agent.</p>
-  <div class="stand" id="stand-list"></div>
-  <p class="ex-sub" id="stand-sum"></p>
-</section>
-<section class="step" data-sec="debate" id="debate-q" hidden>
-  <p class="eyebrow">Appendix · Discussion</p>
-  <h2>Your project and the debate</h2>
-  <ol class="qs">
-    <li><div><b>In your project, what does the person do directly, and what does the system do for them?</b><span>Draw the line between the two.</span></div></li>
-    <li><div><b>If you handed one step of your project to an agent, which step would it be?</b><span>What would it get wrong first?</span></div></li>
-    <li><div><b>Would your users rather feel in control, or have the work taken off their hands?</b><span>Shneiderman or Maes. How do you know?</span></div></li>
-    <li><div><b>Does your project need to be predictable, or can it adapt as it learns?</b><span>What breaks if it changes behaviour?</span></div></li>
-    <li><div><b>When your system gets something wrong, who is responsible?</b><span>The user, you as the designer, or the system?</span></div></li>
-  </ol>
-</section>
-<section class="step" data-sec="debate" id="mi-q-more" hidden>
+<section class="step" data-sec="appendix" id="mi-q-more" hidden>
   <p class="eyebrow">Appendix · Discussion</p>
   <h2>More questions on mixed initiative</h2>
   <ol class="qs">
@@ -1081,8 +1135,9 @@ const SECTIONS = [
   { id: "intro", name: "Introduction" },
   { id: "dm", name: "Direct manipulation", c: "var(--sel)" },
   { id: "agents", name: "Interface agents" },
+  { id: "debate", name: "The debate" },
   { id: "mixed", name: "Mixed initiative" },
-  { id: "debate", name: "Appendix: the debate" },
+  { id: "appendix", name: "Appendix" },
 ];
 const steps = [...document.querySelectorAll(".step")];
 let cur = 0, ready = false;
