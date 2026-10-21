@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Haptic Network Prototypes</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Two patterned heatmaps (friction and roughness), a lasso tool and six more browser prototypes that use pseudo-haptics to make node-link diagrams feel sticky, hilly, heavy, springy, rough or magnetic, plus a canvas for drawing textured communities. Aditya Retnanto.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=DM+Sans:wght@300;400;500;600;700&display=swap">
+<style>
+/* Same look as drep/hciprinciples demo pages: header with tabs, dashboard greys, Previous / k of N / Next footer. */
+:root {
+  color-scheme: light;
+  --bg: #f9f9f7; --surface: #fcfcfb; --text: #0b0b0b; --text-muted: #52514e; --border: #e1e0d9; --accent: #0b0b0b;
+  --navy: #000fa1; --sel: #e8710a; --sel-ink: #b85a07;
+  --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+html, body { background: var(--bg); margin: 0 }
+body { color: var(--text); font-family: var(--sans); font-size: 16px; line-height: 1.5 }
+h1, h2, h3 { margin: 0; font-weight: 700; text-wrap: balance }
+p { margin: 0 }
+a { color: inherit }
+button, input { font: inherit; color: inherit }
+:focus-visible { outline: 2px solid var(--sel); outline-offset: 2px }
+
+header.bar { position: sticky; top: 0; z-index: 5; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 20px }
+.bar-in { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; flex-wrap: wrap }
+.bar h1 { font-size: 18px }
+.bar h1 a { text-decoration: none }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap }
+.tab { font-size: 14px; padding: 6px 14px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text-muted); cursor: pointer }
+.tab[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: #fff }
+
+main { padding: 20px; max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; min-height: calc(100vh - 70px) }
+.dash-head { display: flex; align-items: center; gap: 8px 20px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px }
+.dash-head h2 { font-size: 22px; margin-right: auto }
+.mock { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--text-muted); border: 1px dashed var(--text-muted); border-radius: 4px; padding: 2px 8px }
+.task { font-size: 15px; flex-basis: 100% }
+.task b { color: var(--sel-ink) }
+
+.demo { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start }
+.view { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0 }
+.view h3 { font-size: 15px; display: flex; justify-content: space-between; gap: 8px; align-items: baseline }
+.view h3 span { font-weight: 400; color: var(--text-muted); font-size: 13px }
+#ph { width: 100%; height: auto; display: block; border-radius: 6px; cursor: pointer; touch-action: none; border: 1px solid var(--border) }
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0 }
+.row { display: flex; gap: 6px; flex-wrap: wrap }
+.sbtn { font-size: 13px; padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text-muted); cursor: pointer }
+.sbtn:hover { background: #f0efec }
+.sbtn[aria-pressed="true"] { background: #0b0b0b; border-color: #0b0b0b; color: #fff }
+.ctrl { display: flex; flex-direction: column; gap: 2px; font-size: 13px }
+.ctrl label { display: flex; justify-content: space-between; gap: 8px; color: var(--text-muted) }
+.ctrl output { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums }
+.ctrl input { width: 100%; accent-color: #52514e }
+.ctrl select { font-size: 13px; padding: 5px 6px; border: 1px solid var(--border); border-radius: 6px; background: #ffffff; color: var(--text) }
+.readout { font-size: 14px; color: var(--text-muted); display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; font-variant-numeric: tabular-nums }
+.readout b { color: var(--text); font-weight: 600 }
+.how { font-size: 14px }
+.sub { font-size: 12px; color: var(--text-muted); margin-bottom: -4px }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -2px; margin-right: 6px; border: 1px solid rgba(0,0,0,.2) }
+.cite { font-size: 12px; color: var(--text-muted) }
+
+.spacer { flex: 1 }
+.page-nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid var(--border) }
+.btn { font-size: 14px; padding: 8px 16px; border: 1px solid #0b0b0b; background: var(--surface); border-radius: 6px; cursor: pointer }
+.btn:hover { background: #f0efec }
+.btn.next { background: #0b0b0b; color: #fff }
+.btn.next:hover { background: #2b2b2b }
+.btn:disabled { visibility: hidden }
+.page-count { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums }
+
+@media (max-width: 1000px) { .demo { grid-template-columns: minmax(0,1fr) } }
+@media (max-width: 700px) { main { padding: 12px 16px } }
+</style>
+</head>
+<body>
+
+<header class="bar"><div class="bar-in">
+  <h1><a href="../../prototypes.html">Haptic network prototypes</a></h1>
+  <nav class="tabs" id="tabs" aria-label="Prototypes"></nav>
+</div></header>
+
+<main>
+  <div class="dash-head">
+    <h2 id="p-title"></h2>
+    <span class="mock" id="p-sub"></span>
+    <p class="task" id="p-task"></p>
+  </div>
+
+  <div class="demo">
+    <div class="view">
+      <h3>Network <span id="status">Click the chart to lock the pointer</span></h3>
+      <canvas id="ph" width="1280" height="680" aria-label="Prototype canvas. Click to lock the pointer."></canvas>
+    </div>
+    <div class="side">
+      <div class="view">
+        <h3>Illusion</h3>
+        <div class="row">
+          <button class="sbtn" id="c-on" aria-pressed="true">Illusion on</button>
+          <button class="sbtn" id="c-hide" aria-pressed="false">Hide visuals</button>
+          <button class="sbtn" id="c-cursor" aria-pressed="false">Hide cursor</button>
+          <button class="sbtn" id="c-ghost" aria-pressed="false">Show real pointer</button>
+          <button class="sbtn" id="c-new">New data</button>
+        </div>
+        <p class="cite" id="cursor-note" hidden>Cursor hidden. The mouse itself never changes, so if the effect is a visual illusion it should disappear now. The readout is hidden too, so it can’t give the answer away.</p>
+      </div>
+      <div class="view">
+        <h3>Parameters</h3>
+        <div id="params" style="display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+      <div class="view">
+        <h3>Under the cursor</h3>
+        <div class="readout" id="readout"></div>
+      </div>
+      <div class="view">
+        <h3>How it works</h3>
+        <p class="how" id="p-how"></p>
+        <p class="cite" id="p-cite"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+  <nav class="page-nav"><button class="btn" id="prev">← Previous</button><span class="page-count" id="count"></span><button class="btn next" id="next">Next →</button></nav>
+</main>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const cv = $("ph"), ctx = cv.getContext("2d");
+const LW = 640, LH = 340, PT = 24, PLOT = 272, BASE = PT + PLOT;
+ctx.scale(cv.width / LW, cv.height / LH);
+const NAVY = "#000fa1", GREY = "#e1e0d9", MUTED = "#52514e";
+const R = (a, b) => Math.round(a + Math.random() * (b - a));
+// The cursor can never leave the chart area: every position is clamped to the current prototype's bounds.
+const AREA = { x0: 34, x1: LW - 34, y0: PT, y1: BASE };
+const B = () => (cur && cur.bounds) || AREA;
+const cx = v => Math.max(B().x0, Math.min(B().x1, v)), cy = v => Math.max(B().y0, Math.min(B().y1, v));
+
+// shared state: S.x/S.y is the drawn cursor; S.rx/S.ry is where the hand "really" is (raw movement, no illusion)
+const S = { x: LW / 2, y: LH / 2, rx: LW / 2, ry: LH / 2, jx: 0, jy: 0, locked: false, on: true, hide: false, ghost: false, nocursor: false };
+const g1 = (k, v) => S.on ? 1 - k * v / 100 : 1;   // gain that drops with the value
+function axis() { ctx.strokeStyle = MUTED; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(16, BASE + .5); ctx.lineTo(LW - 16, BASE + .5); ctx.stroke(); }
+function label(t, x, y = BASE + 22, col = MUTED) { ctx.fillStyle = col; ctx.font = "600 14px 'DM Sans', sans-serif"; ctx.textAlign = "center"; ctx.fillText(t, x, y); }
+function hiddenRect(x, y, w, h) {
+  ctx.fillStyle = "#f0efec"; ctx.fillRect(x, y, w, h);
+  ctx.setLineDash([4, 4]); ctx.strokeStyle = "#c3c2b7"; ctx.lineWidth = 1; ctx.strokeRect(x + .5, y + .5, w - 1, h - 1); ctx.setLineDash([]);
+}
+const K = (v = 0.8) => ({ key: "k", label: "Strength", min: 0, max: 0.95, step: 0.05, value: v });
+
+// ---------- texture helpers for the Draw prototype ----------
+const TEX = {
+  sticky:   { name: "Sticky",   col: "#e8710a", feel: "slows the cursor" },
+  slippery: { name: "Slippery", col: "#5a9bd5", feel: "speeds it up" },
+  ridged:   { name: "Ridged",   col: "#000fa1", feel: "slow–fast stripes" },
+  rough:    { name: "Rough",    col: "#52514e", feel: "shakes it" },
+  magnetic: { name: "Magnetic", col: "#7a3fb0", feel: "pulls to the centre" },
+};
+function blob(x, y, r, tex) {
+  const f1 = Math.random() * 6, f2 = Math.random() * 6, pts = [];
+  for (let i = 0; i < 40; i++) { const a = i / 40 * Math.PI * 2, rr = r * (1 + .18 * Math.sin(3 * a + f1) + .1 * Math.sin(5 * a + f2)); pts.push([x + rr * Math.cos(a), y + rr * Math.sin(a) * .8]); }
+  return makeShape(pts, tex);
+}
+function makeShape(pts, tex) {
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  const sh = { pts, tex, x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys),
+    cx: xs.reduce((a, b) => a + b, 0) / xs.length, cy: ys.reduce((a, b) => a + b, 0) / ys.length, dots: [] };
+  const n = Math.round((sh.x1 - sh.x0) * (sh.y1 - sh.y0) / 30);
+  for (let i = 0; i < n; i++) sh.dots.push([sh.x0 + Math.random() * (sh.x1 - sh.x0), sh.y0 + Math.random() * (sh.y1 - sh.y0), Math.random() < .5 ? 1 : 2]);
+  return sh;
+}
+function inside(sh, x, y) {
+  if (x < sh.x0 || x > sh.x1 || y < sh.y0 || y > sh.y1) return false;
+  let c = false;
+  for (let i = 0, j = sh.pts.length - 1; i < sh.pts.length; j = i++) {
+    const [xi, yi] = sh.pts[i], [xj, yj] = sh.pts[j];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c;
+  }
+  return c;
+}
+function paintShape(sh, period) {
+  ctx.save(); ctx.beginPath(); sh.pts.forEach((p, i) => ctx[i ? "lineTo" : "moveTo"](p[0], p[1])); ctx.closePath();
+  const t = TEX[sh.tex];
+  if (S.hide) { ctx.fillStyle = "#f0efec"; ctx.fill(); ctx.setLineDash([4, 4]); ctx.strokeStyle = "#c3c2b7"; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore(); return; }
+  ctx.fillStyle = "#ffffff"; ctx.fill(); ctx.strokeStyle = t.col; ctx.lineWidth = 2; ctx.stroke(); ctx.clip();
+  const { x0, x1, y0, y1 } = sh;
+  if (sh.tex === "sticky") {          // honey: warm fill and dense drops
+    ctx.fillStyle = "rgba(232,113,10,.22)"; ctx.fillRect(x0, y0, x1 - x0, y1 - y0); ctx.fillStyle = "rgba(184,90,7,.7)";
+    for (let y = y0; y < y1; y += 8) for (let x = x0 + ((y / 8) % 2) * 4; x < x1; x += 8) { ctx.beginPath(); ctx.arc(x, y, 1.8, 0, 7); ctx.fill(); }
+  } else if (sh.tex === "slippery") { // ice: pale fill, sparse diagonal glints
+    ctx.fillStyle = "rgba(90,155,213,.14)"; ctx.fillRect(x0, y0, x1 - x0, y1 - y0); ctx.strokeStyle = "rgba(90,155,213,.7)"; ctx.lineWidth = 1.5;
+    for (let d = x0 - (y1 - y0); d < x1; d += 22) { ctx.beginPath(); ctx.moveTo(d, y1); ctx.lineTo(d + (y1 - y0), y0); ctx.stroke(); }
+  } else if (sh.tex === "ridged") {   // stripes at exactly the felt period
+    ctx.fillStyle = "rgba(0,15,161,.75)";
+    for (let x = Math.floor(x0 / period) * period; x < x1; x += period) ctx.fillRect(x, y0, period / 2, y1 - y0);
+  } else if (sh.tex === "rough") {    // grit
+    ctx.fillStyle = "rgba(82,81,78,.12)"; ctx.fillRect(x0, y0, x1 - x0, y1 - y0); ctx.fillStyle = "#3a3936";
+    sh.dots.forEach(d => ctx.fillRect(d[0], d[1], d[2], d[2]));
+  } else if (sh.tex === "magnetic") { // field rings around the centre
+    ctx.strokeStyle = "rgba(122,63,176,.55)"; ctx.lineWidth = 1.5;
+    for (let r = 6; r < Math.max(x1 - x0, y1 - y0); r += 10) { ctx.beginPath(); ctx.arc(sh.cx, sh.cy, r, 0, 7); ctx.stroke(); }
+    ctx.fillStyle = "#7a3fb0"; ctx.beginPath(); ctx.arc(sh.cx, sh.cy, 3, 0, 7); ctx.fill();
+  }
+  ctx.restore();
+}
+
+// ---------- shared network helpers ----------
+function makeGraph(n) {
+  const nodes = []; let tries = 0; const gap = n > 16 ? 55 : n > 11 ? 66 : 80;
+  while (nodes.length < n && tries++ < 8000) {
+    const q = { x: R(70, 570), y: R(PT + 26, BASE - 26) };
+    if (nodes.every(o => Math.hypot(o.x - q.x, o.y - q.y) > gap)) nodes.push(q);
+  }
+  nodes.forEach((q, i) => { q.id = String.fromCharCode(65 + i); q.v = R(5, 95); });
+  const seen = new Set(), edges = [];
+  nodes.forEach((q, i) => nodes.map((o, j) => [j, Math.hypot(o.x - q.x, o.y - q.y)]).filter(([j]) => j !== i).sort((a, b) => a[1] - b[1]).slice(0, 2)
+    .forEach(([j]) => { const k = Math.min(i, j) + "-" + Math.max(i, j); if (!seen.has(k)) { seen.add(k); edges.push({ a: i, b: j, u: R(0, 100), w: R(5, 95), seed: Math.random() * 1000, bend: 0 }); } }));
+  return { nodes, edges };
+}
+function segInfo(g, e, x, y) {
+  const A = g.nodes[e.a], Bn = g.nodes[e.b], vx = Bn.x - A.x, vy = Bn.y - A.y, L2 = vx * vx + vy * vy, L = Math.sqrt(L2);
+  const t = Math.max(0, Math.min(1, ((x - A.x) * vx + (y - A.y) * vy) / L2)), px = A.x + t * vx, py = A.y + t * vy;
+  return { e, t, px, py, d: Math.hypot(x - px, y - py), nx: -vy / L, ny: vx / L };
+}
+function nearestEdge(g, x, y, reach) { let best = null; g.edges.forEach(e => { const s = segInfo(g, e, x, y); if (s.d < reach && (!best || s.d < best.d)) best = s; }); return best; }
+function nearestNode(g, x, y, reach) { let best = null, bd = reach; g.nodes.forEach(q => { const d = Math.hypot(q.x - x, q.y - y); if (d < bd) { bd = d; best = q; } }); return best; }
+const nodeR = (q, sized) => S.hide || !sized ? 10 : 7 + q.v * 0.13;
+const nodeFill = q => S.hide ? "#ffffff" : `rgba(0,15,161,${.25 + .75 * q.v / 100})`;
+const nodeStroke = () => S.hide ? "#a9a89f" : NAVY;
+const edgeEnds = (g, e) => [g.nodes[e.a], g.nodes[e.b]];
+function drawEdge(g, e, col = "#b9b8b0", w = 1.5) {
+  const [A, Bn] = edgeEnds(g, e);
+  ctx.beginPath(); ctx.moveTo(A.x, A.y);
+  if (e.bend) {
+    const L = Math.hypot(Bn.x - A.x, Bn.y - A.y), nx = -(Bn.y - A.y) / L, ny = (Bn.x - A.x) / L;
+    ctx.quadraticCurveTo((A.x + Bn.x) / 2 + nx * 2 * e.bend, (A.y + Bn.y) / 2 + ny * 2 * e.bend, Bn.x, Bn.y);
+  } else ctx.lineTo(Bn.x, Bn.y);
+  ctx.strokeStyle = col; ctx.lineWidth = w; ctx.stroke();
+}
+function drawNode(q, r, fill, stroke, hl) {
+  ctx.beginPath(); ctx.arc(q.x, q.y, r, 0, 7); ctx.fillStyle = fill; ctx.fill();
+  ctx.strokeStyle = hl ? "#e8710a" : stroke; ctx.lineWidth = hl ? 3 : 1.5; ctx.stroke();
+  ctx.fillStyle = fill === "#ffffff" ? MUTED : q.v > 45 ? "#ffffff" : NAVY;
+  ctx.font = "600 11px 'DM Sans', sans-serif"; ctx.textAlign = "center"; ctx.fillText(q.id, q.x, q.y + 4);
+}
+const plainNode = q => drawNode(q, 9, "#ffffff", nodeStroke(), false);
+const NODES = (v = 12) => ({ key: "n", label: "Nodes", min: 5, max: 22, step: 1, value: v, reinit: true });
+
+// Les Misérables character co-occurrence (Knuth 1993), from vega-datasets 2.8.0
+const LESMIS = { names: ["Myriel", "Napoleon", "Mlle.Baptistine", "Mme.Magloire", "CountessdeLo", "Geborand", "Champtercier", "Cravatte", "Count", "OldMan", "Labarre", "Valjean", "Marguerite", "Mme.deR", "Isabeau", "Gervais", "Tholomyes", "Listolier", "Fameuil", "Blacheville", "Favourite", "Dahlia", "Zephine", "Fantine", "Mme.Thenardier", "Thenardier", "Cosette", "Javert", "Fauchelevent", "Bamatabois", "Perpetue", "Simplice", "Scaufflaire", "Woman1", "Judge", "Champmathieu", "Brevet", "Chenildieu", "Cochepaille", "Pontmercy", "Boulatruelle", "Eponine", "Anzelma", "Woman2", "MotherInnocent", "Gribier", "Jondrette", "Mme.Burgon", "Gavroche", "Gillenormand", "Magnon", "Mlle.Gillenormand", "Mme.Pontmercy", "Mlle.Vaubois", "Lt.Gillenormand", "Marius", "BaronessT", "Mabeuf", "Enjolras", "Combeferre", "Prouvaire", "Feuilly", "Courfeyrac", "Bahorel", "Bossuet", "Joly", "Grantaire", "MotherPlutarch", "Gueulemer", "Babet", "Claquesous", "Montparnasse", "Toussaint", "Child1", "Child2", "Brujon", "Mme.Hucheloup"], groups: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 5, 4, 0, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 4, 6, 4, 4, 5, 0, 0, 7, 7, 8, 5, 5, 5, 5, 5, 5, 8, 5, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 4, 4, 4, 4, 5, 10, 10, 4, 8], links: [[1,0,1],[2,0,8],[3,0,10],[3,2,6],[4,0,1],[5,0,1],[6,0,1],[7,0,1],[8,0,2],[9,0,1],[11,10,1],[11,3,3],[11,2,3],[11,0,5],[12,11,1],[13,11,1],[14,11,1],[15,11,1],[17,16,4],[18,16,4],[18,17,4],[19,16,4],[19,17,4],[19,18,4],[20,16,3],[20,17,3],[20,18,3],[20,19,4],[21,16,3],[21,17,3],[21,18,3],[21,19,3],[21,20,5],[22,16,3],[22,17,3],[22,18,3],[22,19,3],[22,20,4],[22,21,4],[23,16,3],[23,17,3],[23,18,3],[23,19,3],[23,20,4],[23,21,4],[23,22,4],[23,12,2],[23,11,9],[24,23,2],[24,11,7],[25,24,13],[25,23,1],[25,11,12],[26,24,4],[26,11,31],[26,16,1],[26,25,1],[27,11,17],[27,23,5],[27,25,5],[27,24,1],[27,26,1],[28,11,8],[28,27,1],[29,23,1],[29,27,1],[29,11,2],[30,23,1],[31,30,2],[31,11,3],[31,23,2],[31,27,1],[32,11,1],[33,11,2],[33,27,1],[34,11,3],[34,29,2],[35,11,3],[35,34,3],[35,29,2],[36,34,2],[36,35,2],[36,11,2],[36,29,1],[37,34,2],[37,35,2],[37,36,2],[37,11,2],[37,29,1],[38,34,2],[38,35,2],[38,36,2],[38,37,2],[38,11,2],[38,29,1],[39,25,1],[40,25,1],[41,24,2],[41,25,3],[42,41,2],[42,25,2],[42,24,1],[43,11,3],[43,26,1],[43,27,1],[44,28,3],[44,11,1],[45,28,2],[47,46,1],[48,47,2],[48,25,1],[48,27,1],[48,11,1],[49,26,3],[49,11,2],[50,49,1],[50,24,1],[51,49,9],[51,26,2],[51,11,2],[52,51,1],[52,39,1],[53,51,1],[54,51,2],[54,49,1],[54,26,1],[55,51,6],[55,49,12],[55,39,1],[55,54,1],[55,26,21],[55,11,19],[55,16,1],[55,25,2],[55,41,5],[55,48,4],[56,49,1],[56,55,1],[57,55,1],[57,41,1],[57,48,1],[58,55,7],[58,48,7],[58,27,6],[58,57,1],[58,11,4],[59,58,15],[59,55,5],[59,48,6],[59,57,2],[60,48,1],[60,58,4],[60,59,2],[61,48,2],[61,58,6],[61,60,2],[61,59,5],[61,57,1],[61,55,1],[62,55,9],[62,58,17],[62,59,13],[62,48,7],[62,57,2],[62,41,1],[62,61,6],[62,60,3],[63,59,5],[63,48,5],[63,62,6],[63,57,2],[63,58,4],[63,61,3],[63,60,2],[63,55,1],[64,55,5],[64,62,12],[64,48,5],[64,63,4],[64,58,10],[64,61,6],[64,60,2],[64,59,9],[64,57,1],[64,11,1],[65,63,5],[65,64,7],[65,48,3],[65,62,5],[65,58,5],[65,61,5],[65,60,2],[65,59,5],[65,57,1],[65,55,2],[66,64,3],[66,58,3],[66,59,1],[66,62,2],[66,65,2],[66,48,1],[66,63,1],[66,61,1],[66,60,1],[67,57,3],[68,25,5],[68,11,1],[68,24,1],[68,27,1],[68,48,1],[68,41,1],[69,25,6],[69,68,6],[69,11,1],[69,24,1],[69,27,2],[69,48,1],[69,41,1],[70,25,4],[70,69,4],[70,68,4],[70,11,1],[70,24,1],[70,27,1],[70,41,1],[70,58,1],[71,27,1],[71,69,2],[71,68,2],[71,70,2],[71,11,1],[71,48,1],[71,41,1],[71,25,1],[72,26,2],[72,27,1],[72,11,1],[73,48,2],[74,48,2],[74,73,3],[75,69,3],[75,68,3],[75,25,3],[75,48,1],[75,41,1],[75,70,1],[75,71,1],[76,64,1],[76,65,1],[76,66,1],[76,63,1],[76,62,1],[76,48,1],[76,58,1]] };
+
+const GCOL = ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#d4a72c", "#b07aa1", "#ff9da7", "#9c755f", "#7f7f7f", "#000fa1"];
+function seeded(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+function lesmisGraph(seed) {
+  const rnd = seeded(seed), n = LESMIS.names.length;
+  const nodes = LESMIS.names.map((name, i) => ({ id: name, name, grp: LESMIS.groups[i], v: 0, deg: 0, x: rnd() * 400, y: rnd() * 400, vx: 0, vy: 0 }));
+  const edges = LESMIS.links.map(([a, b, w]) => ({ a, b, w }));
+  edges.forEach(e => { nodes[e.a].deg++; nodes[e.b].deg++; });
+  for (let it = 0; it < 400; it++) {            // small force-directed layout, deterministic for a given seed
+    const al = 1 - it / 400;
+    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+      const A = nodes[i], Bn = nodes[j], dx = A.x - Bn.x, dy = A.y - Bn.y, f = 700 / (dx * dx + dy * dy + .01) * al;
+      A.vx += dx * f; A.vy += dy * f; Bn.vx -= dx * f; Bn.vy -= dy * f;
+    }
+    edges.forEach(e => {
+      const A = nodes[e.a], Bn = nodes[e.b], dx = Bn.x - A.x, dy = Bn.y - A.y, d = Math.hypot(dx, dy) || 1, f = (d - 28) * .06 * al;
+      A.vx += dx / d * f; A.vy += dy / d * f; Bn.vx -= dx / d * f; Bn.vy -= dy / d * f;
+    });
+    nodes.forEach(q => { q.vx += (200 - q.x) * .012 * al; q.vy += (200 - q.y) * .012 * al; q.x += Math.max(-8, Math.min(8, q.vx)); q.y += Math.max(-8, Math.min(8, q.vy)); q.vx *= .55; q.vy *= .55; });
+  }
+  const xs = nodes.map(q => q.x), ys = nodes.map(q => q.y), mnx = Math.min(...xs), mxx = Math.max(...xs), mny = Math.min(...ys), mxy = Math.max(...ys);
+  nodes.forEach(q => { q.x = 52 + (q.x - mnx) / (mxx - mnx) * 536; q.y = PT + 14 + (q.y - mny) / (mxy - mny) * (PLOT - 28); q.v = q.deg; });
+  return { nodes, edges, seed };
+}
+function segCross(x0, y0, x1, y1, ax, ay, bx, by) {
+  const d = (x1 - x0) * (by - ay) - (y1 - y0) * (bx - ax); if (!d) return false;
+  const t = ((ax - x0) * (by - ay) - (ay - y0) * (bx - ax)) / d, u = ((ax - x0) * (y1 - y0) - (ay - y0) * (x1 - x0)) / d;
+  return t > 0 && t <= 1 && u > 0 && u < 1;
+}
+function inPoly(pts, x, y) {
+  let c = false;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const [xi, yi] = pts[i], [xj, yj] = pts[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c; }
+  return c;
+}
+const lassoR = q => S.hide ? 5 : 3 + Math.sqrt(q.deg) * 1.6;
+
+
+// ---------- cells: every point of the plot belongs to its nearest node (up to a reach), like a bar's column ----------
+function hexRGB(h) { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+function cellLayer(cache, g, maxD, fill, border) {
+  const sc = g.nodes.length > 30 ? 1 : 2, w = LW * sc, h = LH * sc;
+  const c = cache.canvas || (cache.canvas = document.createElement("canvas")); c.width = w; c.height = h;
+  const b = c.getContext("2d"), img = b.createImageData(w, h), d = img.data, idx = new Int16Array(w * h).fill(-1), N = g.nodes, md2 = maxD * maxD;
+  for (let py = 0; py < h; py++) {
+    const y = (py + .5) / sc; if (y < AREA.y0 || y > AREA.y1) continue;
+    for (let px = 0; px < w; px++) {
+      const x = (px + .5) / sc; if (x < AREA.x0 || x > AREA.x1) continue;
+      let bi = -1, bd = md2;
+      for (let i = 0; i < N.length; i++) { const dx = N[i].x - x, dy = N[i].y - y, dd = dx * dx + dy * dy; if (dd < bd) { bd = dd; bi = i; } }
+      idx[py * w + px] = bi;
+    }
+  }
+  for (let p = 0; p < w * h; p++) {
+    const i = idx[p]; if (i < 0) continue;
+    const edge = (p % w > 0 && idx[p - 1] !== i) || (p >= w && idx[p - w] !== i);
+    const col = edge ? border : fill(i, (p % w + .5) / sc), o = p * 4;
+    d[o] = col[0]; d[o + 1] = col[1]; d[o + 2] = col[2]; d[o + 3] = Math.round(col[3] * 255);
+  }
+  b.putImageData(img, 0, 0); return c;
+}
+const HIDE_FILL = [240, 239, 236, 1], HIDE_LINE = [195, 194, 183, 1], WHITE_LINE = [255, 255, 255, 1];
+const LASSO = { id: "lasso", name: "Lasso", title: "Lasso a network by feel", sub: "Les Misérables · 77 nodes, 254 edges",
+  task: "Click to lock the pointer, then <b>press and hold to draw a lasso</b>; release to select. Each community owns a territory, and busier communities are stickier. Hide visuals and try to lasso one community by feel.",
+  how: "Every point near the network belongs to its nearest character. In community mode, a whole territory has one speed set by the community’s average degree, with a sharp change at the border, the same way each bar worked in the bar chart. Crossing an edge adds a small catch, so tightly knit areas feel rougher. Any node the stroke touches is selected too.",
+  cite: "Data: Les Misérables co-occurrence (Knuth 1993), via vega-datasets. Node size: degree. Colour: community.",
+  params: [
+    { key: "feel", label: "What the territory feels like", type: "choice", options: [["community", "Sticky by community (average degree)"], ["node", "Sticky by node (degree)"], ["ridges", "Ridges, spacing by community"], ["none", "Nothing"]], value: "community" },
+    { key: "k", label: "Strength", min: 0, max: 0.95, step: 0.05, value: 0.85 },
+    { key: "reach", label: "Territory reach", min: 15, max: 80, step: 5, value: 45, unit: " px" },
+    { key: "tick", label: "Catch when crossing an edge", min: 0, max: 0.8, step: 0.05, value: 0.35 },
+    { key: "snap", label: "Snap to hubs", min: 0, max: 0.9, step: 0.05, value: 0 },
+  ],
+  init(first) {
+    this.g = lesmisGraph(first ? 7 : R(1, 9999)); this.sel = new Set(); this.path = null; this.poly = null; this.touch = new Set(); this.cache = {}; this.key = ""; this.q = null; this.cross = 0;
+    const sum = {}, cnt = {}; this.g.nodes.forEach(q => { sum[q.grp] = (sum[q.grp] || 0) + q.deg; cnt[q.grp] = (cnt[q.grp] || 0) + 1; });
+    const mean = Object.keys(sum).map(k => [k, sum[k] / cnt[k]]), mx = Math.max(...mean.map(m => m[1]));
+    this.cval = {}; mean.forEach(([k, m]) => this.cval[k] = Math.round(100 * m / mx));
+    this.maxDeg = Math.max(...this.g.nodes.map(q => q.deg));
+  },
+  per(t) { return 8 + 4 * (t % 5); },
+  val(q) { return this.P.feel === "community" ? this.cval[q.grp] : Math.round(100 * q.deg / this.maxDeg); },
+  hub(q) { return Math.min(1, q.deg / 16); },
+  down() { this.path = [[S.x, S.y]]; this.touch = new Set(); this.poly = null; },
+  up() {
+    if (!this.path) return;
+    const p = this.path; this.path = null;
+    if (p.length >= 5) { this.poly = p; this.sel = new Set(this.g.nodes.filter(q => inPoly(p, q.x, q.y))); this.touch.forEach(q => this.sel.add(q)); }
+    else { const q = nearestNode(this.g, S.x, S.y, 10); this.sel = new Set(q ? [q] : []); this.poly = null; }
+    this.showSel();
+  },
+  move(dx, dy) {
+    const P = this.P, m = Math.hypot(dx, dy), x0 = S.x, y0 = S.y;
+    const q = nearestNode(this.g, S.x, S.y, P.reach); this.q = q;
+    let g = 1;
+    if (S.on && q) {
+      if (P.feel === "community" || P.feel === "node") g = 1 - P.k * this.val(q) / 100;
+      if (P.feel === "ridges") g = 1 - P.k * (Math.sin(2 * Math.PI * S.x / this.per(q.grp)) > 0 ? 1 : .05);
+    }
+    S.x += dx * g; S.y += dy * g;
+    this.cross = 0;
+    if (S.on && P.tick > 0 && m) {
+      this.g.edges.forEach(e => { const A = this.g.nodes[e.a], Bn = this.g.nodes[e.b]; if (segCross(x0, y0, S.x, S.y, A.x, A.y, Bn.x, Bn.y)) this.cross++; });
+      if (this.cross) { const back = Math.min(.8, P.tick * (.6 + .2 * this.cross)); S.x -= (S.x - x0) * back; S.y -= (S.y - y0) * back; }
+    }
+    if (S.on && P.snap > 0 && m) {
+      const h = nearestNode(this.g, S.x, S.y, 18);
+      if (h) { const d = Math.hypot(h.x - S.x, h.y - S.y); if (d > 0) { const p = Math.min(d, m * P.snap * this.hub(h)); S.x += (h.x - S.x) / d * p; S.y += (h.y - S.y) / d * p; } }
+    }
+    S.jx = S.jy = 0;
+    if (this.path) {
+      const l = this.path[this.path.length - 1];
+      if (Math.hypot(S.x - l[0], S.y - l[1]) > 2) this.path.push([S.x, S.y]);
+      const t = nearestNode(this.g, S.x, S.y, 30); if (t && Math.hypot(t.x - S.x, t.y - S.y) < lassoR(t) + 2) this.touch.add(t);
+    }
+  },
+  layer() {
+    const P = this.P, key = [S.hide, P.feel, P.reach, this.g.seed].join("|");
+    if (key !== this.key) {
+      this.key = key;
+      const N = this.g.nodes;
+      this.cache.img = P.feel === "none" ? null : cellLayer(this.cache, this.g, P.reach, (i, x) => {
+        if (S.hide) return HIDE_FILL;
+        const q = N[i], [r, g, b] = hexRGB(GCOL[q.grp]);
+        if (P.feel === "ridges") return [r, g, b, Math.sin(2 * Math.PI * x / this.per(q.grp)) > 0 ? .42 : .08];
+        if (P.feel === "node") return [0, 15, 161, .05 + .6 * this.val(q) / 100];
+        return [r, g, b, .08 + .55 * this.val(q) / 100];
+      }, S.hide ? HIDE_LINE : WHITE_LINE);
+    }
+    return this.cache.img;
+  },
+  draw() {
+    const img = this.layer(); if (img) ctx.drawImage(img, 0, 0, LW, LH);
+    ctx.strokeStyle = "rgba(82,81,78,.3)"; ctx.lineWidth = 1;
+    this.g.edges.forEach(e => { const A = this.g.nodes[e.a], Bn = this.g.nodes[e.b]; ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(Bn.x, Bn.y); ctx.stroke(); });
+    if (this.poly) { ctx.beginPath(); this.poly.forEach((p, i) => ctx[i ? "lineTo" : "moveTo"](p[0], p[1])); ctx.closePath(); ctx.fillStyle = "rgba(232,113,10,.08)"; ctx.fill(); ctx.setLineDash([5, 4]); ctx.strokeStyle = "#e8710a"; ctx.lineWidth = 1.5; ctx.stroke(); ctx.setLineDash([]); }
+    this.g.nodes.forEach(q => {
+      ctx.beginPath(); ctx.arc(q.x, q.y, lassoR(q), 0, 7); ctx.fillStyle = S.hide ? "#a9a89f" : GCOL[q.grp]; ctx.fill();
+      ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 1; ctx.stroke();
+      if (this.sel.has(q)) { ctx.beginPath(); ctx.arc(q.x, q.y, lassoR(q) + 3, 0, 7); ctx.strokeStyle = "#e8710a"; ctx.lineWidth = 2.5; ctx.stroke(); }
+    });
+    if (this.path && this.path.length > 1 && !S.nocursor) { ctx.beginPath(); this.path.forEach((p, i) => ctx[i ? "lineTo" : "moveTo"](p[0], p[1])); ctx.strokeStyle = "#e8710a"; ctx.lineWidth = 2; ctx.stroke(); }
+    if (S.locked && this.q && !S.hide && !S.nocursor) { ctx.fillStyle = "#0b0b0b"; ctx.font = "500 12px 'DM Sans', sans-serif"; ctx.textAlign = "left"; ctx.fillText(this.q.name, Math.min(this.q.x + 12, LW - 90), this.q.y - 10); }
+  },
+  read() {
+    const q = this.q, f = this.P.feel;
+    return [["Node", q ? (S.hide ? "a node" : q.name) : "–"], ["Community", q ? q.grp : "–"],
+      ["Felt value", q && (f === "community" || f === "node") ? this.val(q) : q && f === "ridges" ? this.per(q.grp) + " px ridges" : "–"],
+      ["Edges crossed", this.cross], ["Selected", this.sel.size]];
+  },
+  panel(el) {
+    const d = document.createElement("div");
+    d.innerHTML = `<p class="sub">Selection</p><p class="how" id="sel-list" style="margin-top:8px"></p><div class="row" style="margin-top:8px"><button class="sbtn" id="sel-clear">Clear selection</button></div>`;
+    el.appendChild(d);
+    d.querySelector("#sel-clear").onclick = () => { this.sel = new Set(); this.poly = null; this.showSel(); render(); };
+    this.showSel();
+  },
+  showSel() {
+    const el = document.getElementById("sel-list"); if (!el) return;
+    if (!this.sel.size) { el.textContent = "Nothing selected yet."; return; }
+    const groups = new Set([...this.sel].map(q => q.grp));
+    el.textContent = `${this.sel.size} nodes in ${groups.size} ${groups.size === 1 ? "community" : "communities"}: ` + (() => { const names = [...this.sel].sort((a, b) => b.deg - a.deg).map(q => q.name); return names.slice(0, 10).join(", ") + (names.length > 10 ? `, and ${names.length - 10} more` : ""); })();
+  },
+};
+
+
+// ---------- heatmap tabs: one shared grid, two feels ----------
+const HEAT_BASE = { id: "heatmap", name: "Heatmap", title: "A heatmap you can feel", sub: "Grid · friction or roughness",
+  task: "Move over the grid. <b>Hot cells slow the cursor (friction), shake it (roughness), or both</b>; choose under Feel. Pick a pattern, or press <b>Mystery pattern</b> to hide the colours and guess which pattern you are feeling.",
+  how: "Friction: inside a cell the cursor moves at 1 − friction × value/100 of your hand’s speed, the same mechanism as the bar chart. Roughness: each movement adds a random offset to the drawn cursor, scaled by the cell’s value and by how fast you move; standing still stays still. The community matrix shows how densely each pair of Les Misérables communities is connected: the bright diagonal is the communities themselves.",
+  cite: "Friction: Lécuyer 2009 · roughness: Ujitoko, Ban & Hirota (arXiv 1902.07071) · matrix data: Les Misérables (Knuth 1993)",
+  PATTERNS: [["gradient", "Left-to-right gradient"], ["hotspot", "Hot spot in the centre"], ["checker", "Checkerboard"], ["diagonal", "Diagonal band"], ["stripes", "Vertical stripes"], ["corners", "Two hot corners"], ["matrix", "Les Misérables community matrix (11 × 11)"], ["random", "Random"]],
+  get params() { return [
+    { key: "pattern", label: "Pattern", type: "choice", options: this.PATTERNS, value: "hotspot", reinit: true },
+    { key: "a", label: "Shake at value 100", min: 0, max: 20, step: 1, value: 9, unit: " px" },
+    { key: "d", label: "Friction at value 100", min: 0, max: 0.95, step: 0.05, value: 0.85 },
+    { key: "n", label: "Columns (not used by the matrix)", min: 4, max: 16, step: 1, value: 10, reinit: true },
+    { key: "rows", label: "Rows (not used by the matrix)", min: 2, max: 10, step: 1, value: 6, reinit: true },
+  ]; },
+  matrix() {
+    if (this._m) return this._m;
+    const G = 11, size = Array(G).fill(0), cnt = Array.from({ length: G }, () => Array(G).fill(0));
+    LESMIS.groups.forEach(g => size[g]++);
+    LESMIS.links.forEach(([a, b]) => { const ga = LESMIS.groups[a], gb = LESMIS.groups[b]; cnt[ga][gb]++; if (ga !== gb) cnt[gb][ga]++; });
+    const dens = cnt.map((row, i) => row.map((c, j) => { const pairs = i === j ? size[i] * (size[i] - 1) / 2 : size[i] * size[j]; return pairs ? c / pairs : 0; }));
+    const mx = Math.max(...dens.flat());
+    return this._m = dens.map(row => row.map(v => Math.round(100 * Math.sqrt(v / mx))));
+  },
+  init() {
+    const pat = this.P.pattern;
+    if (pat === "matrix") { this.cols = 11; this.rows = 11; this.v = this.matrix().flat(); }
+    else {
+      const n = this.cols = this.P.n, rows = this.rows = this.P.rows;
+      this.v = [];
+      for (let r = 0; r < rows; r++) for (let c = 0; c < n; c++) {
+        const u = n > 1 ? c / (n - 1) : 0, w = rows > 1 ? r / (rows - 1) : 0;
+        let v = 0;
+        if (pat === "gradient") v = 100 * u;
+        if (pat === "hotspot") v = 100 * Math.exp(-(((u - .5) / .28) ** 2 + ((w - .5) / .32) ** 2));
+        if (pat === "checker") v = (c + r) % 2 ? 90 : 8;
+        if (pat === "diagonal") v = 100 * Math.max(0, 1 - Math.abs(u - w) * 3.2);
+        if (pat === "stripes") v = c % 2 ? 90 : 8;
+        if (pat === "corners") v = 100 * Math.max(Math.exp(-((u / .3) ** 2 + (w / .35) ** 2)), Math.exp(-(((1 - u) / .3) ** 2 + ((1 - w) / .35) ** 2)));
+        if (pat === "random") v = R(0, 100);
+        this.v.push(Math.round(v));
+      }
+    }
+    this.a = 0;
+  },
+  cell(x, y) { const c = Math.floor((x - 40) / (560 / this.cols)), r = Math.floor((y - PT) / (PLOT / this.rows)); return c >= 0 && c < this.cols && r >= 0 && r < this.rows ? r * this.cols + c : -1; },
+  move(dx, dy) {
+    const f = this.feel, i = this.cell(S.x, S.y), v = i < 0 ? 0 : this.v[i];
+    const g = S.on && f !== "rough" ? 1 - this.P.d * v / 100 : 1;
+    S.x += dx * g; S.y += dy * g; this.g = g;
+    this.a = S.on && f !== "friction" ? this.P.a * v / 100 * Math.min(1, Math.hypot(dx, dy) / 2) : 0;
+    S.jx = (Math.random() * 2 - 1) * this.a; S.jy = (Math.random() * 2 - 1) * this.a;
+  },
+  draw() {
+    const w = 560 / this.cols, h = PLOT / this.rows, mat = this.P.pattern === "matrix";
+    this.v.forEach((v, i) => {
+      const x = 40 + (i % this.cols) * w, y = PT + Math.floor(i / this.cols) * h;
+      ctx.fillStyle = S.hide ? "#f0efec" : `rgba(0,15,161,${.05 + .85 * v / 100})`;
+      ctx.fillRect(x + 1, y + 1, w - 2, h - 2);
+    });
+    for (let c = 0; c < this.cols; c++) label(mat ? c : String.fromCharCode(65 + c), 40 + (c + .5) * w);
+    if (mat) { ctx.fillStyle = MUTED; ctx.font = "600 11px 'DM Sans', sans-serif"; ctx.textAlign = "right"; for (let r = 0; r < this.rows; r++) ctx.fillText(r, 34, PT + (r + .5) * h + 4); }
+  },
+  read() {
+    const i = this.cell(S.x, S.y), n = this.cols, mat = this.P.pattern === "matrix";
+    const name = this.mystery ? "?" : this.PATTERNS.find(p => p[0] === this.P.pattern)[1];
+    const where = i < 0 ? "–" : mat ? `community ${Math.floor(i / n)} × ${i % n}` : String.fromCharCode(65 + i % n) + (Math.floor(i / n) + 1);
+    return [["Pattern", name], ["Cell", where], ["Value", i < 0 || this.mystery ? (i < 0 ? "–" : "?") : this.v[i]], ["Gain", (this.g || 1).toFixed(2)], ["Shake", this.a.toFixed(1) + " px"]];
+  },
+  panel(el) {
+    const d = document.createElement("div");
+    d.innerHTML = `<p class="sub">Guess the pattern</p><div class="row" style="margin-top:8px"><button class="sbtn" id="hm-mystery">Mystery pattern</button><button class="sbtn" id="hm-reveal" ${this.mystery ? "" : "disabled"}>Reveal</button></div><p class="cite" id="hm-msg" style="margin-top:8px">${this.mystery ? "Colours hidden. Feel the grid, then reveal." : ""}</p>`;
+    el.appendChild(d);
+    const setHide = h => { S.hide = h; $("c-hide").setAttribute("aria-pressed", h); };
+    d.querySelector("#hm-mystery").onclick = () => {
+      const keys = this.PATTERNS.map(p => p[0]).filter(k => k !== "random");
+      this.P.pattern = keys[R(0, keys.length - 1)]; this.mystery = true; this.init(false); setHide(true); renderParams(); render();
+    };
+    d.querySelector("#hm-reveal").onclick = () => { this.mystery = false; setHide(false); renderParams(); render(); };
+  },
+};
+function heatTab(o) { const t = { ...HEAT_BASE, ...o }; t.params = HEAT_BASE.params.filter(p => !o.drop.includes(p.key)); return t; }
+const HEAT_FRICTION = heatTab({ id: "heatfriction", name: "Heat friction", feel: "friction", drop: ["a"],
+  title: "A sticky heatmap", sub: "Grid · cursor gain",
+  task: "Move over the grid. <b>Hot cells slow the cursor</b>, so they feel sticky, like the tall bars did. Pick a pattern, or press <b>Mystery pattern</b> to hide the colours and guess the pattern by feel.",
+  how: "Inside a cell the cursor moves at 1 − friction × value/100 of your hand’s speed, with a sharp change at each cell border. This is the bar-chart mechanism applied to every cell of a grid. The community matrix shows how densely each pair of Les Misérables communities is connected; the bright diagonal is the communities themselves.",
+  cite: "Lécuyer 2009 (survey) · Ujitoko, Ban & Hirota, WHC 2019 · matrix data: Les Misérables (Knuth 1993)" });
+const HEAT_ROUGH = heatTab({ id: "heatrough", name: "Heat roughness", feel: "rough", drop: ["d"],
+  title: "A gritty heatmap", sub: "Grid · cursor jitter",
+  task: "Move over the grid. <b>Hot cells make the cursor shake</b>, so they feel rough. Pick a pattern, or press <b>Mystery pattern</b> to hide the colours and guess the pattern by feel.",
+  how: "Each movement adds a random offset to the drawn cursor, scaled by the cell’s value and by how fast you move; standing still stays still. Compare with Heat friction on the same pattern to see which channel reads better. The community matrix shows how densely each pair of Les Misérables communities is connected.",
+  cite: "Ujitoko, Ban & Hirota, pointer-jitter roughness (arXiv 1902.07071) · matrix data: Les Misérables (Knuth 1993)" });
+
+const PROTOS = [
+HEAT_FRICTION,
+HEAT_ROUGH,
+LASSO,
+{ id: "friction", name: "Sticky cells", title: "Sticky cells", sub: "Node territories · cursor gain",
+  task: "Move across the network. <b>Each node owns the area closest to it, and a bigger value makes that whole area sticky</b>, the way a taller bar did. Hide visuals and find the stickiest node by feel.",
+  how: "The plot is split into cells: each point belongs to its nearest node, up to the cell reach. Inside a cell the cursor moves at 1 − strength × value/100 of your hand’s speed, and the speed changes sharply at the border. Large regions with one constant speed are what made the bar chart feel strong.",
+  cite: "Lécuyer 2009 (survey) · Ujitoko, Ban & Hirota, WHC 2019",
+  params: [K(0.85), { key: "reach", label: "Cell reach", min: 30, max: 200, step: 5, value: 110, unit: " px" }, NODES(10)],
+  init() { this.g = makeGraph(this.P.n); this.cache = {}; this.key = ""; this.ver = (this.ver || 0) + 1; },
+  here() { return nearestNode(this.g, S.x, S.y, this.P.reach); },
+  gain() { const q = this.here(); return q ? g1(this.P.k, q.v) : 1; },
+  move(dx, dy) { const g = this.gain(); S.x += dx * g; S.y += dy * g; },
+  draw() {
+    const key = [S.hide, this.P.reach, this.ver].join("|");
+    if (key !== this.key) { this.key = key; this.cache.img = cellLayer(this.cache, this.g, this.P.reach, i => S.hide ? HIDE_FILL : [0, 15, 161, .05 + .7 * this.g.nodes[i].v / 100], S.hide ? HIDE_LINE : WHITE_LINE); }
+    ctx.drawImage(this.cache.img, 0, 0, LW, LH);
+    const h = S.locked && !S.nocursor && this.here();
+    this.g.edges.forEach(e => drawEdge(this.g, e, "rgba(82,81,78,.45)"));
+    this.g.nodes.forEach(q => drawNode(q, 10, "#ffffff", S.hide ? "#a9a89f" : NAVY, q === h));
+  },
+  read() { const q = this.here(); return [["Node", q ? q.id : "–"], ["Value", q ? q.v : "–"], ["Gain", this.gain().toFixed(2)]]; },
+},
+{ id: "weight", name: "Weight", title: "Heavy nodes", sub: "Drag nodes · C/D ratio",
+  task: "Press and hold on a node, then drag it. <b>Nodes with bigger values move slower than your hand</b>, so they feel heavier, and their edges follow. Hide visuals and sort the nodes by weight.",
+  how: "While you hold a node, the node and cursor move at 1 − strength × value/100 of your hand’s speed. People already drag nodes to tidy node-link layouts, so the weight rides on a familiar action.",
+  cite: "Samad et al., CHI 2019 · Rietzler et al., CHI 2018",
+  params: [K(), NODES(10)],
+  init() { this.g = makeGraph(this.P.n); this.held = null; },
+  down() { const q = nearestNode(this.g, S.x, S.y, 18); if (q) { this.held = q; this.ox = q.x - S.x; this.oy = q.y - S.y; } },
+  up() { this.held = null; },
+  gain() { return this.held ? g1(this.P.k, this.held.v) : 1; },
+  move(dx, dy) {
+    const g = this.gain(); S.x += dx * g; S.y += dy * g;
+    if (this.held) { this.held.x = cx(S.x + this.ox); this.held.y = cy(S.y + this.oy); }
+  },
+  draw() {
+    this.g.edges.forEach(e => drawEdge(this.g, e));
+    this.g.nodes.forEach(q => drawNode(q, nodeR(q, true), nodeFill(q), nodeStroke(), q === this.held));
+  },
+  read() { const q = this.held; return [["Holding", q ? q.id : "–"], ["Value", q ? q.v : "–"], ["Gain", this.gain().toFixed(2)]]; },
+},
+{ id: "stiffness", name: "Stiffness", title: "Springy edges", sub: "Pull edges · visual deformation",
+  task: "Press and hold on an edge, then <b>pull sideways to bend it</b>. Stronger ties bend less for the same pull, so they feel stiffer. Hide visuals so all edges look alike, then find the strongest tie.",
+  how: "While you hold an edge, its bend is your sideways movement × (1 − strength × weight/100). A stiff edge barely moves, so you pull further for the same bend, which reads as tension. Let go and it springs back.",
+  cite: "Lécuyer et al., IEEE VR 2000 · Argelaguet et al., ACM TAP 2013",
+  params: [K(), { key: "spring", label: "Spring-back speed", min: 0.05, max: 0.6, step: 0.05, value: 0.25 }, NODES(10)],
+  init() { this.g = makeGraph(this.P.n); this.p = null; this.pull = 0; },
+  down() { const s = nearestEdge(this.g, S.x, S.y, 10); if (s && s.t > .1 && s.t < .9) { this.p = s; this.pull = 0; S.x = s.px; S.y = s.py; } },
+  up() {
+    if (!this.p) return;
+    const e = this.p.e; this.p = null;
+    const spring = () => { e.bend *= 1 - this.P.spring; if (Math.abs(e.bend) < .5) e.bend = 0; render(); if (e.bend) requestAnimationFrame(spring); };
+    requestAnimationFrame(spring);
+  },
+  move(dx, dy) {
+    if (!this.p) { S.x += dx; S.y += dy; return; }
+    const s = this.p, e = s.e, f = 4 * s.t * (1 - s.t);
+    this.pull = Math.max(-140, Math.min(140, this.pull + dx * s.nx + dy * s.ny));
+    e.bend = this.pull * g1(this.P.k, e.w);
+    S.x = s.px + s.nx * e.bend * f; S.y = s.py + s.ny * e.bend * f;
+  },
+  draw() {
+    this.g.edges.forEach(e => {
+      const held = this.p && this.p.e === e;
+      if (held) drawEdge(this.g, e, "rgba(232,113,10,.45)", 9);
+      drawEdge(this.g, e, S.hide ? "#a9a89f" : NAVY, S.hide ? 2 : 1 + 5 * e.w / 100);
+    });
+    this.g.nodes.forEach(plainNode);
+  },
+  read() {
+    const s = this.p; if (!s) return [["Pulling", "–"], ["Weight", "–"], ["Your pull", "–"], ["Bend", "–"]];
+    const [A, Bn] = edgeEnds(this.g, s.e);
+    return [["Pulling", A.id + "–" + Bn.id], ["Weight", s.e.w], ["Your pull", Math.round(Math.abs(this.pull)) + " px"], ["Bend", Math.round(Math.abs(s.e.bend)) + " px"]];
+  },
+},
+{ id: "roughness", name: "Roughness", title: "Edges you can feel", sub: "Trace edges · cursor jitter",
+  task: "Trace along the edges. <b>Each edge owns a wide band; uncertain edges make the whole band gritty and slow.</b> Hide visuals so every edge looks the same, then find the most uncertain one by feel.",
+  how: "Every point within the band width belongs to its nearest edge. Inside the band, each step is bent gently onto the line, so tracing is easy. On the edge, the cursor shakes and drags in proportion to the edge’s uncertainty. With visuals on, more uncertain edges are drawn wobblier, so the picture hints at the feel.",
+  cite: "Roughness: Ujitoko, Ban & Hirota (arXiv 1902.07071) · snapping: pseudo-haptic attraction (Lécuyer 2009)",
+  params: [
+    { key: "shake", label: "Shake at uncertainty 100", min: 0, max: 20, step: 1, value: 12, unit: " px" },
+    { key: "d", label: "Drag at uncertainty 100", min: 0, max: 0.9, step: 0.05, value: 0.6 },
+    { key: "snap", label: "Snap to edges", min: 0, max: 0.95, step: 0.05, value: 0.35 },
+    { key: "reach", label: "Edge band width", min: 6, max: 40, step: 1, value: 20, unit: " px" },
+    NODES(10),
+  ],
+  init() { this.g = makeGraph(this.P.n); this.e = null; this.a = 0; },
+  move(dx, dy) {
+    const m = Math.hypot(dx, dy), here = nearestEdge(this.g, S.x, S.y, this.P.reach);
+    const g = S.on && here ? 1 - this.P.d * here.e.u / 100 : 1;
+    S.x += dx * g; S.y += dy * g;
+    const h = nearestEdge(this.g, S.x, S.y, this.P.reach);
+    if (S.on && h && h.d > 0 && m) { const p = Math.min(h.d, m * this.P.snap); S.x += (h.px - S.x) / h.d * p; S.y += (h.py - S.y) / h.d * p; }
+    const now = nearestEdge(this.g, S.x, S.y, this.P.reach);
+    this.e = now ? now.e : null;
+    this.a = S.on && this.e ? this.P.shake * this.e.u / 100 * Math.min(1, m / 2) : 0;
+    S.jx = (Math.random() * 2 - 1) * this.a; S.jy = (Math.random() * 2 - 1) * this.a;
+  },
+  wobble(e) {
+    const [A, Bn] = edgeEnds(this.g, e), L = Math.hypot(Bn.x - A.x, Bn.y - A.y), nx = -(Bn.y - A.y) / L, ny = (Bn.x - A.x) / L;
+    const amp = S.hide ? 0 : 6 * e.u / 100, steps = Math.max(2, Math.round(L / 4));
+    ctx.beginPath();
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps, h = Math.sin((i + e.seed) * 12.9898) * 43758.5453, w = (h - Math.floor(h) - .5) * 2 * amp * Math.sin(Math.PI * t);
+      ctx[i ? "lineTo" : "moveTo"](A.x + (Bn.x - A.x) * t + nx * w, A.y + (Bn.y - A.y) * t + ny * w);
+    }
+  },
+  draw() {
+    ctx.lineCap = "round";
+    this.g.edges.forEach(e => {
+      const [A, Bn] = edgeEnds(this.g, e); ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(Bn.x, Bn.y);
+      ctx.strokeStyle = S.hide ? "rgba(169,168,159,.18)" : `rgba(0,15,161,${.04 + .3 * e.u / 100})`; ctx.lineWidth = 2 * this.P.reach; ctx.stroke();
+    });
+    ctx.lineCap = "butt";
+    this.g.edges.forEach(e => {
+      if (e === this.e && S.locked && !S.nocursor) { this.wobble(e); ctx.strokeStyle = "rgba(232,113,10,.45)"; ctx.lineWidth = 8; ctx.stroke(); }
+      this.wobble(e); ctx.strokeStyle = S.hide ? "#a9a89f" : NAVY; ctx.lineWidth = 2; ctx.stroke();
+    });
+    this.g.nodes.forEach(plainNode);
+  },
+  read() {
+    const e = this.e; if (!e) return [["Edge", "–"], ["Uncertainty", "–"], ["Shake", "0.0 px"]];
+    const [A, Bn] = edgeEnds(this.g, e);
+    return [["Edge", A.id + "–" + Bn.id], ["Uncertainty", e.u], ["Shake", this.a.toFixed(1) + " px"]];
+  },
+},
+{ id: "gravity", name: "Gravity", title: "Magnetic hubs", sub: "Nodes · attraction",
+  task: "Sweep the cursor across the network. <b>Nodes with bigger values pull the cursor in</b> and are harder to leave. Hide visuals and find the three strongest.",
+  how: "Within reach of a node, each step is bent toward it by up to strength × value/100 of the step. You can always escape, but strong nodes hold you longer.",
+  cite: "Related to semantic pointing and pseudo-haptic attraction; see Lécuyer 2009",
+  params: [K(0.9), { key: "r", label: "Reach", min: 15, max: 120, step: 5, value: 65, unit: " px" }, NODES(10)],
+  init() { this.g = makeGraph(this.P.n); this.pull = 0; this.q = null; },
+  move(dx, dy) {
+    S.x += dx; S.y += dy; this.pull = 0;
+    const q = nearestNode(this.g, S.x, S.y, this.P.r), m = Math.hypot(dx, dy); this.q = q;
+    if (S.on && q && m) {
+      const d = Math.hypot(q.x - S.x, q.y - S.y);
+      if (d > 0) { const p = Math.min(d, m * this.P.k * q.v / 100 * 0.9); S.x += (q.x - S.x) / d * p; S.y += (q.y - S.y) / d * p; this.pull = p; }
+    }
+  },
+  draw() {
+    this.g.edges.forEach(e => drawEdge(this.g, e));
+    this.g.nodes.forEach(q => drawNode(q, nodeR(q, true), nodeFill(q), nodeStroke(), S.locked && !S.nocursor && q === this.q && this.pull > 0));
+  },
+  read() { const q = this.q; return [["Nearest node", q ? q.id : "–"], ["Value", q ? q.v : "–"], ["Pull", this.pull.toFixed(1) + " px"]]; },
+},
+{ id: "draw", name: "Draw", title: "Draw community textures", sub: "Freehand regions · five textures",
+  task: "Pick a texture and <b>drag to draw a region</b>, for example around a cluster of nodes. Then switch to <b>Feel</b>, click to lock the pointer, and move between regions. Hide visuals to feel the boundaries blind.",
+  how: "Each texture is one cursor trick: sticky lowers the gain, slippery raises it, ridged alternates slow and fast stripes, rough shakes the cursor, magnetic pulls toward the region’s centre. The fill pattern hints at the feel; ridged stripes match the felt spacing exactly.",
+  cite: "Built from the mechanisms in the other tabs",
+  params: [K(), { key: "period", label: "Ridge spacing", min: 6, max: 40, step: 2, value: 14, unit: " px" }, { key: "shake", label: "Roughness shake", min: 0, max: 16, step: 1, value: 8, unit: " px" }, NODES(14)],
+  mode: "draw", tex: "sticky", bounds: { x0: 4, x1: LW - 4, y0: 4, y1: LH - 4 },
+  init(first, why) {
+    this.stroke = null; this.here = null;
+    this.g = makeGraph(this.P.n);
+    if (why === "param" && this.shapes) return;
+    const keys = Object.keys(TEX), ns = [...this.g.nodes].sort((a, b) => a.x - b.x);
+    const picks = [ns[0], ns[Math.floor(ns.length / 2)], ns[ns.length - 1]];
+    this.shapes = picks.map((q, i) => blob(q.x, q.y, R(50, 66), first ? ["sticky", "ridged", "rough"][i] : keys[R(0, keys.length - 1)]));
+  },
+  drawing() { return this.mode === "draw"; },
+  at(x, y) { for (let i = this.shapes.length - 1; i >= 0; i--) if (inside(this.shapes[i], x, y)) return this.shapes[i]; return null; },
+  move(dx, dy) {
+    const sh = this.at(S.x, S.y), k = this.P.k, m = Math.hypot(dx, dy);
+    this.here = sh ? sh.tex : null;
+    let g = 1;
+    if (S.on && sh) {
+      if (sh.tex === "sticky") g = 1 - k;
+      if (sh.tex === "slippery") g = 1 + k;
+      if (sh.tex === "ridged") g = 1 - k * 0.95 * (Math.sin(2 * Math.PI * S.x / this.P.period) > 0 ? 1 : 0.1);
+      if (sh.tex === "rough") g = 0.85;
+    }
+    S.x += dx * g; S.y += dy * g;
+    if (S.on && sh && sh.tex === "rough") { const a = this.P.shake * Math.min(1, m / 2); S.jx = (Math.random() * 2 - 1) * a; S.jy = (Math.random() * 2 - 1) * a; } else { S.jx = S.jy = 0; }
+    if (S.on && sh && sh.tex === "magnetic" && m) {
+      const d = Math.hypot(sh.cx - S.x, sh.cy - S.y);
+      if (d > 0) { const p = Math.min(d, m * k * 0.7); S.x += (sh.cx - S.x) / d * p; S.y += (sh.cy - S.y) / d * p; }
+    }
+  },
+  draw() {
+    this.shapes.forEach(sh => paintShape(sh, this.P.period));
+    this.g.edges.forEach(e => drawEdge(this.g, e, "rgba(82,81,78,.55)", 1.5));
+    this.g.nodes.forEach(plainNode);
+    if (this.stroke && this.stroke.length > 1) {
+      ctx.strokeStyle = TEX[this.tex].col; ctx.lineWidth = 2; ctx.beginPath();
+      this.stroke.forEach((p, i) => ctx[i ? "lineTo" : "moveTo"](p[0], p[1])); ctx.stroke();
+    }
+  },
+  read() { return [["Mode", this.mode === "draw" ? "Draw" : "Feel"], ["Texture here", this.here ? TEX[this.here].name : "–"], ["Regions", this.shapes.length]]; },
+  panel(el) {
+    const mk = html => { const d = document.createElement("div"); d.innerHTML = html; el.appendChild(d); return d; };
+    const modes = mk(`<div class="row"><button class="sbtn" data-m="draw">Draw</button><button class="sbtn" data-m="feel">Feel</button></div>`);
+    const texs = mk(`<p class="sub">Texture for the next shape</p><div class="row" style="margin-top:8px">${Object.entries(TEX).map(([k, t]) => `<button class="sbtn" data-t="${k}" title="${t.feel}"><span class="sw" style="background:${t.col}"></span>${t.name}</button>`).join("")}</div>`);
+    const acts = mk(`<div class="row"><button class="sbtn" data-a="undo">Undo shape</button><button class="sbtn" data-a="clear">Clear all</button></div>`);
+    const sync = () => {
+      modes.querySelectorAll("[data-m]").forEach(b => b.setAttribute("aria-pressed", b.dataset.m === this.mode));
+      texs.querySelectorAll("[data-t]").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === this.tex));
+      cv.style.cursor = this.mode === "draw" ? "crosshair" : "pointer";
+      $("status").textContent = this.mode === "draw" ? "Drag to draw" : (S.locked ? "Esc to release" : "Click the chart to lock the pointer");
+    };
+    modes.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { this.mode = b.dataset.m; if (this.mode === "draw" && document.pointerLockElement) document.exitPointerLock(); sync(); render(); });
+    texs.querySelectorAll("[data-t]").forEach(b => b.onclick = () => { this.tex = b.dataset.t; sync(); });
+    acts.querySelector("[data-a=undo]").onclick = () => { this.shapes.pop(); render(); };
+    acts.querySelector("[data-a=clear]").onclick = () => { this.shapes = []; render(); };
+    sync();
+  },
+},
+];
+
+// ---------- drawing ----------
+let cur = PROTOS[0];
+const drawing = () => !!(cur.drawing && cur.drawing());
+function active() { return !drawing() && S.locked; }
+function render() {
+  ctx.clearRect(0, 0, LW, LH); ctx.fillStyle = "#fcfcfb"; ctx.fillRect(0, 0, LW, LH);
+  cur.draw();
+  if (active() && S.ghost && !S.nocursor) {
+    ctx.strokeStyle = "rgba(82,81,78,.6)"; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(S.rx, S.ry); ctx.lineTo(cx(S.x + S.jx), cy(S.y + S.jy)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.beginPath(); ctx.arc(S.rx, S.ry, 7, 0, 7); ctx.stroke();
+  }
+  if (active()) {
+    if (!S.nocursor) {
+    ctx.fillStyle = "#e8710a"; ctx.beginPath(); ctx.arc(cx(S.x + S.jx), cy(S.y + S.jy), 6, 0, 7); ctx.fill();
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke();
+    }
+  } else if (!drawing()) {
+    ctx.fillStyle = "rgba(11,11,11,.72)"; ctx.fillRect(LW / 2 - 130, LH / 2 - 24, 260, 48);
+    ctx.fillStyle = "#fff"; ctx.font = "500 15px 'DM Sans', sans-serif"; ctx.textAlign = "center"; ctx.fillText("Click to start", LW / 2, LH / 2 + 5);
+  }
+  $("readout").innerHTML = S.nocursor ? "<span>Hidden while the cursor is hidden</span><b></b>" : cur.read().map(([k, v]) => `<span>${k}</span><b>${v}</b>`).join("");
+}
+
+// ---------- input ----------
+async function lock() {
+  try { const r = cv.requestPointerLock({ unadjustedMovement: true }); if (r && r.then) await r; }
+  catch (e) {
+    try { const r = cv.requestPointerLock(); if (r && r.then) await r; }
+    catch (e2) { $("status").textContent = "Pointer lock was blocked. Wait a second and click again, or open this page directly in Chrome."; }
+  }
+}
+let startAt = null;
+cv.addEventListener("click", e => {
+  if (S.locked || drawing()) return;
+  const r = cv.getBoundingClientRect();
+  startAt = [(e.clientX - r.left) * LW / r.width, (e.clientY - r.top) * LH / r.height];
+  lock();
+});
+const toCanvas = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * LW / r.width, (e.clientY - r.top) * LH / r.height]; };
+cv.addEventListener("pointerdown", e => { if (!drawing()) return; cv.setPointerCapture(e.pointerId); cur.stroke = [toCanvas(e)]; render(); });
+cv.addEventListener("pointermove", e => {
+  if (!drawing() || !cur.stroke) return;
+  const p = toCanvas(e), q = cur.stroke[cur.stroke.length - 1];
+  if (Math.hypot(p[0] - q[0], p[1] - q[1]) > 3) { cur.stroke.push(p); render(); }
+});
+cv.addEventListener("pointerup", () => {
+  if (!drawing() || !cur.stroke) return;
+  if (cur.stroke.length >= 6) cur.shapes.push(makeShape(cur.stroke, cur.tex));
+  cur.stroke = null; render();
+});
+document.addEventListener("pointerlockchange", () => {
+  S.locked = document.pointerLockElement === cv;
+  if (S.locked) {
+    if (startAt) { S.x = startAt[0]; S.y = startAt[1]; startAt = null; }
+    S.x = cx(S.x); S.y = cy(S.y); S.rx = S.x; S.ry = S.y;
+  } else { if (cur.up) cur.up(); S.jx = S.jy = 0; }
+  if (!drawing()) $("status").textContent = S.locked ? "Esc to release" : "Click the chart to lock the pointer";
+  render();
+});
+document.addEventListener("mousemove", e => {
+  if (!active()) return;
+  if (Math.abs(e.movementX) > 200 || Math.abs(e.movementY) > 200) return;   // browsers sometimes report a spurious jump right after locking
+  const s = LW / cv.getBoundingClientRect().width, dx = e.movementX * s, dy = e.movementY * s;
+  S.rx = cx(S.rx + dx); S.ry = cy(S.ry + dy);
+  cur.move(dx, dy);
+  S.x = cx(S.x); S.y = cy(S.y);
+  render();
+});
+document.addEventListener("mousedown", () => { if (S.locked && cur.down) { cur.down(); render(); } });
+document.addEventListener("mouseup", () => { if (cur.up) { cur.up(); render(); } });
+
+// ---------- controls ----------
+function toggle(id, key, onText, offText) {
+  $(id).onclick = e => {
+    S[key] = !S[key]; e.currentTarget.setAttribute("aria-pressed", key === "on" ? S.on : S[key]);
+    if (onText) e.currentTarget.textContent = S[key] ? onText : offText;
+    render();
+  };
+}
+toggle("c-on", "on", "Illusion on", "Illusion off");
+toggle("c-hide", "hide");
+toggle("c-ghost", "ghost");
+$("c-cursor").onclick = e => { S.nocursor = !S.nocursor; e.currentTarget.setAttribute("aria-pressed", S.nocursor); $("cursor-note").hidden = !S.nocursor; render(); };
+$("c-new").onclick = () => { cur.init(false); render(); };
+function renderParams() {
+  const el = $("params"); el.innerHTML = "";
+  const fmt = (p, v) => (p.step < 1 ? v.toFixed(2) : String(v)) + (p.unit || "");
+  cur.params.forEach(p => {
+    const d = document.createElement("div"); d.className = "ctrl";
+    if (p.type === "choice") {
+      d.innerHTML = `<label for="pp-${p.key}">${p.label}</label><select id="pp-${p.key}">${p.options.map(([v, t]) => `<option value="${v}"${cur.P[p.key] === v ? " selected" : ""}>${t}</option>`).join("")}</select>`;
+      const sel = d.querySelector("select"); sel.onchange = () => { cur.P[p.key] = sel.value; if (p.reinit) cur.init(false, "param"); if (cur.mystery) { cur.mystery = false; renderParams(); } render(); };
+      el.appendChild(d); return;
+    }
+    d.innerHTML = `<label for="pp-${p.key}">${p.label} <output>${fmt(p, cur.P[p.key])}</output></label><input type="range" id="pp-${p.key}" min="${p.min}" max="${p.max}" step="${p.step}" value="${cur.P[p.key]}">`;
+    const inp = d.querySelector("input"), out = d.querySelector("output");
+    inp.oninput = () => { cur.P[p.key] = +inp.value; out.textContent = fmt(p, cur.P[p.key]); if (p.reinit) cur.init(false, "param"); render(); };
+    el.appendChild(d);
+  });
+  if (cur.panel) cur.panel(el);
+}
+
+// ---------- navigation ----------
+const tabs = $("tabs");
+PROTOS.forEach((p, i) => {
+  const b = document.createElement("button"); b.className = "tab"; b.textContent = p.name; b.onclick = () => show(i); tabs.appendChild(b);
+});
+let idx = 0;
+function show(i) {
+  if (document.pointerLockElement) document.exitPointerLock();
+  idx = Math.max(0, Math.min(PROTOS.length - 1, i));
+  if (cur.up) cur.up();
+  cur = PROTOS[idx];
+  if (!cur.P) { cur.P = {}; cur.params.forEach(p => cur.P[p.key] = p.value); }
+  if (!cur.ready) { cur.init(true); cur.ready = true; }
+  cv.style.cursor = drawing() ? "crosshair" : "pointer";
+  $("status").textContent = drawing() ? "Drag to draw" : S.locked ? "Esc to release" : "Click the chart to lock the pointer";
+  S.jx = S.jy = 0;
+  $("p-title").textContent = cur.title; $("p-sub").textContent = cur.sub; $("p-task").innerHTML = cur.task;
+  $("p-how").textContent = cur.how; $("p-cite").textContent = cur.cite;
+  [...tabs.children].forEach((t, k) => t.setAttribute("aria-current", k === idx));
+  $("count").textContent = `Prototype ${idx + 1} of ${PROTOS.length}`;
+  $("prev").disabled = idx === 0; $("next").disabled = idx === PROTOS.length - 1;
+  try { history.replaceState(null, "", "#" + cur.id); } catch (e) {}
+  renderParams();
+  render();
+}
+$("prev").onclick = () => show(idx - 1); $("next").onclick = () => show(idx + 1);
+document.addEventListener("keydown", e => {
+  if (S.locked || e.target.closest("input")) return;
+  if (e.key === "ArrowRight") show(idx + 1);
+  if (e.key === "ArrowLeft") show(idx - 1);
+});
+const start = PROTOS.findIndex(p => p.id === location.hash.slice(1));
+show(start >= 0 ? start : 0);
+window.addEventListener("hashchange", () => { const j = PROTOS.findIndex(p => p.id === location.hash.slice(1)); if (j >= 0 && j !== idx) show(j); });
+document.fonts && document.fonts.ready.then(render);
+})();
+</script>
+</body>
+</html>
