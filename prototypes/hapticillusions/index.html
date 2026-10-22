@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Haptic Network Prototypes</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Two patterned heatmaps (friction and roughness), a lasso tool and six more browser prototypes that use pseudo-haptics to make node-link diagrams feel sticky, hilly, heavy, springy, rough or magnetic, plus a canvas for drawing textured communities. Aditya Retnanto.">
+<meta name="description" content="A terrain you can feel and print (persistent homology, STL export), two patterned heatmaps, a lasso tool and six more browser prototypes that use pseudo-haptics to make node-link diagrams feel sticky, hilly, heavy, springy, rough or magnetic, plus a canvas for drawing textured communities. Aditya Retnanto.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=DM+Sans:wght@300;400;500;600;700&display=swap">
 <style>
@@ -55,6 +55,7 @@ main { padding: 20px; max-width: 1400px; margin: 0 auto; display: flex; flex-dir
 .ctrl label { display: flex; justify-content: space-between; gap: 8px; color: var(--text-muted) }
 .ctrl output { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums }
 .ctrl input { width: 100%; accent-color: #52514e }
+.check { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--text-muted) }
 .ctrl select { font-size: 13px; padding: 5px 6px; border: 1px solid var(--border); border-radius: 6px; background: #ffffff; color: var(--text) }
 .readout { font-size: 14px; color: var(--text-muted); display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; font-variant-numeric: tabular-nums }
 .readout b { color: var(--text); font-weight: 600 }
@@ -423,7 +424,7 @@ const HEAT_BASE = { id: "heatmap", name: "Heatmap", title: "A heatmap you can fe
   cite: "Friction: Lécuyer 2009 · roughness: Ujitoko, Ban & Hirota (arXiv 1902.07071) · matrix data: Les Misérables (Knuth 1993)",
   PATTERNS: [["gradient", "Left-to-right gradient"], ["hotspot", "Hot spot in the centre"], ["checker", "Checkerboard"], ["diagonal", "Diagonal band"], ["stripes", "Vertical stripes"], ["corners", "Two hot corners"], ["matrix", "Les Misérables community matrix (11 × 11)"], ["random", "Random"]],
   get params() { return [
-    { key: "pattern", label: "Pattern", type: "choice", options: this.PATTERNS, value: "hotspot", reinit: true },
+    { key: "pattern", label: "Pattern", type: "choice", options: this.PATTERNS, value: "gradient", reinit: true },
     { key: "a", label: "Shake at value 100", min: 0, max: 20, step: 1, value: 9, unit: " px" },
     { key: "d", label: "Friction at value 100", min: 0, max: 0.95, step: 0.05, value: 0.85 },
     { key: "n", label: "Columns (not used by the matrix)", min: 4, max: 16, step: 1, value: 10, reinit: true },
@@ -507,7 +508,202 @@ const HEAT_ROUGH = heatTab({ id: "heatrough", name: "Heat roughness", feel: "rou
   how: "Each movement adds a random offset to the drawn cursor, scaled by the cell’s value and by how fast you move; standing still stays still. Compare with Heat friction on the same pattern to see which channel reads better. The community matrix shows how densely each pair of Les Misérables communities is connected.",
   cite: "Ujitoko, Ban & Hirota, pointer-jitter roughness (arXiv 1902.07071) · matrix data: Les Misérables (Knuth 1993)" });
 
+
+// ---------- topology: terrain, persistence of peaks, simplification, STL export ----------
+const CAN_DOWNLOAD = true;
+const TG = { W: 128, H: 68 };
+function terrainField(kind, seed) {
+  const r = seeded(seed), { W, H } = TG, f = new Float32Array(W * H), B = [];
+  const add = (cx, cy, sx, sy, a) => B.push([cx, cy, sx, sy, a]);
+  if (kind === "peaks") { add(.2, .38, .09, .17, 1); add(.58, .62, .11, .2, .72); add(.84, .3, .07, .13, .52); }
+  if (kind === "ridge") { add(.32, .45, .13, .12, .92); add(.68, .55, .13, .12, .8); add(.5, .5, .32, .07, .5); }
+  if (kind === "random") for (let i = 0; i < 9; i++) add(.08 + .84 * r(), .1 + .8 * r(), .05 + .09 * r(), .08 + .14 * r(), .3 + .7 * r());
+  for (let i = 0; i < 45; i++) add(r(), r(), .012 + .018 * r(), .025 + .03 * r(), .035 + .05 * r());   // small bumps: low persistence
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const u = x / (W - 1), v = y / (H - 1); let s = 0;
+    for (const [cx, cy, sx, sy, a] of B) s += a * Math.exp(-(((u - cx) / sx) ** 2 + ((v - cy) / sy) ** 2) / 2);
+    if (kind === "volcano") { const d = Math.hypot((u - .5) * 2.1, v - .5); s += Math.exp(-(((d - .27) / .07) ** 2) / 2) * .9 + .25 * Math.exp(-((d / .09) ** 2) / 2); }
+    f[y * W + x] = s;
+  }
+  let mn = Infinity, mx = -Infinity; f.forEach(v => { mn = Math.min(mn, v); mx = Math.max(mx, v); });
+  for (let i = 0; i < f.length; i++) f[i] = 100 * (f[i] - mn) / (mx - mn);
+  return f;
+}
+// 0-dimensional persistent homology of superlevel sets (union-find over the grid, 4-connected).
+// Each peak is born at its height and dies at the saddle where it merges into a higher peak; persistence = peak - saddle.
+// Peaks with persistence below tau are flattened to their saddle height (topological simplification).
+function persistence(f, tau, order) {
+  const { W, H } = TG, N = W * H, g = Float32Array.from(f);
+  const parent = new Int32Array(N).fill(-1), peak = new Int32Array(N), mem = new Array(N), pairs = [];
+  const find = i => { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+  for (const i of order) {
+    parent[i] = i; peak[i] = i; mem[i] = [i];
+    const x = i % W, y = (i / W) | 0, nb = [];
+    if (x > 0) nb.push(i - 1); if (x < W - 1) nb.push(i + 1); if (y > 0) nb.push(i - W); if (y < H - 1) nb.push(i + W);
+    for (const n of nb) {
+      if (parent[n] === -1) continue;
+      const ra = find(i), rb = find(n); if (ra === rb) continue;
+      const [keep, die] = f[peak[ra]] >= f[peak[rb]] ? [ra, rb] : [rb, ra];
+      const pers = f[peak[die]] - f[i];
+      if (peak[die] !== i) pairs.push({ peak: peak[die], saddle: i, pers });
+      if (pers < tau) for (const c of mem[die]) if (g[c] > f[i]) g[c] = f[i];
+      let A = mem[keep], Bm = mem[die]; if (A.length < Bm.length) { for (const c of A) Bm.push(c); mem[keep] = Bm; } else for (const c of Bm) A.push(c);
+      mem[die] = null; parent[die] = keep;
+    }
+  }
+  pairs.push({ peak: order[0], saddle: -1, pers: Infinity });
+  return { g, pairs };
+}
+function gridAt(fld, x, y) {
+  const { W, H } = TG, u = Math.max(0, Math.min(W - 1.001, (x - AREA.x0) / (AREA.x1 - AREA.x0) * (W - 1))), v = Math.max(0, Math.min(H - 1.001, (y - AREA.y0) / (AREA.y1 - AREA.y0) * (H - 1)));
+  const i = u | 0, j = v | 0, a = u - i, b = v - j, k = j * W + i;
+  return fld[k] * (1 - a) * (1 - b) + fld[k + 1] * a * (1 - b) + fld[k + W] * (1 - a) * b + fld[k + W + 1] * a * b;
+}
+const gridXY = k => [AREA.x0 + (k % TG.W) / (TG.W - 1) * (AREA.x1 - AREA.x0), AREA.y0 + ((k / TG.W) | 0) / (TG.H - 1) * (AREA.y1 - AREA.y0)];
+function terrainSTL(g, opt) {
+  // binary STL of a solid heightfield: top surface, flat bottom, four walls (units: mm)
+  const { W, H } = TG, wmm = opt.width, dmm = wmm * (AREA.y1 - AREA.y0) / (AREA.x1 - AREA.x0), sx = wmm / (W - 1), sy = dmm / (H - 1);
+  const band = i => Math.floor(g[i] / opt.iv);
+  const ridge = i => opt.emboss && ((i % W < W - 1 && band(i) !== band(i + 1)) || (i + W < W * H && band(i) !== band(i + W)));
+  const P = (x, y) => [x * sx, (H - 1 - y) * sy, opt.base + g[y * W + x] / 100 * opt.relief + (ridge(y * W + x) ? opt.ridge : 0)];
+  const Q = (x, y) => [x * sx, (H - 1 - y) * sy, 0];
+  const tris = [];
+  for (let y = 0; y < H - 1; y++) for (let x = 0; x < W - 1; x++) {
+    const a = P(x, y), b = P(x + 1, y), c = P(x, y + 1), d = P(x + 1, y + 1);
+    tris.push([a, c, b], [b, c, d]);
+    const A = Q(x, y), Bq = Q(x + 1, y), C = Q(x, y + 1), D = Q(x + 1, y + 1);
+    tris.push([A, Bq, C], [Bq, D, C]);
+  }
+  const wall = (p0, p1, b0, b1) => tris.push([p0, b0, p1], [p1, b0, b1]);
+  for (let x = 0; x < W - 1; x++) { wall(P(x + 1, 0), P(x, 0), Q(x + 1, 0), Q(x, 0)); wall(P(x, H - 1), P(x + 1, H - 1), Q(x, H - 1), Q(x + 1, H - 1)); }
+  for (let y = 0; y < H - 1; y++) { wall(P(0, y), P(0, y + 1), Q(0, y), Q(0, y + 1)); wall(P(W - 1, y + 1), P(W - 1, y), Q(W - 1, y + 1), Q(W - 1, y)); }
+  const buf = new ArrayBuffer(84 + 50 * tris.length), dv = new DataView(buf);
+  dv.setUint32(80, tris.length, true);
+  tris.forEach((t, n) => {
+    const o = 84 + 50 * n, [p, q, r] = t, ux = q[0] - p[0], uy = q[1] - p[1], uz = q[2] - p[2], vx = r[0] - p[0], vy = r[1] - p[1], vz = r[2] - p[2];
+    let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx; const L = Math.hypot(nx, ny, nz) || 1;
+    [nx / L, ny / L, nz / L, ...p, ...q, ...r].forEach((v, m) => dv.setFloat32(o + 4 * m, v, true));
+  });
+  return buf;
+}
+
+const TOPO = { id: "topology", name: "Topology", title: "Feel the important peaks", sub: "Terrain · persistent homology · STL export",
+  task: "Click to lock the pointer and explore the terrain. <b>Raise “Keep peaks more prominent than” to flatten the small bumps</b>, so only the significant peaks remain to be felt. Try the tasks from Herman et al.: trace a path downhill, compare two heights, find the highest point in a region. Then download the same terrain as an STL and print it.",
+  how: "Peak prominence is the 0-dimensional persistence of the terrain: each peak is born at its height and dies at the saddle where it joins a higher peak. Peaks below the threshold are flattened to their saddle height, and you feel that simplified terrain. Friction makes high ground sticky; slope slows you climbing and speeds you descending; contours give a catch at each contour line. The STL is the same simplified terrain, with contour ridges raised if you choose, so the screen and the print can be compared on the same data.",
+  cite: "Persistence: Edelsbrunner, Letscher & Zomorodian 2002 · tasks: Herman, Jackson & Keefe, TVCG 2024 · bumps: Lécuyer et al., CHI 2004",
+  params: [
+    { key: "terrain", label: "Terrain", type: "choice", options: [["peaks", "Three peaks with small bumps"], ["ridge", "Two summits joined by a saddle"], ["volcano", "Crater rim"], ["random", "Random hills"]], value: "peaks", reinit: true },
+    { key: "feel", label: "Feel", type: "choice", options: [["friction", "Friction: high ground is sticky"], ["slope", "Slope: uphill slow, downhill fast"], ["contour", "Contours: a catch at each contour line"]], value: "friction" },
+    { key: "tau", label: "Keep peaks more prominent than", min: 0, max: 60, step: 1, value: 12 },
+    { key: "k", label: "Strength", min: 0, max: 0.95, step: 0.05, value: 0.85 },
+    { key: "iv", label: "Contour interval", min: 4, max: 25, step: 1, value: 10 },
+    { key: "show", label: "What you see", type: "choice", options: [["simple", "The simplified terrain you feel"], ["orig", "The original terrain"]], value: "simple" },
+    { key: "relief", label: "Print relief", min: 4, max: 40, step: 1, value: 16, unit: " mm" },
+  ],
+  init(first) {
+    this.seed = first ? 11 : R(1, 9999);
+    this.f = terrainField(this.P.terrain, this.seed);
+    this.order = [...this.f.keys()].sort((a, b) => this.f[b] - this.f[a]);
+    this.tauDone = null; this.key = ""; this.cache = {}; this.g1 = 1; this.lastBand = null; this.caught = false;
+  },
+  topo() {
+    if (this.tauDone !== this.P.tau) { const r = persistence(this.f, this.P.tau, this.order); this.g = r.g; this.pairs = r.pairs; this.tauDone = this.P.tau; }
+    return this;
+  },
+  move(dx, dy) {
+    this.topo();
+    const P = this.P, m = Math.hypot(dx, dy), x0 = S.x, y0 = S.y, h0 = gridAt(this.g, S.x, S.y);
+    let g = 1; this.caught = false;
+    if (S.on && P.feel === "friction") g = 1 - P.k * h0 / 100;
+    if (S.on && P.feel === "slope" && m) {
+      const ux = dx / m, uy = dy / m, s = (gridAt(this.g, S.x + ux * 3, S.y + uy * 3) - gridAt(this.g, S.x - ux * 3, S.y - uy * 3)) / 6;
+      g = Math.max(.1, Math.min(1.9, 1 - P.k * Math.max(-1, Math.min(1, s / 1.2))));
+    }
+    S.x += dx * g; S.y += dy * g;
+    if (S.on && P.feel === "contour" && m) {
+      const b0 = Math.floor(h0 / P.iv), b1 = Math.floor(gridAt(this.g, cx(S.x), cy(S.y)) / P.iv);
+      if (b0 !== b1) { const back = Math.min(.85, P.k); S.x -= (S.x - x0) * back; S.y -= (S.y - y0) * back; this.caught = true; }
+    }
+    this.g1 = g; S.jx = S.jy = 0;
+  },
+  layer() {
+    this.topo();
+    const P = this.P, key = [S.hide, P.show, P.tau, P.iv, this.seed, P.terrain].join("|");
+    if (key === this.key) return this.cache.c;
+    this.key = key;
+    const c = this.cache.c || (this.cache.c = document.createElement("canvas")); c.width = cv.width; c.height = cv.height;
+    const b = c.getContext("2d"), w = c.width, h = c.height, img = b.createImageData(w, h), d = img.data, fld = P.show === "orig" ? this.f : this.g;
+    const sc = w / LW, bands = new Int16Array(w * h).fill(-1);
+    const ramp = [[243, 241, 231], [154, 167, 214], [0, 15, 161]];
+    for (let py = 0; py < h; py++) {
+      const y = (py + .5) / sc; if (y < AREA.y0 || y > AREA.y1) continue;
+      for (let px = 0; px < w; px++) {
+        const x = (px + .5) / sc; if (x < AREA.x0 || x > AREA.x1) continue;
+        const v = gridAt(fld, x, y), p = py * w + px, o = p * 4;
+        bands[p] = Math.floor(v / P.iv);
+        if (S.hide) { d[o] = 240; d[o + 1] = 239; d[o + 2] = 236; d[o + 3] = 255; continue; }
+        const t = v / 100, [A, Bc] = t < .5 ? [ramp[0], ramp[1]] : [ramp[1], ramp[2]], u = t < .5 ? t * 2 : (t - .5) * 2;
+        let rr = A[0] + (Bc[0] - A[0]) * u, gg = A[1] + (Bc[1] - A[1]) * u, bb = A[2] + (Bc[2] - A[2]) * u;
+        const edge = (px > 0 && bands[p - 1] >= 0 && bands[p - 1] !== bands[p]) || (py > 0 && bands[p - w] >= 0 && bands[p - w] !== bands[p]);
+        if (edge) { const dk = t > .55 ? 1.6 : .55; rr = t > .55 ? Math.min(255, rr * dk + 60) : rr * dk; gg = t > .55 ? Math.min(255, gg * dk + 60) : gg * dk; bb = t > .55 ? Math.min(255, bb * 1.1 + 60) : bb * dk; }
+        d[o] = rr; d[o + 1] = gg; d[o + 2] = bb; d[o + 3] = 255;
+      }
+    }
+    b.putImageData(img, 0, 0);
+    return c;
+  },
+  kept() { return this.topo().pairs.filter(p => p.pers >= this.P.tau); },
+  draw() {
+    this.drawBars();
+    ctx.drawImage(this.layer(), 0, 0, LW, LH);
+    if (S.hide) return;
+    const kept = this.kept().sort((a, b) => b.pers - a.pers);
+    kept.forEach(p => {
+      const [x, y] = gridXY(p.peak);
+      ctx.beginPath(); ctx.moveTo(x, y - 7); ctx.lineTo(x + 6, y + 4); ctx.lineTo(x - 6, y + 4); ctx.closePath();
+      ctx.fillStyle = "#ffffff"; ctx.fill(); ctx.strokeStyle = "#e8710a"; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = "#0b0b0b"; ctx.font = "600 11px 'DM Sans', sans-serif"; ctx.textAlign = "left";
+      ctx.fillText(p.pers === Infinity ? "highest" : "p " + Math.round(p.pers), x + 9, y + 3);
+      if (p.saddle >= 0) { const [sx, sy] = gridXY(p.saddle); ctx.strokeStyle = "#e8710a"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(sx - 4, sy - 4); ctx.lineTo(sx + 4, sy + 4); ctx.moveTo(sx + 4, sy - 4); ctx.lineTo(sx - 4, sy + 4); ctx.stroke(); }
+    });
+  },
+  read() {
+    const kept = this.kept().length, all = this.pairs.length;
+    const hOrig = gridAt(this.f, S.x, S.y), hFelt = gridAt(this.g, S.x, S.y), f = this.P.feel;
+    return [["Height", hOrig.toFixed(0)], ["Height you feel", hFelt.toFixed(0)], ["Peaks kept", `${kept} of ${all}`],
+      [f === "contour" ? "Contour band" : "Gain", f === "contour" ? Math.floor(hFelt / this.P.iv) + (this.caught ? " · catch" : "") : this.g1.toFixed(2)]];
+  },
+  panel(el) {
+    const d = document.createElement("div");
+    d.innerHTML = `<p class="sub">Peak prominence (persistence)</p><canvas id="tp-bars" width="520" height="150" style="width:100%;height:auto;display:block;margin-top:8px;border:1px solid var(--border);border-radius:6px;background:#fff" aria-label="Bars for each peak's persistence; bars above the line are kept"></canvas>
+      <p class="cite" style="margin-top:4px">One bar per peak, tallest first. Orange bars are kept; the line is the threshold.</p>
+      <p class="sub" style="margin-top:14px">Print this terrain</p>
+      <label class="check" style="margin-top:8px"><input type="checkbox" id="tp-emboss"> Raise contour lines on the print (0.8 mm ridges)</label>
+      <div class="row" style="margin-top:8px">${CAN_DOWNLOAD ? '<button class="sbtn" id="tp-stl">Download STL</button>' : ""}</div>
+      <p class="cite" id="tp-msg" style="margin-top:6px">${CAN_DOWNLOAD ? "120 mm wide, 3 mm base. Exports the simplified terrain you feel." : "Downloads are blocked in this preview. Open the version on aretnanto.com to download the STL."}</p>`;
+    el.appendChild(d);
+    this.drawBars();
+    const btn = d.querySelector("#tp-stl");
+    if (btn) btn.onclick = () => {
+      this.topo();
+      const buf = terrainSTL(this.g, { width: 120, base: 3, relief: this.P.relief, iv: this.P.iv, emboss: d.querySelector("#tp-emboss").checked, ridge: .8 });
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([buf], { type: "model/stl" }));
+      a.download = `terrain-${this.P.terrain}-tau${this.P.tau}.stl`; document.body.appendChild(a); a.click(); a.remove();
+      d.querySelector("#tp-msg").textContent = `Saved ${a.download} (${Math.round(buf.byteLength / 1024)} KB).`;
+    };
+  },
+  drawBars() {
+    const c = document.getElementById("tp-bars"); if (!c) return;
+    const b = c.getContext("2d"), w = c.width, h = c.height; b.clearRect(0, 0, w, h);
+    const ps = this.topo().pairs.filter(p => p.pers !== Infinity).map(p => p.pers).sort((a, b) => b - a).slice(0, 48);
+    const mx = Math.max(60, ps[0] || 1), bw = (w - 16) / Math.max(ps.length, 1), base = h - 10, top = 10;
+    ps.forEach((v, i) => { const bh = (base - top) * v / mx; b.fillStyle = v >= this.P.tau ? "#e8710a" : "#c3c2b7"; b.fillRect(8 + i * bw + 1, base - bh, Math.max(1, bw - 2), bh); });
+    const ty = base - (base - top) * this.P.tau / mx; b.strokeStyle = "#0b0b0b"; b.setLineDash([6, 4]); b.lineWidth = 2; b.beginPath(); b.moveTo(4, ty); b.lineTo(w - 4, ty); b.stroke(); b.setLineDash([]);
+  },
+};
+
 const PROTOS = [
+TOPO,
 HEAT_FRICTION,
 HEAT_ROUGH,
 LASSO,
