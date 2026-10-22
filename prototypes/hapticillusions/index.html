@@ -621,6 +621,8 @@ const TOPO = { id: "topology", name: "Topology", wide: true, title: "Feel the im
     { key: "tau", label: "Keep peaks more prominent than", min: 0, max: 60, step: 1, value: 12 },
     { key: "k", label: "Strength", min: 0, max: 0.95, step: 0.05, value: 0.85 },
     { key: "iv", label: "Contour interval", min: 4, max: 25, step: 1, value: 10 },
+    { key: "colour", label: "Surface", type: "choice", options: [["plain", "Plain: contour lines only"], ["height", "Coloured by height"]], value: "plain" },
+    { key: "marks", label: "Peak markers", type: "choice", options: [["off", "Hidden"], ["on", "Show the kept peaks and their saddles"]], value: "off" },
     { key: "show", label: "What you see", type: "choice", options: [["simple", "The simplified terrain you feel"], ["orig", "The original terrain"]], value: "simple" },
     { key: "relief", label: "Print relief", min: 4, max: 40, step: 1, value: 16, unit: " mm" },
   ],
@@ -657,20 +659,32 @@ const TOPO = { id: "topology", name: "Topology", wide: true, title: "Feel the im
   },
   layer() {
     this.topo();
-    const P = this.P, key = [S.hide, P.show, P.tau, P.iv, this.seed, P.terrain].join("|");
+    const P = this.P, key = [S.hide, P.show, P.tau, P.iv, this.seed, P.terrain, P.colour, this.upload ? this.upload.name : ""].join("|");
     if (key === this.key) return this.cache.c;
     this.key = key;
     const c = this.cache.c || (this.cache.c = document.createElement("canvas")); c.width = cv.width; c.height = cv.height;
-    const b = c.getContext("2d"), w = c.width, h = c.height, img = b.createImageData(w, h), d = img.data, fld = P.show === "orig" ? this.f : this.g;
+    const b = c.getContext("2d"), w = c.width, h = c.height, img = b.createImageData(w, h), d = img.data, raw = P.show === "orig" ? this.f : this.g;
+    // draw from a lightly smoothed copy, so digitizing noise does not leave stray contour fragments (what you feel is unchanged)
+    const fld = new Float32Array(raw.length), RR = this.meta ? this.meta.rect : { x0: 0, y0: 0, x1: TG.W - 1, y1: TG.H - 1 }, RX0 = RR.x0, RY0 = RR.y0, RX1 = RR.x1, RY1 = RR.y1;   // stay inside the data
+    for (let j = 0; j < TG.H; j++) for (let i = 0; i < TG.W; i++) { let a = 0, n = 0; for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) { const ii = i + di, jj = j + dj; if (ii >= RX0 && jj >= RY0 && ii <= RX1 && jj <= RY1) { a += raw[jj * TG.W + ii]; n++; } } fld[j * TG.W + i] = n ? a / n : raw[j * TG.W + i]; }
     const sc = w / LW, bands = new Int16Array(w * h).fill(-1);
     const ramp = [[243, 241, 231], [154, 167, 214], [0, 15, 161]];
     for (let py = 0; py < h; py++) {
       const y = (py + .5) / sc; if (y < AREA.y0 || y > AREA.y1) continue;
       for (let px = 0; px < w; px++) {
         const x = (px + .5) / sc; if (x < AREA.x0 || x > AREA.x1) continue;
+        if (this.meta) {   // real data: draw only the terrain itself, not the empty margin around it
+          const R = this.meta.rect, gi = (x - AREA.x0) / (AREA.x1 - AREA.x0) * (TG.W - 1), gj = (y - AREA.y0) / (AREA.y1 - AREA.y0) * (TG.H - 1);
+          if (gi < R.x0 || gi > R.x1 || gj < R.y0 || gj > R.y1) continue;
+        }
         const v = gridAt(fld, x, y), p = py * w + px, o = p * 4;
         bands[p] = Math.floor(v / P.iv);
         if (S.hide) { d[o] = 240; d[o + 1] = 239; d[o + 2] = 236; d[o + 3] = 255; continue; }
+        if (P.colour === "plain") {   // a plain map: light ground, grey contour lines, every fifth line darker
+          const edge = (px > 0 && bands[p - 1] >= 0 && bands[p - 1] !== bands[p]) || (py > 0 && bands[p - w] >= 0 && bands[p - w] !== bands[p]);
+          const major = edge && Math.max(bands[p], px > 0 ? bands[p - 1] : 0, py > 0 ? bands[p - w] : 0) % 5 === 0;
+          const c = !edge ? 252 : major ? 70 : 150; d[o] = c; d[o + 1] = c; d[o + 2] = edge ? c + 4 : 251; d[o + 3] = 255; continue;
+        }
         const t = v / 100, [A, Bc] = t < .5 ? [ramp[0], ramp[1]] : [ramp[1], ramp[2]], u = t < .5 ? t * 2 : (t - .5) * 2;
         let rr = A[0] + (Bc[0] - A[0]) * u, gg = A[1] + (Bc[1] - A[1]) * u, bb = A[2] + (Bc[2] - A[2]) * u;
         const edge = (px > 0 && bands[p - 1] >= 0 && bands[p - 1] !== bands[p]) || (py > 0 && bands[p - w] >= 0 && bands[p - w] !== bands[p]);
@@ -686,7 +700,7 @@ const TOPO = { id: "topology", name: "Topology", wide: true, title: "Feel the im
   draw() {
     this.drawBars();
     ctx.drawImage(this.layer(), 0, 0, LW, LH);
-    if (S.hide) return;
+    if (S.hide || this.P.marks !== "on") return;
     const kept = this.kept().sort((a, b) => b.pers - a.pers);
     kept.forEach(p => {
       const [x, y] = gridXY(p.peak);
