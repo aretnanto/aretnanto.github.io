@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Haptic Network Prototypes</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="A terrain you can feel and print (persistent homology, STL export), two patterned heatmaps, a lasso tool and six more browser prototypes that use pseudo-haptics to make node-link diagrams feel sticky, hilly, heavy, springy, rough or magnetic, plus a canvas for drawing textured communities. Aditya Retnanto.">
+<meta name="description" content="Pseudo-haptic prototypes for data: a heatmap you feel as friction, a Les Misérables lasso, heavy, springy, rough, magnetic and snapping network nodes and edges, and a terrain you can feel and 3D print. Aditya Retnanto.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=DM+Sans:wght@300;400;500;600;700&display=swap">
 <style>
@@ -508,11 +508,6 @@ const HEAT_FRICTION = heatTab({ id: "heatfriction", name: "Heat friction", feel:
   task: "Move over the grid. <b>Hot cells slow the cursor</b>, so they feel sticky, like the tall bars did. Pick a pattern, or press <b>Mystery pattern</b> to hide the colours and guess the pattern by feel.",
   how: "Inside a cell the cursor moves at 1 − friction × value/100 of your hand’s speed, with a sharp change at each cell border. This is the bar-chart mechanism applied to every cell of a grid. The community matrix shows how densely each pair of Les Misérables communities is connected; the bright diagonal is the communities themselves.",
   cite: "Lécuyer 2009 (survey) · Ujitoko, Ban & Hirota, WHC 2019 · matrix data: Les Misérables (Knuth 1993)" });
-const HEAT_ROUGH = heatTab({ id: "heatrough", name: "Heat roughness", feel: "rough", drop: ["d"],
-  title: "A gritty heatmap", sub: "Grid · cursor jitter",
-  task: "Move over the grid. <b>Hot cells make the cursor shake</b>, so they feel rough. Pick a pattern, or press <b>Mystery pattern</b> to hide the colours and guess the pattern by feel.",
-  how: "Each movement adds a random offset to the drawn cursor, scaled by the cell’s value and by how fast you move; standing still stays still. Compare with Heat friction on the same pattern to see which channel reads better. The community matrix shows how densely each pair of Les Misérables communities is connected.",
-  cite: "Ujitoko, Ban & Hirota, pointer-jitter roughness (arXiv 1902.07071) · matrix data: Les Misérables (Knuth 1993)" });
 
 
 // ---------- topology: terrain, persistence of peaks, simplification, STL export ----------
@@ -710,27 +705,7 @@ const TOPO = { id: "topology", name: "Topology", wide: true, title: "Feel the im
 
 const PROTOS = [
 HEAT_FRICTION,
-HEAT_ROUGH,
 LASSO,
-{ id: "friction", name: "Sticky cells", title: "Sticky cells", sub: "Node territories · cursor gain",
-  task: "Move across the network. <b>Each node owns the area closest to it, and a bigger value makes that whole area sticky</b>, the way a taller bar did. Hide visuals and find the stickiest node by feel.",
-  how: "The plot is split into cells: each point belongs to its nearest node, up to the cell reach. Inside a cell the cursor moves at 1 − strength × value/100 of your hand’s speed, and the speed changes sharply at the border. Large regions with one constant speed are what made the bar chart feel strong.",
-  cite: "Lécuyer 2009 (survey) · Ujitoko, Ban & Hirota, WHC 2019",
-  params: [K(0.85), { key: "reach", label: "Cell reach", min: 30, max: 200, step: 5, value: 110, unit: " px" }, NODES(10)],
-  init() { this.g = makeGraph(this.P.n); this.cache = {}; this.key = ""; this.ver = (this.ver || 0) + 1; },
-  here() { return nearestNode(this.g, S.x, S.y, this.P.reach); },
-  gain() { const q = this.here(); return q ? g1(this.P.k, q.v) : 1; },
-  move(dx, dy) { const g = this.gain(); S.x += dx * g; S.y += dy * g; },
-  draw() {
-    const key = [S.hide, this.P.reach, this.ver].join("|");
-    if (key !== this.key) { this.key = key; this.cache.img = cellLayer(this.cache, this.g, this.P.reach, i => S.hide ? HIDE_FILL : [0, 15, 161, .05 + .7 * this.g.nodes[i].v / 100], S.hide ? HIDE_LINE : WHITE_LINE); }
-    ctx.drawImage(this.cache.img, 0, 0, LW, LH);
-    const h = S.locked && !S.nocursor && this.here();
-    this.g.edges.forEach(e => drawEdge(this.g, e, "rgba(82,81,78,.45)"));
-    this.g.nodes.forEach(q => drawNode(q, 10, "#ffffff", S.hide ? "#a9a89f" : NAVY, q === h));
-  },
-  read() { const q = this.here(); return [["Node", q ? q.id : "–"], ["Value", q ? q.v : "–"], ["Gain", this.gain().toFixed(2)]]; },
-},
 { id: "weight", name: "Weight", title: "Heavy nodes", sub: "Drag nodes · C/D ratio",
   task: "Press and hold on a node, then drag it. <b>Nodes with bigger values move slower than your hand</b>, so they feel heavier, and their edges follow. Hide visuals and sort the nodes by weight.",
   how: "While you hold a node, the node and cursor move at 1 − strength × value/100 of your hand’s speed. People already drag nodes to tidy node-link layouts, so the weight rides on a familiar action.",
@@ -919,67 +894,6 @@ LASSO,
     d.innerHTML = `<div class="row"><button class="sbtn" id="sn-scr">Scramble again</button></div>`;
     el.appendChild(d);
     d.querySelector("#sn-scr").onclick = () => { this.scramble(); render(); };
-  },
-},
-{ id: "draw", name: "Draw", title: "Draw community textures", sub: "Freehand regions · five textures",
-  task: "Pick a texture and <b>drag to draw a region</b>, for example around a cluster of nodes. Then switch to <b>Feel</b>, click to lock the pointer, and move between regions. Hide visuals to feel the boundaries blind.",
-  how: "Each texture is one cursor trick: sticky lowers the gain, slippery raises it, ridged alternates slow and fast stripes, rough shakes the cursor, magnetic pulls toward the region’s centre. The fill pattern hints at the feel; ridged stripes match the felt spacing exactly.",
-  cite: "Built from the mechanisms in the other tabs",
-  params: [K(), { key: "period", label: "Ridge spacing", min: 6, max: 40, step: 2, value: 14, unit: " px" }, { key: "shake", label: "Roughness shake", min: 0, max: 16, step: 1, value: 8, unit: " px" }, NODES(14)],
-  mode: "draw", tex: "sticky", bounds: { x0: 4, x1: LW - 4, y0: 4, y1: LH - 4 },
-  init(first, why) {
-    this.stroke = null; this.here = null;
-    this.g = makeGraph(this.P.n);
-    if (why === "param" && this.shapes) return;
-    const keys = Object.keys(TEX), ns = [...this.g.nodes].sort((a, b) => a.x - b.x);
-    const picks = [ns[0], ns[Math.floor(ns.length / 2)], ns[ns.length - 1]];
-    this.shapes = picks.map((q, i) => blob(q.x, q.y, R(50, 66), first ? ["sticky", "ridged", "rough"][i] : keys[R(0, keys.length - 1)]));
-  },
-  drawing() { return this.mode === "draw"; },
-  at(x, y) { for (let i = this.shapes.length - 1; i >= 0; i--) if (inside(this.shapes[i], x, y)) return this.shapes[i]; return null; },
-  move(dx, dy) {
-    const sh = this.at(S.x, S.y), k = this.P.k, m = Math.hypot(dx, dy);
-    this.here = sh ? sh.tex : null;
-    let g = 1;
-    if (S.on && sh) {
-      if (sh.tex === "sticky") g = 1 - k;
-      if (sh.tex === "slippery") g = 1 + k;
-      if (sh.tex === "ridged") g = 1 - k * 0.95 * (Math.sin(2 * Math.PI * S.x / this.P.period) > 0 ? 1 : 0.1);
-      if (sh.tex === "rough") g = 0.85;
-    }
-    S.x += dx * g; S.y += dy * g;
-    if (S.on && sh && sh.tex === "rough") { const a = this.P.shake * Math.min(1, m / 2); S.jx = (Math.random() * 2 - 1) * a; S.jy = (Math.random() * 2 - 1) * a; } else { S.jx = S.jy = 0; }
-    if (S.on && sh && sh.tex === "magnetic" && m) {
-      const d = Math.hypot(sh.cx - S.x, sh.cy - S.y);
-      if (d > 0) { const p = Math.min(d, m * k * 0.7); S.x += (sh.cx - S.x) / d * p; S.y += (sh.cy - S.y) / d * p; }
-    }
-  },
-  draw() {
-    this.shapes.forEach(sh => paintShape(sh, this.P.period));
-    this.g.edges.forEach(e => drawEdge(this.g, e, "rgba(82,81,78,.55)", 1.5));
-    this.g.nodes.forEach(plainNode);
-    if (this.stroke && this.stroke.length > 1) {
-      ctx.strokeStyle = TEX[this.tex].col; ctx.lineWidth = 2; ctx.beginPath();
-      this.stroke.forEach((p, i) => ctx[i ? "lineTo" : "moveTo"](p[0], p[1])); ctx.stroke();
-    }
-  },
-  read() { return [["Mode", this.mode === "draw" ? "Draw" : "Feel"], ["Texture here", this.here ? TEX[this.here].name : "–"], ["Regions", this.shapes.length]]; },
-  panel(el) {
-    const mk = html => { const d = document.createElement("div"); d.innerHTML = html; el.appendChild(d); return d; };
-    const modes = mk(`<div class="row"><button class="sbtn" data-m="draw">Draw</button><button class="sbtn" data-m="feel">Feel</button></div>`);
-    const texs = mk(`<p class="sub">Texture for the next shape</p><div class="row" style="margin-top:8px">${Object.entries(TEX).map(([k, t]) => `<button class="sbtn" data-t="${k}" title="${t.feel}"><span class="sw" style="background:${t.col}"></span>${t.name}</button>`).join("")}</div>`);
-    const acts = mk(`<div class="row"><button class="sbtn" data-a="undo">Undo shape</button><button class="sbtn" data-a="clear">Clear all</button></div>`);
-    const sync = () => {
-      modes.querySelectorAll("[data-m]").forEach(b => b.setAttribute("aria-pressed", b.dataset.m === this.mode));
-      texs.querySelectorAll("[data-t]").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === this.tex));
-      cv.style.cursor = this.mode === "draw" ? "crosshair" : "pointer";
-      $("status").textContent = this.mode === "draw" ? "Drag to draw" : (S.locked ? "Esc to release" : "Click the chart to lock the pointer");
-    };
-    modes.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { this.mode = b.dataset.m; if (this.mode === "draw" && document.pointerLockElement) document.exitPointerLock(); sync(); render(); });
-    texs.querySelectorAll("[data-t]").forEach(b => b.onclick = () => { this.tex = b.dataset.t; sync(); });
-    acts.querySelector("[data-a=undo]").onclick = () => { this.shapes.pop(); render(); };
-    acts.querySelector("[data-a=clear]").onclick = () => { this.shapes = []; render(); };
-    sync();
   },
 },
 TOPO,
