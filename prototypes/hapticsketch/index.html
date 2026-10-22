@@ -5,16 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Haptic Sketch</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="A lo-fi authoring tool for felt data: load a dataset, map its attributes to pseudo-haptic channels, feel it with a mouse, and export a printable STL. Aditya Retnanto.">
+<meta name="description" content="A lo-fi authoring tool for felt data: turn terrain, images, tables or networks into a surface, feel it with your mouse, simplify it by peak prominence, and print it. Aditya Retnanto.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=DM+Sans:wght@300;400;500;600;700&display=swap">
 <style>
-/* Layout: same system as the prototypes. Feel canvas on the left; the four steps of the pipeline (Data, Map, Feel, Print) down the right. */
+/* Layout: same system as the prototypes. The surface on the left; the four steps (Data, Shape, Feel, Print) down the right. */
 :root {
   color-scheme: light;
   --bg: #f9f9f7; --surface: #fcfcfb; --text: #0b0b0b; --text-muted: #52514e; --border: #e1e0d9; --accent: #0b0b0b;
   --navy: #000fa1; --sel: #e8710a; --sel-ink: #b85a07; --sel-soft: #fdf1e6;
-  --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "DM Mono", Menlo, Consolas, monospace;
+  --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 * { box-sizing: border-box }
 [hidden] { display: none !important }
@@ -25,13 +25,11 @@ p { margin: 0 }
 a { color: inherit }
 button, input, select { font: inherit; color: inherit }
 :focus-visible { outline: 2px solid var(--sel); outline-offset: 2px }
-
 header.bar { position: sticky; top: 0; z-index: 5; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 20px }
 .bar-in { display: flex; align-items: baseline; justify-content: space-between; gap: 8px 16px; padding-block: 12px; flex-wrap: wrap }
 .bar h1 { font-size: 18px }
 .bar p { font-size: 14px; color: var(--text-muted); margin-right: auto }
 .bar a { font-size: 14px; color: var(--text-muted) }
-
 main { padding: 20px; max-width: 1440px; margin: 0 auto }
 .app { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start }
 .app:fullscreen { background: var(--bg); padding: 16px; overflow: auto }
@@ -39,8 +37,7 @@ main { padding: 20px; max-width: 1440px; margin: 0 auto }
 .app:fullscreen .side { max-height: calc(100vh - 32px); overflow: auto }
 .view { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0 }
 .view h3 { font-size: 15px; display: flex; justify-content: space-between; gap: 8px; align-items: baseline }
-.view h3 span { font-weight: 400; color: var(--text-muted); font-size: 13px }
-.step h3 { font-size: 15px }
+.view h3 span.s { font-weight: 400; color: var(--text-muted); font-size: 13px }
 .step h3 i { font-style: normal; display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 12px; margin-right: 8px }
 #ph { width: 100%; height: auto; aspect-ratio: 640 / 340; display: block; border-radius: 6px; cursor: pointer; touch-action: none; border: 1px solid var(--border) }
 .side { display: flex; flex-direction: column; gap: 12px; min-width: 0 }
@@ -58,17 +55,10 @@ main { padding: 20px; max-width: 1440px; margin: 0 auto }
 .check { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--text-muted) }
 .two { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px }
 .cite { font-size: 12px; color: var(--text-muted) }
-.layer { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; background: #ffffff }
-.layer-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; font-weight: 600 }
-.layer-h button { border: 0; background: none; color: var(--text-muted); cursor: pointer; font-size: 13px }
-.chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border-radius: 3px; padding: 1px 6px; background: #f0efec; color: var(--text-muted) }
-.chip.yes { background: var(--sel-soft); color: var(--sel-ink) }
-.readout { font-size: 13px; color: var(--text-muted); display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 3px 12px; font-variant-numeric: tabular-nums; align-items: baseline }
-.readout b { color: var(--text); font-weight: 600; text-align: right }
-.readout span.n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
-.ptable { width: 100%; border-collapse: collapse; font-size: 13px }
-.ptable td { padding: 4px 0; border-bottom: 1px solid var(--border); vertical-align: top }
-.ptable td:last-child { text-align: right }
+.readout { font-size: 13px; color: var(--text-muted); display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 4px 16px; font-variant-numeric: tabular-nums }
+.readout div { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 3px }
+.readout b { color: var(--text); font-weight: 600 }
+#bars { width: 100%; height: auto; display: block; border: 1px solid var(--border); border-radius: 6px; background: #ffffff }
 @media (max-width: 1000px) { .app { grid-template-columns: minmax(0,1fr) } }
 @media (max-width: 700px) { main { padding: 12px 16px } }
 </style>
@@ -76,15 +66,15 @@ main { padding: 20px; max-width: 1440px; margin: 0 auto }
 <body>
 <header class="bar"><div class="bar-in">
   <h1>Haptic Sketch</h1>
-  <p>Load data, map it to something you feel, feel it with your mouse, then print it.</p>
+  <p>Turn data into a surface, feel it with your mouse, then print the same surface.</p>
   <a href="../hapticillusions/">Example gallery</a>
 </div></header>
 
 <main>
 <div class="app" id="app">
   <div class="view">
-    <h3 id="ds-title">Feel <span id="status">Click the plot to lock the pointer</span></h3>
-    <canvas id="ph" width="1280" height="680" aria-label="Data you can feel. Click to lock the pointer; Esc releases it."></canvas>
+    <h3><span id="ds-title">Surface</span> <span class="s" id="status">Click the surface to lock the pointer</span></h3>
+    <canvas id="ph" width="1280" height="680" aria-label="A data surface you can feel. Click to lock the pointer; Esc releases it."></canvas>
     <div class="readout" id="readout"></div>
     <p class="cite" id="ds-cite"></p>
   </div>
@@ -93,27 +83,31 @@ main { padding: 20px; max-width: 1440px; margin: 0 auto }
     <section class="view step">
       <h3><span><i>1</i>Data</span></h3>
       <label class="field">Dataset<select id="ds-pick"></select></label>
-      <label class="field">Or load your own: CSV table, network JSON ({nodes, links}) or a grayscale elevation image
+      <label class="field">Or load your own: an elevation image (lighter is higher), a CSV table, or a network JSON ({nodes, links})
         <input type="file" id="ds-file" accept=".csv,.json,image/*"></label>
-      <div class="two" id="xy-pick" hidden>
-        <label class="field">X axis<select id="ds-x"></select></label>
-        <label class="field">Y axis<select id="ds-y"></select></label>
+      <div class="two" id="xy-w" hidden>
+        <label class="field">X axis<select id="o-x"></select></label>
+        <label class="field">Y axis<select id="o-y"></select></label>
       </div>
-      <div class="two">
-        <label class="field">Colour by<select id="vis-col"></select></label>
-        <label class="field" id="vis-size-w">Size by<select id="vis-size"></select></label>
-      </div>
+      <label class="field">Height comes from<select id="o-height"></select></label>
+      <div class="ctrl" id="spread-w"><label for="o-spread">Spread around each item <output id="o-spread-o"></output></label><input type="range" id="o-spread" min="4" max="40" step="1" value="14"></div>
       <p class="cite" id="ds-msg"></p>
     </section>
 
     <section class="view step">
-      <h3><span><i>2</i>Map</span><span>attribute → feel</span></h3>
-      <div id="layers" style="display:flex;flex-direction:column;gap:8px"></div>
-      <div class="row"><button class="sbtn" id="add-layer">Add layer</button></div>
+      <h3><span><i>2</i>Shape</span></h3>
+      <div class="ctrl"><label for="o-smooth">Smoothing <output id="o-smooth-o"></output></label><input type="range" id="o-smooth" min="0" max="6" step="0.5" value="0"></div>
+      <div class="ctrl"><label for="o-tau">Keep peaks more prominent than <output id="o-tau-o"></output></label><input type="range" id="o-tau" min="0" max="60" step="1" value="12"></div>
+      <canvas id="bars" width="600" height="150" aria-label="One bar per peak, tallest first; orange bars are kept"></canvas>
+      <p class="cite">One bar per peak, by prominence (how far it rises above the saddle that joins it to a higher peak). Peaks under the dashed line are flattened, in what you feel and in what you print.</p>
+      <label class="check" id="overlay-w"><input type="checkbox" id="o-overlay" checked> Show the <span id="overlay-n">items</span> on top</label>
     </section>
 
     <section class="view step">
       <h3><span><i>3</i>Feel</span></h3>
+      <label class="field">The surface feels like<select id="o-feel"></select></label>
+      <div class="ctrl"><label for="o-k">Strength <output id="o-k-o"></output></label><input type="range" id="o-k" min="0" max="0.95" step="0.05" value="0.85"></div>
+      <div class="ctrl"><label for="o-iv">Contour interval <output id="o-iv-o"></output></label><input type="range" id="o-iv" min="4" max="25" step="1" value="10"></div>
       <div class="row">
         <button class="sbtn" id="c-on" aria-pressed="true">Illusion on</button>
         <button class="sbtn" id="c-hide" aria-pressed="false">Hide visuals</button>
@@ -121,22 +115,18 @@ main { padding: 20px; max-width: 1440px; margin: 0 auto }
         <button class="sbtn" id="c-ghost" aria-pressed="false">Show real pointer</button>
         <button class="sbtn" id="c-full">Full screen</button>
       </div>
-      <p class="cite">Hide visuals to feel the data alone. Hide the cursor too and the feeling should vanish, because the mouse itself never changes.</p>
+      <p class="cite">Hide visuals to feel the surface alone. Hide the cursor too and the feeling should vanish, because the mouse itself never changes.</p>
     </section>
 
     <section class="view step">
       <h3><span><i>4</i>Print</span></h3>
-      <label class="field">Relief from<select id="pr-relief"></select></label>
-      <div class="ctrl"><label for="pr-h">Relief height <output id="pr-h-o">12 mm</output></label><input type="range" id="pr-h" min="2" max="40" step="1" value="12"></div>
-      <table class="ptable" id="pr-map"></table>
+      <div class="ctrl"><label for="o-relief">Relief height <output id="o-relief-o"></output></label><input type="range" id="o-relief" min="2" max="40" step="1" value="16"></div>
+      <label class="check"><input type="checkbox" id="o-pcontour"> Raise the contour lines (0.8 mm ridges)</label>
+      <label class="check" id="pnet-w"><input type="checkbox" id="o-pnet"> Raise the <span id="pnet-n">items</span> on the surface</label>
       <div class="row" id="pr-btns"></div>
       <p class="cite" id="pr-msg"></p>
-      <p class="cite" style="margin-top:4px">The sketch itself (data choice, layers, view) saves as a small JSON file you can share and load again.</p>
-      <div class="row">
-        <span id="spec-btns" class="row"></span>
-        <label class="sbtn" for="spec-file" style="display:inline-block">Load sketch</label>
-        <input type="file" id="spec-file" accept=".json,application/json" hidden>
-      </div>
+      <div class="row"><span id="spec-btns" class="row"></span><label class="sbtn" for="spec-file">Load sketch</label><input type="file" id="spec-file" accept=".json,application/json" hidden></div>
+      <p class="cite">A sketch file stores the dataset and every setting, so someone else can feel and print the same surface.</p>
     </section>
   </div>
 </div>
@@ -152,474 +142,371 @@ const CARS = { cols: ["Horsepower", "Miles_per_Gallon", "Weight_in_lbs", "Accele
 const CAN_DOWNLOAD = true;
 const $ = id => document.getElementById(id);
 const cv = $("ph"), ctx = cv.getContext("2d");
-const LW = 640, LH = 340, AREA = { x0: 34, x1: 606, y0: 24, y1: 304 };
+const LW = 640, LH = 340, AREA = { x0: 34, x1: 606, y0: 24, y1: 316 };
 ctx.scale(cv.width / LW, cv.height / LH);
-const NAVY = "#000fa1", MUTED = "#52514e";
-const GCOL = ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#d4a72c", "#b07aa1", "#ff9da7", "#9c755f", "#7f7f7f", "#000fa1", "#2f6b3a"];
+const TG = { W: 150, H: 77 };                       // the surface grid; it always spans AREA
+const MUTED = "#52514e";
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const cx = v => clamp(v, AREA.x0, AREA.x1), cy = v => clamp(v, AREA.y0, AREA.y1);
 function seeded(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
-const ramp = t => { t = clamp(t, 0, 1); const A = [[243, 241, 231], [154, 167, 214], [0, 15, 161]], [p, q] = t < .5 ? [A[0], A[1]] : [A[1], A[2]], u = t < .5 ? t * 2 : t * 2 - 1; return [p[0] + (q[0] - p[0]) * u, p[1] + (q[1] - p[1]) * u, p[2] + (q[2] - p[2]) * u]; };
-const rgb = c => `rgb(${c[0] | 0},${c[1] | 0},${c[2] | 0})`;
+const RAMP = [[243, 241, 231], [154, 167, 214], [0, 15, 161]];
+const ramp = t => { t = clamp(t, 0, 1); const [p, q] = t < .5 ? [RAMP[0], RAMP[1]] : [RAMP[1], RAMP[2]], u = t < .5 ? t * 2 : t * 2 - 1; return [p[0] + (q[0] - p[0]) * u, p[1] + (q[1] - p[1]) * u, p[2] + (q[2] - p[2]) * u]; };
+const pretty = a => String(a).replace(/_/g, " ");
+const gx = i => AREA.x0 + (i % TG.W) / (TG.W - 1) * (AREA.x1 - AREA.x0), gy = i => AREA.y0 + ((i / TG.W) | 0) / (TG.H - 1) * (AREA.y1 - AREA.y0);
 
-// ---------------------------------------------------------------- datasets
-// A dataset has one kind (grid, network, points), named attributes per element type, and a layout in plot coordinates.
+// ---------------------------------------------------------------- sources
 function layoutGraph(nodes, edges, seed) {
-  const rnd = seeded(seed), n = nodes.length;
+  const rnd = seeded(seed), n = nodes.length, rep = n > 120 ? 84000 / n : 700;
   nodes.forEach(q => { q.x = rnd() * 400; q.y = rnd() * 400; q.vx = 0; q.vy = 0; });
-  const rep = n > 120 ? 1200 / n * 60 : 700;
   for (let it = 0; it < 400; it++) {
     const al = 1 - it / 400;
-    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
-      const A = nodes[i], B = nodes[j], dx = A.x - B.x, dy = A.y - B.y, f = rep / (dx * dx + dy * dy + .01) * al;
-      A.vx += dx * f; A.vy += dy * f; B.vx -= dx * f; B.vy -= dy * f;
-    }
-    edges.forEach(e => {
-      const A = nodes[e.a], B = nodes[e.b], dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || 1, f = (d - 28) * .06 * al;
-      A.vx += dx / d * f; A.vy += dy / d * f; B.vx -= dx / d * f; B.vy -= dy / d * f;
-    });
+    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) { const A = nodes[i], B = nodes[j], dx = A.x - B.x, dy = A.y - B.y, f = rep / (dx * dx + dy * dy + .01) * al; A.vx += dx * f; A.vy += dy * f; B.vx -= dx * f; B.vy -= dy * f; }
+    edges.forEach(e => { const A = nodes[e.a], B = nodes[e.b], dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || 1, f = (d - 28) * .06 * al; A.vx += dx / d * f; A.vy += dy / d * f; B.vx -= dx / d * f; B.vy -= dy / d * f; });
     nodes.forEach(q => { q.vx += (200 - q.x) * .012 * al; q.vy += (200 - q.y) * .012 * al; q.x += clamp(q.vx, -8, 8); q.y += clamp(q.vy, -8, 8); q.vx *= .55; q.vy *= .55; });
   }
   const xs = nodes.map(q => q.x), ys = nodes.map(q => q.y), mnx = Math.min(...xs), mxx = Math.max(...xs), mny = Math.min(...ys), mxy = Math.max(...ys);
-  nodes.forEach(q => { q.x = AREA.x0 + 18 + (q.x - mnx) / (mxx - mnx || 1) * (AREA.x1 - AREA.x0 - 36); q.y = AREA.y0 + 14 + (q.y - mny) / (mxy - mny || 1) * (AREA.y1 - AREA.y0 - 28); });
+  nodes.forEach(q => { q.x = AREA.x0 + 40 + (q.x - mnx) / (mxx - mnx || 1) * (AREA.x1 - AREA.x0 - 80); q.y = AREA.y0 + 34 + (q.y - mny) / (mxy - mny || 1) * (AREA.y1 - AREA.y0 - 68); });
 }
-function networkDS(name, cite, nodes, edges, catNode) {
+function networkSrc(name, cite, nodes, edges) {
   nodes.forEach(q => { q.a.degree = 0; q.a.strength = 0; });
-  edges.forEach(e => { nodes[e.a].a.degree++; nodes[e.b].a.degree++; const w = e.at.weight ?? 1; nodes[e.a].a.strength += w; nodes[e.b].a.strength += w; });
+  edges.forEach(e => { const w = e.w ?? 1; nodes[e.a].a.degree++; nodes[e.b].a.degree++; nodes[e.a].a.strength += w; nodes[e.b].a.strength += w; });
   layoutGraph(nodes, edges, 7);
-  return { kind: "network", name, cite, nodes, edges, cat: catNode || [] };
+  return { kind: "network", name, cite, nodes, edges, heights: ["density", ...Object.keys(nodes[0].a).filter(k => !/^(community|group)$/i.test(k))], noun: "network" };
 }
-function gridDS(name, cite, w, h, cols, smooth) {
-  return { kind: "grid", name, cite, w, h, cols, smooth };
-}
-function pointsDS(name, cite, cols, rows, labels) {
-  return { kind: "points", name, cite, cols, rows, labels };
-}
-const BUILTIN = [
-  ["lesmis", "Network: Les Misérables characters", () => {
-    const nodes = LESMIS.names.map((nm, i) => ({ label: nm, a: { community: LESMIS.groups[i] } }));
-    const edges = LESMIS.links.map(([a, b, w]) => ({ a, b, at: { weight: w } }));
-    return networkDS("Les Misérables characters", "Character co-occurrence in Les Misérables (Knuth 1993), via vega-datasets. 77 characters, 254 links.", nodes, edges, ["community"]);
+const SOURCES = [
+  ["maungawhau", "Terrain: Maunga Whau volcano, Auckland", () => ({ kind: "raster", name: "Maunga Whau", cite: "Maunga Whau (Mt Eden), Auckland: 87 × 61 points at 10 m spacing, digitized from a topographic map by Ross Ihaka (R’s volcano dataset, via vega-datasets). Not survey-accurate.", w: VOLCANO.w, h: VOLCANO.h, cols: { elevation: Float32Array.from(VOLCANO.v) }, unit: " m", spacing: 10 })],
+  ["lesmis", "Network: Les Misérables characters as a landscape", () => {
+    const nodes = LESMIS.names.map((nm, i) => ({ label: nm, a: { community: LESMIS.groups[i] } })), edges = LESMIS.links.map(([a, b, w]) => ({ a, b, w }));
+    return networkSrc("Les Misérables landscape", "Character co-occurrence in Les Misérables (Knuth 1993), via vega-datasets. Each character raises the ground around it; tightly knit groups become hills.", nodes, edges);
   }],
-  ["cars", "Scatterplot: 1970s–80s cars", () => {
-    const cols = CARS.cols;
-    return pointsDS("Cars", "Cars dataset (Henderson & Velleman 1981, StatLib), via vega-datasets. 392 cars with horsepower and mileage.", cols, CARS.rows.map(r => r.slice(1)), CARS.rows.map(r => r[0]));
-  }],
-  ["maungawhau", "Terrain: Maunga Whau volcano, Auckland", () => gridDS("Maunga Whau", "Maunga Whau (Mt Eden): 87 × 61 points at 10 m spacing, digitized from a topographic map by Ross Ihaka (R’s volcano dataset). Not survey-accurate.", VOLCANO.w, VOLCANO.h, { elevation: Float32Array.from(VOLCANO.v) }, true)],
+  ["cars", "Table: cars, as a density landscape", () => ({ kind: "points", name: "Cars landscape", cite: "Cars dataset (Henderson & Velleman 1981, StatLib), via vega-datasets: 392 cars. Each car raises the ground around it, so common kinds of car become hills.", cols: CARS.cols, rows: CARS.rows.map(r => r.slice(1)), labels: CARS.rows.map(r => r[0]), x: "Horsepower", y: "Miles_per_Gallon", noun: "cars" })],
   ["matrix", "Matrix: Les Misérables community links", () => {
     const G = 11, size = Array(G).fill(0), cnt = Array.from({ length: G }, () => Array(G).fill(0));
     LESMIS.groups.forEach(g => size[g]++);
     LESMIS.links.forEach(([a, b]) => { const ga = LESMIS.groups[a], gb = LESMIS.groups[b]; cnt[ga][gb]++; if (ga !== gb) cnt[gb][ga]++; });
     const dens = new Float32Array(G * G), links = new Float32Array(G * G);
-    for (let i = 0; i < G; i++) for (let j = 0; j < G; j++) { const pairs = i === j ? size[i] * (size[i] - 1) / 2 : size[i] * size[j]; dens[i * G + j] = pairs ? cnt[i][j] / pairs : 0; links[i * G + j] = cnt[i][j]; }
-    const ds = gridDS("Community matrix", "How densely each pair of the 11 Les Misérables communities is linked (link density and link count).", G, G, { density: dens, links }, false);
-    ds.axis = "community"; return ds;
+    for (let i = 0; i < G; i++) for (let j = 0; j < G; j++) { const pairs = i === j ? size[i] * (size[i] - 1) / 2 : size[i] * size[j]; dens[j * G + i] = pairs ? cnt[i][j] / pairs : 0; links[j * G + i] = cnt[i][j]; }
+    return { kind: "raster", name: "Community matrix", cite: "How densely each pair of the 11 Les Misérables communities is linked. Each cell becomes a flat terrace; smoothing turns the terraces into hills.", w: G, h: G, cols: { density: dens, links }, blocky: true };
   }],
-  ["gradient", "Pattern: left-to-right gradient", () => { const w = 10, h = 6, v = new Float32Array(w * h); for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) v[j * w + i] = 100 * i / (w - 1); return gridDS("Gradient", "A test pattern: value rises from left to right.", w, h, { value: v }, false); }],
-  ["hotspot", "Pattern: hot spot in the centre", () => { const w = 10, h = 6, v = new Float32Array(w * h); for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) v[j * w + i] = 100 * Math.exp(-(((i / (w - 1) - .5) / .28) ** 2 + ((j / (h - 1) - .5) / .32) ** 2)); return gridDS("Hot spot", "A test pattern: one peak in the middle.", w, h, { value: v }, false); }],
-  ["checker", "Pattern: checkerboard", () => { const w = 10, h = 6, v = new Float32Array(w * h); for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) v[j * w + i] = (i + j) % 2 ? 90 : 8; return gridDS("Checkerboard", "A test pattern: alternating high and low cells.", w, h, { value: v }, false); }],
+  ["hotspot", "Pattern: hot spot in the centre", () => { const w = 10, h = 6, v = new Float32Array(w * h); for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) v[j * w + i] = 100 * Math.exp(-(((i / (w - 1) - .5) / .28) ** 2 + ((j / (h - 1) - .5) / .32) ** 2)); return { kind: "raster", name: "Hot spot", cite: "A test pattern with one peak, as a 10 × 6 grid.", w, h, cols: { value: v }, blocky: true, fill: true }; }],
+  ["gradient", "Pattern: left-to-right gradient", () => { const w = 10, h = 6, v = new Float32Array(w * h); for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) v[j * w + i] = 100 * i / (w - 1); return { kind: "raster", name: "Gradient", cite: "A test pattern that rises from left to right, as a 10 × 6 grid.", w, h, cols: { value: v }, blocky: true, fill: true }; }],
 ];
 
 // ---------------------------------------------------------------- state
-const S = { x: 320, y: 170, rx: 320, ry: 170, jx: 0, jy: 0, r: 6, locked: false, on: true, hide: false, nocursor: false, ghost: false };
-let DS = null, LAYERS = [], VIS = { col: null, size: null }, uid = 1;
-const DEFAULTS = {
-  network: () => [{ target: "nodes", attr: "degree", ch: "friction", k: .85, zone: 22 }, { target: "edges", attr: "weight", ch: "roughness", k: .6, zone: 10 }],
-  grid: ds => [{ target: "cells", attr: Object.keys(ds.cols)[0], ch: "friction", k: .85, zone: 20 }],
-  points: () => [{ target: "points", attr: "Weight_in_lbs", ch: "size", k: .8, zone: 16 }],
-};
-const CHANNELS = [["friction", "Friction: slows the cursor"], ["roughness", "Roughness: shakes the cursor"], ["size", "Cursor size: grows the cursor"], ["snap", "Snap: pulls the cursor in"]];
-const TARGETS = { network: [["nodes", "Nodes"], ["edges", "Edges"]], grid: [["cells", "Cells"]], points: [["points", "Points"]] };
+const S = { x: 320, y: 170, rx: 320, ry: 170, jx: 0, jy: 0, locked: false, on: true, hide: false, nocursor: false, ghost: false, g: 1, caught: false };
+let SRC = null, SRCKEY = "maungawhau";
+const O = { height: null, spread: 14, smooth: 0, tau: 12, overlay: true, feel: "friction", k: .85, iv: 10, relief: 16, pcontour: false, pnet: false, x: null, y: null };
+let F = null, G = null, PAIRS = [], META = null, RECT = null, ORDER = null, topoKey = "";
 
-// attribute lists and ranges per element type
-function attrs(target) {
-  if (!DS) return [];
-  if (target === "nodes") return Object.keys(DS.nodes[0].a);
-  if (target === "edges") return Object.keys(DS.edges[0].at);
-  if (target === "cells") return Object.keys(DS.cols);
-  if (target === "points") return DS.cols.filter((c, i) => DS.rows.some(r => typeof r[i] === "number"));
-  return [];
+// ---------------------------------------------------------------- data -> surface
+function blur(f, sigma) {
+  if (sigma <= 0) return f;
+  const { W, H } = TG, r = Math.ceil(sigma * 3), k = []; let s = 0;
+  for (let i = -r; i <= r; i++) { const v = Math.exp(-(i * i) / (2 * sigma * sigma)); k.push(v); s += v; }
+  const kn = k.map(v => v / s), tmp = new Float32Array(W * H), out = new Float32Array(W * H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { let a = 0; for (let i = -r; i <= r; i++) a += f[y * W + clamp(x + i, 0, W - 1)] * kn[i + r]; tmp[y * W + x] = a; }
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { let a = 0; for (let i = -r; i <= r; i++) a += tmp[clamp(y + i, 0, H - 1) * W + x] * kn[i + r]; out[y * W + x] = a; }
+  return out;
 }
-const rangeCache = {};
-function range(target, attr) {
-  const key = DS.name + "|" + target + "|" + attr; if (rangeCache[key]) return rangeCache[key];
-  let vals = [];
-  if (target === "nodes") vals = DS.nodes.map(q => q.a[attr]);
-  if (target === "edges") vals = DS.edges.map(e => e.at[attr]);
-  if (target === "cells") vals = Array.from(DS.cols[attr]);
-  if (target === "points") { const i = DS.cols.indexOf(attr); vals = DS.rows.map(r => r[i]); }
-  vals = vals.filter(v => typeof v === "number" && isFinite(v));
-  return rangeCache[key] = [Math.min(...vals), Math.max(...vals)];
+function pointsXY() {   // place table rows in the plot
+  const xi = SRC.cols.indexOf(O.x), yi = SRC.cols.indexOf(O.y);
+  const ok = SRC.rows.map((r, i) => [r[xi], r[yi], i]).filter(([a, b]) => Number.isFinite(a) && Number.isFinite(b));
+  const xs = ok.map(o => o[0]), ys = ok.map(o => o[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  SRC.pts = ok.map(([a, b, i]) => ({ i, label: SRC.labels[i], x: AREA.x0 + 40 + (a - x0) / (x1 - x0 || 1) * (AREA.x1 - AREA.x0 - 80), y: AREA.y1 - 34 - (b - y0) / (y1 - y0 || 1) * (AREA.y1 - AREA.y0 - 68) }));
 }
-const norm = (target, attr, v) => { if (typeof v !== "number" || !isFinite(v)) return null; const [a, b] = range(target, attr); return b > a ? (v - a) / (b - a) : 0; };
-
-// ---------------------------------------------------------------- placing data in the plot
-function placeGrid() {
-  const AW = AREA.x1 - AREA.x0, AH = AREA.y1 - AREA.y0;
-  if (!DS.smooth) { DS.rect = { x0: AREA.x0, y0: AREA.y0, x1: AREA.x1, y1: AREA.y1 }; return; }
-  const sc = Math.min(AW / (DS.w - 1), AH / (DS.h - 1)), w = sc * (DS.w - 1), h = sc * (DS.h - 1);
-  DS.rect = { x0: AREA.x0 + (AW - w) / 2, y0: AREA.y0 + (AH - h) / 2, x1: AREA.x0 + (AW + w) / 2, y1: AREA.y0 + (AH + h) / 2 };
-}
-function placePoints() {
-  const xi = DS.cols.indexOf(DS.xcol), yi = DS.cols.indexOf(DS.ycol);
-  const xs = DS.rows.map(r => r[xi]).filter(Number.isFinite), ys = DS.rows.map(r => r[yi]).filter(Number.isFinite);
-  const [x0, x1] = [Math.min(...xs), Math.max(...xs)], [y0, y1] = [Math.min(...ys), Math.max(...ys)];
-  DS.pts = DS.rows.map((r, i) => ({ i, label: DS.labels[i], x: AREA.x0 + 28 + (r[xi] - x0) / (x1 - x0 || 1) * (AREA.x1 - AREA.x0 - 44), y: AREA.y1 - 22 - (r[yi] - y0) / (y1 - y0 || 1) * (AREA.y1 - AREA.y0 - 34) })).filter(p => isFinite(p.x) && isFinite(p.y));
-  DS.ext = { x0, x1, y0, y1 };
-}
-
-// ---------------------------------------------------------------- what is under the cursor, per element type
-function gridValue(attr, x, y) {
-  const r = DS.rect, col = DS.cols[attr]; if (x < r.x0 || x > r.x1 || y < r.y0 || y > r.y1) return null;
-  if (!DS.smooth) {
-    const i = Math.min(DS.w - 1, Math.floor((x - r.x0) / (r.x1 - r.x0) * DS.w)), j = Math.min(DS.h - 1, Math.floor((y - r.y0) / (r.y1 - r.y0) * DS.h));
-    return { key: j * DS.w + i, v: col[j * DS.w + i], cx: r.x0 + (i + .5) * (r.x1 - r.x0) / DS.w, cy: r.y0 + (j + .5) * (r.y1 - r.y0) / DS.h,
-      label: DS.axis ? `community ${j} × ${i}` : String.fromCharCode(65 + i) + (j + 1) };
-  }
-  const u = (x - r.x0) / (r.x1 - r.x0) * (DS.w - 1), v = (y - r.y0) / (r.y1 - r.y0) * (DS.h - 1);
-  const i = Math.min(DS.w - 2, Math.floor(u)), j = Math.min(DS.h - 2, Math.floor(v)), a = u - i, b = v - j, k = j * DS.w + i;
-  const val = col[k] * (1 - a) * (1 - b) + col[k + 1] * a * (1 - b) + col[k + DS.w] * (1 - a) * b + col[k + DS.w + 1] * a * b;
-  const gi = Math.round(u), gj = Math.round(v);
-  return { key: gj * DS.w + gi, v: val, cx: r.x0 + gi / (DS.w - 1) * (r.x1 - r.x0), cy: r.y0 + gj / (DS.h - 1) * (r.y1 - r.y0), label: "here" };
-}
-function seg(A, B, x, y) {
-  const vx = B.x - A.x, vy = B.y - A.y, L2 = vx * vx + vy * vy || 1, t = clamp(((x - A.x) * vx + (y - A.y) * vy) / L2, 0, 1), px = A.x + t * vx, py = A.y + t * vy;
-  return { d: Math.hypot(x - px, y - py), px, py };
-}
-function lookup(L, x, y) {
-  if (L.target === "cells") return gridValue(L.attr, x, y);
-  if (L.target === "nodes") { let best = null, bd = L.zone; DS.nodes.forEach((q, i) => { const d = Math.hypot(q.x - x, q.y - y); if (d < bd) { bd = d; best = { key: i, v: q.a[L.attr], cx: q.x, cy: q.y, label: q.label }; } }); return best; }
-  if (L.target === "edges") { let best = null, bd = L.zone; DS.edges.forEach((e, i) => { const s = seg(DS.nodes[e.a], DS.nodes[e.b], x, y); if (s.d < bd) { bd = s.d; best = { key: i, v: e.at[L.attr], cx: s.px, cy: s.py, label: DS.nodes[e.a].label + "–" + DS.nodes[e.b].label }; } }); return best; }
-  if (L.target === "points") { const ai = DS.cols.indexOf(L.attr); let best = null, bd = L.zone; DS.pts.forEach(p => { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = { key: p.i, v: DS.rows[p.i][ai], cx: p.x, cy: p.y, label: p.label }; } }); return best; }
-  return null;
-}
-function strengthAt(L, x, y) {   // 0..1 for this layer at a point, or null when nothing is there
-  const el = lookup(L, x, y); if (!el) return null;
-  let t = norm(L.target, L.attr, el.v); if (t === null) return null;
-  if (L.invert) t = 1 - t;
-  return { t, el };
-}
-
-// ---------------------------------------------------------------- the illusion: one step of hand movement
-const LAST = [];
-function step(dx, dy) {
-  const m = Math.hypot(dx, dy), x0 = S.x, y0 = S.y;
-  let g = 1, jit = 0, size = 1; LAST.length = 0;
-  LAYERS.forEach(L => {
-    const h = strengthAt(L, S.x, S.y); LAST.push({ L, h, effect: "" });
-    if (!h || !S.on) return;
-    const o = LAST[LAST.length - 1];
-    if (L.ch === "friction") { const f = 1 - L.k * .95 * h.t; g *= f; o.effect = "speed ×" + f.toFixed(2); }
-    if (L.ch === "roughness") { const a = L.k * 14 * h.t; jit += a; o.effect = "shake " + a.toFixed(1) + " px"; }
-    if (L.ch === "size") { const s = 1 + L.k * 2.5 * h.t; size *= s; o.effect = "cursor ×" + s.toFixed(2); }
-  });
-  S.x += dx * g; S.y += dy * g;
-  if (S.on && m) LAYERS.forEach((L, li) => {
-    if (L.ch !== "snap") return;
-    const h = strengthAt(L, S.x, S.y); if (!h) return;
-    const d = Math.hypot(h.el.cx - S.x, h.el.cy - S.y); if (!d) return;
-    const p = Math.min(d, m * L.k * .9 * h.t); S.x += (h.el.cx - S.x) / d * p; S.y += (h.el.cy - S.y) / d * p;
-    if (LAST[li]) LAST[li].effect = "pull " + p.toFixed(1) + " px";
-  });
-  S.x = cx(S.x); S.y = cy(S.y);
-  const a = jit * Math.min(1, m / 2); S.jx = (Math.random() * 2 - 1) * a; S.jy = (Math.random() * 2 - 1) * a;
-  S.rTarget = 6 * size;
-}
-
-// ---------------------------------------------------------------- drawing
-const cache = { key: "", c: document.createElement("canvas") };
-function gridImage() {
-  const key = [DS.name, VIS.col, S.hide].join("|"); if (key === cache.key) return cache.c;
-  cache.key = key; const c = cache.c; c.width = cv.width; c.height = cv.height;
-  const b = c.getContext("2d"); b.setTransform(cv.width / LW, 0, 0, cv.height / LH, 0, 0); b.clearRect(0, 0, LW, LH);
-  const r = DS.rect;
-  if (!DS.smooth) {
-    const cw = (r.x1 - r.x0) / DS.w, ch = (r.y1 - r.y0) / DS.h;
-    for (let j = 0; j < DS.h; j++) for (let i = 0; i < DS.w; i++) {
-      b.fillStyle = S.hide ? "#f0efec" : rgb(ramp(norm("cells", VIS.col, DS.cols[VIS.col][j * DS.w + i])));
-      b.fillRect(r.x0 + i * cw + 1, r.y0 + j * ch + 1, cw - 2, ch - 2);
+function buildSurface() {
+  const { W, H } = TG, AW = AREA.x1 - AREA.x0, AH = AREA.y1 - AREA.y0;
+  let f = new Float32Array(W * H); META = null; RECT = { x0: 0, x1: W - 1, y0: 0, y1: H - 1 };
+  if (SRC.kind === "raster") {
+    const vals = SRC.cols[O.height], w = SRC.w, h = SRC.h; let lo = Infinity, hi = -Infinity; for (const v of vals) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+    // keep the data's proportions; the margin is filled with the lowest value
+    const scx = SRC.fill ? AW / (SRC.blocky ? w : w - 1) : Math.min(AW / (SRC.blocky ? w : w - 1), AH / (SRC.blocky ? h : h - 1)), scy = SRC.fill ? AH / (SRC.blocky ? h : h - 1) : scx;
+    const dw = scx * (SRC.blocky ? w : w - 1), dh = scy * (SRC.blocky ? h : h - 1), ox = (AW - dw) / 2, oy = (AH - dh) / 2, r = { x0: W, x1: 0, y0: H, y1: 0 };
+    for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+      const px = i / (W - 1) * AW - ox, py = j / (H - 1) * AH - oy; let v = lo;
+      if (px >= -1e-6 && py >= -1e-6 && px <= dw + 1e-6 && py <= dh + 1e-6) {
+        if (SRC.blocky) { const a = clamp(Math.floor(px / scx), 0, w - 1), b = clamp(Math.floor(py / scy), 0, h - 1); v = vals[b * w + a]; }
+        else { const u = px / scx, t = py / scy, a = clamp(Math.floor(u), 0, w - 2), b = clamp(Math.floor(t), 0, h - 2), fu = u - a, ft = t - b, k = b * w + a; v = vals[k] * (1 - fu) * (1 - ft) + vals[k + 1] * fu * (1 - ft) + vals[k + w] * (1 - fu) * ft + vals[k + w + 1] * fu * ft; }
+        r.x0 = Math.min(r.x0, i); r.x1 = Math.max(r.x1, i); r.y0 = Math.min(r.y0, j); r.y1 = Math.max(r.y1, j);
+      }
+      f[j * W + i] = v;
     }
-    return c;
+    RECT = r; META = { lo, hi, unit: SRC.unit || "", spacing: SRC.spacing || null, cols: w, real: !!SRC.unit };
+  } else {
+    // each item raises a Gaussian hill; its height comes from the chosen attribute (or 1 for density)
+    const items = SRC.kind === "network" ? SRC.nodes.map(q => ({ x: q.x, y: q.y, v: O.height === "density" ? 1 : q.a[O.height] })) : SRC.pts.map(p => ({ x: p.x, y: p.y, v: O.height === "density" ? 1 : SRC.rows[p.i][SRC.cols.indexOf(O.height)] }));
+    const vs = items.map(o => o.v).filter(Number.isFinite), vlo = Math.min(...vs), vhi = Math.max(...vs), s2 = 2 * O.spread * O.spread, cut = (O.spread * 3) ** 2;
+    items.forEach(o => {
+      if (!Number.isFinite(o.v)) return;
+      const wgt = O.height === "density" ? 1 : .15 + .85 * (vhi > vlo ? (o.v - vlo) / (vhi - vlo) : 1);
+      const i0 = Math.max(0, Math.floor((o.x - AREA.x0 - O.spread * 3) / AW * (W - 1))), i1 = Math.min(W - 1, Math.ceil((o.x - AREA.x0 + O.spread * 3) / AW * (W - 1)));
+      const j0 = Math.max(0, Math.floor((o.y - AREA.y0 - O.spread * 3) / AH * (H - 1))), j1 = Math.min(H - 1, Math.ceil((o.y - AREA.y0 + O.spread * 3) / AH * (H - 1)));
+      for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) { const dx = gx(j * W + i) - o.x, dy = gy(j * W + i) - o.y, d2 = dx * dx + dy * dy; if (d2 < cut) f[j * W + i] += wgt * Math.exp(-d2 / s2); }
+    });
   }
-  const sc = cv.width / LW, img = b.createImageData(cv.width, cv.height), d = img.data;
-  for (let py = 0; py < cv.height; py++) for (let px = 0; px < cv.width; px++) {
-    const x = (px + .5) / sc, y = (py + .5) / sc, gv = gridValue(VIS.col, x, y); if (!gv) continue;
-    const o = (py * cv.width + px) * 4, col = S.hide ? [240, 239, 236] : ramp(norm("cells", VIS.col, gv.v));
-    d[o] = col[0]; d[o + 1] = col[1]; d[o + 2] = col[2]; d[o + 3] = 255;
-  }
-  b.putImageData(img, 0, 0); return c;
+  f = blur(f, O.smooth);
+  let lo = Infinity, hi = -Infinity; f.forEach(v => { lo = Math.min(lo, v); hi = Math.max(hi, v); });
+  for (let i = 0; i < f.length; i++) f[i] = hi > lo ? 100 * (f[i] - lo) / (hi - lo) : 0;
+  F = f; ORDER = [...F.keys()].sort((a, b) => F[b] - F[a]); topoKey = ""; layerKey = "";
 }
-function nodeColour(q) {
-  if (S.hide) return "#a9a89f";
-  const v = q.a[VIS.col]; if (DS.cat.includes(VIS.col)) return GCOL[(v | 0) % GCOL.length];
-  return rgb(ramp(.2 + .8 * (norm("nodes", VIS.col, v) ?? 0)));
+// 0-dimensional persistence of superlevel sets; peaks less prominent than tau are flattened to their saddle
+function persistence(f, tau, order) {
+  const { W, H } = TG, N = W * H, g = Float32Array.from(f), parent = new Int32Array(N).fill(-1), peak = new Int32Array(N), mem = new Array(N), pairs = [];
+  const find = i => { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+  for (const i of order) {
+    parent[i] = i; peak[i] = i; mem[i] = [i];
+    const x = i % W, y = (i / W) | 0, nb = [];
+    if (x > 0) nb.push(i - 1); if (x < W - 1) nb.push(i + 1); if (y > 0) nb.push(i - W); if (y < H - 1) nb.push(i + W);
+    for (const n of nb) {
+      if (parent[n] === -1) continue;
+      const ra = find(i), rb = find(n); if (ra === rb) continue;
+      const [keep, die] = f[peak[ra]] >= f[peak[rb]] ? [ra, rb] : [rb, ra], pers = f[peak[die]] - f[i];
+      if (peak[die] !== i) pairs.push({ peak: peak[die], saddle: i, pers });
+      if (pers < tau) for (const c of mem[die]) if (g[c] > f[i]) g[c] = f[i];
+      const A = mem[keep], B = mem[die]; if (A.length < B.length) { for (const c of A) B.push(c); mem[keep] = B; } else for (const c of B) A.push(c);
+      mem[die] = null; parent[die] = keep;
+    }
+  }
+  pairs.push({ peak: order[0], saddle: -1, pers: Infinity });
+  return { g, pairs };
+}
+function topo() { const key = O.tau + "|" + F.length + "|" + ORDER[0]; if (key !== topoKey || !G) { const r = persistence(F, O.tau, ORDER); G = r.g; PAIRS = r.pairs.filter(p => p.pers >= 1); topoKey = key; } }
+function at(fld, x, y) {
+  const { W, H } = TG, u = clamp((x - AREA.x0) / (AREA.x1 - AREA.x0) * (W - 1), 0, W - 1.001), v = clamp((y - AREA.y0) / (AREA.y1 - AREA.y0) * (H - 1), 0, H - 1.001);
+  const i = u | 0, j = v | 0, a = u - i, b = v - j, k = j * W + i;
+  return fld[k] * (1 - a) * (1 - b) + fld[k + 1] * a * (1 - b) + fld[k + W] * (1 - a) * b + fld[k + W + 1] * a * b;
+}
+const kept = () => PAIRS.filter(p => p.pers >= Math.max(1, O.tau));
+
+// ---------------------------------------------------------------- feel
+function step(dx, dy) {
+  topo();
+  const m = Math.hypot(dx, dy), x0 = S.x, y0 = S.y, h0 = at(G, S.x, S.y); let g = 1; S.caught = false;
+  if (S.on && O.feel === "friction") g = 1 - O.k * h0 / 100;
+  if (S.on && O.feel === "slope" && m) { const ux = dx / m, uy = dy / m, s = (at(G, S.x + ux * 3, S.y + uy * 3) - at(G, S.x - ux * 3, S.y - uy * 3)) / 6; g = clamp(1 - O.k * clamp(s / 1.2, -1, 1), .1, 1.9); }
+  S.x = cx(S.x + dx * g); S.y = cy(S.y + dy * g);
+  if (S.on && O.feel === "contour" && m && Math.floor(h0 / O.iv) !== Math.floor(at(G, S.x, S.y) / O.iv)) { const back = Math.min(.85, O.k); S.x -= (S.x - x0) * back; S.y -= (S.y - y0) * back; S.caught = true; }
+  S.g = g;
+}
+
+// ---------------------------------------------------------------- draw
+let layerKey = ""; const layerC = document.createElement("canvas");
+function layer() {
+  topo();
+  const key = [S.hide, O.iv, topoKey, SRCKEY, O.height, O.spread, O.smooth].join("|"); if (key === layerKey) return layerC;
+  layerKey = key; layerC.width = cv.width; layerC.height = cv.height;
+  const b = layerC.getContext("2d"), w = layerC.width, h = layerC.height, img = b.createImageData(w, h), d = img.data, sc = w / LW, bands = new Int16Array(w * h).fill(-1);
+  const inRect = (x, y) => { const i = (x - AREA.x0) / (AREA.x1 - AREA.x0) * (TG.W - 1), j = (y - AREA.y0) / (AREA.y1 - AREA.y0) * (TG.H - 1); return i >= RECT.x0 - .5 && i <= RECT.x1 + .5 && j >= RECT.y0 - .5 && j <= RECT.y1 + .5; };
+  for (let py = 0; py < h; py++) {
+    const y = (py + .5) / sc; if (y < AREA.y0 || y > AREA.y1) continue;
+    for (let px = 0; px < w; px++) {
+      const x = (px + .5) / sc; if (x < AREA.x0 || x > AREA.x1 || !inRect(x, y)) continue;
+      const v = at(G, x, y), p = py * w + px, o = p * 4; bands[p] = Math.floor(v / O.iv);
+      if (S.hide) { d[o] = 240; d[o + 1] = 239; d[o + 2] = 236; d[o + 3] = 255; continue; }
+      let [r, g, bl] = ramp(v / 100);
+      const edge = (px > 0 && bands[p - 1] >= 0 && bands[p - 1] !== bands[p]) || (py > 0 && bands[p - w] >= 0 && bands[p - w] !== bands[p]);
+      if (edge) { if (v > 55) { r = Math.min(255, r * 1.6 + 60); g = Math.min(255, g * 1.6 + 60); bl = Math.min(255, bl * 1.1 + 60); } else { r *= .55; g *= .55; bl *= .55; } }
+      d[o] = r; d[o + 1] = g; d[o + 2] = bl; d[o + 3] = 255;
+    }
+  }
+  b.putImageData(img, 0, 0); return layerC;
+}
+function drawBars() {
+  const c = $("bars"), b = c.getContext("2d"), w = c.width, h = c.height; b.clearRect(0, 0, w, h);
+  const ps = PAIRS.filter(p => p.pers !== Infinity).map(p => p.pers).sort((a, z) => z - a).slice(0, 60), mx = Math.max(60, ps[0] || 1), bw = (w - 16) / Math.max(ps.length, 1), base = h - 10, top = 10;
+  ps.forEach((v, i) => { const bh = (base - top) * v / mx; b.fillStyle = v >= O.tau ? "#e8710a" : "#c3c2b7"; b.fillRect(8 + i * bw + 1, base - bh, Math.max(1, bw - 2), bh); });
+  const ty = base - (base - top) * O.tau / mx; b.strokeStyle = "#0b0b0b"; b.setLineDash([6, 4]); b.lineWidth = 2; b.beginPath(); b.moveTo(4, ty); b.lineTo(w - 4, ty); b.stroke(); b.setLineDash([]);
+}
+function nearestItem() {
+  if (SRC.kind === "raster") return null;
+  const list = SRC.kind === "network" ? SRC.nodes : SRC.pts; let best = null, bd = 16;
+  list.forEach(q => { const d = Math.hypot(q.x - S.x, q.y - S.y); if (d < bd) { bd = d; best = q; } }); return best;
 }
 function render() {
+  topo(); drawBars();
   ctx.clearRect(0, 0, LW, LH); ctx.fillStyle = "#fcfcfb"; ctx.fillRect(0, 0, LW, LH);
-  if (DS.kind === "grid") {
-    ctx.drawImage(gridImage(), 0, 0, LW, LH);
-    if (!DS.smooth) { ctx.fillStyle = MUTED; ctx.font = "600 11px 'DM Sans', sans-serif"; ctx.textAlign = "center"; const r = DS.rect, cw = (r.x1 - r.x0) / DS.w; for (let i = 0; i < DS.w; i++) ctx.fillText(DS.axis ? i : String.fromCharCode(65 + i), r.x0 + (i + .5) * cw, r.y1 + 14); }
+  ctx.drawImage(layer(), 0, 0, LW, LH);
+  if (!S.hide && O.overlay && SRC.kind === "network") {
+    ctx.strokeStyle = "rgba(11,11,11,.22)"; ctx.lineWidth = .8;
+    SRC.edges.forEach(e => { const A = SRC.nodes[e.a], B = SRC.nodes[e.b]; ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.stroke(); });
+    ctx.fillStyle = "rgba(255,255,255,.9)"; ctx.strokeStyle = "rgba(11,11,11,.55)";
+    SRC.nodes.forEach(q => { ctx.beginPath(); ctx.arc(q.x, q.y, 2.4, 0, 7); ctx.fill(); ctx.stroke(); });
   }
-  if (DS.kind === "network") {
-    ctx.strokeStyle = "rgba(82,81,78,.32)"; ctx.lineWidth = 1;
-    DS.edges.forEach(e => { const A = DS.nodes[e.a], B = DS.nodes[e.b]; ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.stroke(); });
-    DS.nodes.forEach(q => {
-      const rr = S.hide || !VIS.size ? 5 : 3 + 9 * Math.sqrt(norm("nodes", VIS.size, q.a[VIS.size]) ?? 0);
-      ctx.beginPath(); ctx.arc(q.x, q.y, rr, 0, 7); ctx.fillStyle = nodeColour(q); ctx.fill(); ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 1; ctx.stroke();
-    });
+  if (!S.hide && O.overlay && SRC.kind === "points") { ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.strokeStyle = "rgba(11,11,11,.45)"; ctx.lineWidth = .8; SRC.pts.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 1.8, 0, 7); ctx.fill(); ctx.stroke(); }); }
+  if (SRC.kind === "points" && !S.hide) {
+    ctx.fillStyle = MUTED; ctx.font = "500 11px 'DM Sans', sans-serif"; ctx.textAlign = "right"; ctx.fillText(pretty(O.x) + " →", AREA.x1 - 4, AREA.y1 - 6);
+    ctx.save(); ctx.translate(AREA.x0 + 12, AREA.y0 + 4); ctx.rotate(-Math.PI / 2); ctx.textAlign = "right"; ctx.fillText(pretty(O.y) + " →", 0, 0); ctx.restore();
   }
-  if (DS.kind === "points") {
-    ctx.strokeStyle = MUTED; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(AREA.x0 + 16, AREA.y1 - 10.5); ctx.lineTo(AREA.x1, AREA.y1 - 10.5); ctx.moveTo(AREA.x0 + 16.5, AREA.y0); ctx.lineTo(AREA.x0 + 16.5, AREA.y1 - 10); ctx.stroke();
-    ctx.fillStyle = MUTED; ctx.font = "500 11px 'DM Sans', sans-serif"; ctx.textAlign = "right"; ctx.fillText(DS.xcol.replace(/_/g, " ") + " →", AREA.x1, AREA.y1 + 4);
-    ctx.save(); ctx.translate(AREA.x0 + 8, AREA.y0); ctx.rotate(-Math.PI / 2); ctx.textAlign = "right"; ctx.fillText(DS.ycol.replace(/_/g, " ") + " →", 0, 0); ctx.restore();
-    const ci = DS.cols.indexOf(VIS.col), si = DS.cols.indexOf(VIS.size);
-    DS.pts.forEach(p => {
-      const r = DS.rows[p.i], rr = S.hide || si < 0 ? 3.5 : 2 + 5 * Math.sqrt(norm("points", VIS.size, r[si]) ?? 0);
-      ctx.beginPath(); ctx.arc(p.x, p.y, rr, 0, 7); ctx.fillStyle = S.hide ? "#a9a89f" : rgb(ramp(.25 + .75 * (norm("points", VIS.col, r[ci]) ?? 0))); ctx.globalAlpha = .85; ctx.fill(); ctx.globalAlpha = 1;
-    });
-  }
-  const active = S.locked;
-  if (active && S.ghost && !S.nocursor) {
-    ctx.strokeStyle = "rgba(82,81,78,.6)"; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
-    ctx.beginPath(); ctx.moveTo(S.rx, S.ry); ctx.lineTo(cx(S.x + S.jx), cy(S.y + S.jy)); ctx.stroke(); ctx.setLineDash([]);
-    ctx.beginPath(); ctx.arc(S.rx, S.ry, 7, 0, 7); ctx.stroke();
-  }
-  if (active && !S.nocursor) {
-    S.r += ((S.rTarget || 6) - S.r) * .35;
-    ctx.fillStyle = "#e8710a"; ctx.globalAlpha = S.r > 8 ? .85 : 1; ctx.beginPath(); ctx.arc(cx(S.x + S.jx), cy(S.y + S.jy), S.r, 0, 7); ctx.fill(); ctx.globalAlpha = 1;
-    ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke();
-  }
-  if (!active) {
-    ctx.fillStyle = "rgba(11,11,11,.72)"; ctx.fillRect(LW / 2 - 130, LH / 2 - 24, 260, 48);
-    ctx.fillStyle = "#fff"; ctx.font = "500 15px 'DM Sans', sans-serif"; ctx.textAlign = "center"; ctx.fillText("Click to start feeling", LW / 2, LH / 2 + 5);
-  }
+  if (!S.hide) kept().forEach(p => {
+    const x = gx(p.peak), y = gy(p.peak);
+    ctx.beginPath(); ctx.moveTo(x, y - 7); ctx.lineTo(x + 6, y + 4); ctx.lineTo(x - 6, y + 4); ctx.closePath(); ctx.fillStyle = "#fff"; ctx.fill(); ctx.strokeStyle = "#e8710a"; ctx.lineWidth = 2; ctx.stroke();
+    if (p.saddle >= 0) { const sx = gx(p.saddle), sy = gy(p.saddle); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(sx - 4, sy - 4); ctx.lineTo(sx + 4, sy + 4); ctx.moveTo(sx + 4, sy - 4); ctx.lineTo(sx - 4, sy + 4); ctx.stroke(); }
+  });
+  if (S.locked && S.ghost && !S.nocursor) { ctx.strokeStyle = "rgba(82,81,78,.6)"; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(S.rx, S.ry); ctx.lineTo(S.x, S.y); ctx.stroke(); ctx.setLineDash([]); ctx.beginPath(); ctx.arc(S.rx, S.ry, 7, 0, 7); ctx.stroke(); }
+  if (S.locked && !S.nocursor) { ctx.fillStyle = "#e8710a"; ctx.beginPath(); ctx.arc(S.x, S.y, 6, 0, 7); ctx.fill(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke(); }
+  if (!S.locked) { ctx.fillStyle = "rgba(11,11,11,.72)"; ctx.fillRect(LW / 2 - 130, LH / 2 - 24, 260, 48); ctx.fillStyle = "#fff"; ctx.font = "500 15px 'DM Sans', sans-serif"; ctx.textAlign = "center"; ctx.fillText("Click to start feeling", LW / 2, LH / 2 + 5); }
   readout();
 }
 function readout() {
-  const el = $("readout");
-  if (S.nocursor) { el.innerHTML = `<span></span><span class="n">Hidden while the cursor is hidden</span><b></b>`; return; }
-  el.innerHTML = LAYERS.map((L, i) => {
-    const h = LAST[i] && LAST[i].h, nm = h ? (S.hide ? "something" : h.el.label) : "–";
-    const raw = h ? (Number.isInteger(h.el.v) ? h.el.v : (+h.el.v).toFixed(1)) : "";
-    return `<span>Layer ${i + 1}</span><span class="n">${S.hide && h ? "" : nm}${h && !S.hide ? ` · ${L.attr.replace(/_/g, " ")} ${raw}` : ""}</span><b>${S.locked && h ? (LAST[i].effect || "–") : "–"}</b>`;
-  }).join("");
+  if (S.nocursor) { $("readout").innerHTML = "<div><span>Hidden while the cursor is hidden</span><b></b></div>"; return; }
+  const u = v => META && META.real ? (META.lo + v / 100 * (META.hi - META.lo)).toFixed(0) + META.unit : v.toFixed(0);
+  const rows = [["Height", S.locked ? u(at(F, S.x, S.y)) : "–"], ["Height you feel", S.locked ? u(at(G, S.x, S.y)) : "–"], ["Peaks kept", `${kept().length} of ${PAIRS.length}`],
+    [O.feel === "contour" ? "Contour band" : "Speed", !S.locked ? "–" : O.feel === "contour" ? Math.floor(at(G, S.x, S.y) / O.iv) + (S.caught ? " · catch" : "") : "×" + S.g.toFixed(2)]];
+  const it = S.locked && !S.hide ? nearestItem() : null; if (SRC.kind !== "raster") rows.push(["Near", it ? it.label : "–"]);
+  $("readout").innerHTML = rows.map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join("");
 }
 
-// ---------------------------------------------------------------- input (pointer lock keeps the cursor inside the plot)
+// ---------------------------------------------------------------- input
 let startAt = null;
-async function lock() {
-  try { const r = cv.requestPointerLock({ unadjustedMovement: true }); if (r && r.then) await r; }
-  catch (e) { try { const r = cv.requestPointerLock(); if (r && r.then) await r; } catch (e2) { $("status").textContent = "Pointer lock was blocked. Wait a second and click again."; } }
-}
+async function lock() { try { const r = cv.requestPointerLock({ unadjustedMovement: true }); if (r && r.then) await r; } catch (e) { try { const r = cv.requestPointerLock(); if (r && r.then) await r; } catch (e2) { $("status").textContent = "Pointer lock was blocked. Wait a second and click again."; } } }
 cv.addEventListener("click", e => { if (S.locked) return; const r = cv.getBoundingClientRect(); startAt = [(e.clientX - r.left) * LW / r.width, (e.clientY - r.top) * LH / r.height]; lock(); });
 document.addEventListener("pointerlockchange", () => {
   S.locked = document.pointerLockElement === cv;
-  if (S.locked) { if (startAt) { S.x = startAt[0]; S.y = startAt[1]; startAt = null; } S.x = cx(S.x); S.y = cy(S.y); S.rx = S.x; S.ry = S.y; step(0, 0); }
-  else { S.jx = S.jy = 0; }
-  $("status").textContent = S.locked ? "Esc to release" : "Click the plot to lock the pointer";
-  render();
+  if (S.locked) { if (startAt) { S.x = startAt[0]; S.y = startAt[1]; startAt = null; } S.x = cx(S.x); S.y = cy(S.y); S.rx = S.x; S.ry = S.y; S.g = 1; }
+  $("status").textContent = S.locked ? "Esc to release" : "Click the surface to lock the pointer"; render();
 });
 document.addEventListener("mousemove", e => {
-  if (!S.locked) return;
-  if (Math.abs(e.movementX) > 200 || Math.abs(e.movementY) > 200) return;   // ignore the jump some browsers report right after locking
+  if (!S.locked || Math.abs(e.movementX) > 200 || Math.abs(e.movementY) > 200) return;   // ignore the jump some browsers report right after locking
   const s = LW / cv.getBoundingClientRect().width, dx = e.movementX * s, dy = e.movementY * s;
-  S.rx = cx(S.rx + dx); S.ry = cy(S.ry + dy);
-  step(dx, dy); render();
+  S.rx = cx(S.rx + dx); S.ry = cy(S.ry + dy); step(dx, dy); render();
 });
 
-// ---------------------------------------------------------------- UI: data
-function loadDS(ds, layers) {
-  DS = ds;
-  if (DS.kind === "grid") placeGrid();
-  if (DS.kind === "points") { DS.xcol = DS.xcol || DS.cols[0]; DS.ycol = DS.ycol || DS.cols[1]; placePoints(); }
-  const target = TARGETS[DS.kind][0][0];
-  VIS.col = DS.kind === "network" ? (DS.cat[0] || attrs("nodes")[0]) : DS.kind === "grid" ? Object.keys(DS.cols)[0] : (attrs("points").includes("Weight_in_lbs") ? "Weight_in_lbs" : attrs("points")[2] || attrs("points")[0]);
-  VIS.size = DS.kind === "network" ? "degree" : DS.kind === "points" ? null : null;
-  LAYERS = (layers || DEFAULTS[DS.kind](DS)).map(L => ({ id: uid++, invert: false, ...L })).filter(L => attrs(L.target).includes(L.attr));
-  if (!LAYERS.length) LAYERS = [{ id: uid++, target, attr: attrs(target)[0], ch: "friction", k: .85, zone: 20, invert: false }];
-  cache.key = ""; LAST.length = 0;
-  $("ds-cite").textContent = DS.cite || "";
-  $("ds-title").firstChild.textContent = DS.name + " ";
-  uiData(); uiLayers(); uiPrint(); render();
-}
+// ---------------------------------------------------------------- UI
 function opts(sel, list, val) { sel.innerHTML = list.map(([v, t]) => `<option value="${v}"${v === val ? " selected" : ""}>${t}</option>`).join(""); }
-const pretty = a => a.replace(/_/g, " ");
-function uiData() {
-  const isPts = DS.kind === "points";
-  $("xy-pick").hidden = !isPts;
-  if (isPts) { const nums = attrs("points").map(a => [a, pretty(a)]); opts($("ds-x"), nums, DS.xcol); opts($("ds-y"), nums, DS.ycol); }
-  const colList = DS.kind === "network" ? attrs("nodes") : DS.kind === "grid" ? Object.keys(DS.cols) : attrs("points");
-  opts($("vis-col"), colList.map(a => [a, pretty(a)]), VIS.col);
-  $("vis-size-w").hidden = DS.kind === "grid";
-  opts($("vis-size"), [["", "Nothing"], ...(DS.kind === "network" ? attrs("nodes") : DS.kind === "points" ? attrs("points") : []).filter(a => !DS.cat?.includes(a)).map(a => [a, pretty(a)])], VIS.size || "");
+function heightList() {
+  if (SRC.kind === "raster") return Object.keys(SRC.cols).map(k => [k, pretty(k)]);
+  if (SRC.kind === "network") return SRC.heights.map(k => [k, k === "density" ? "How many nodes are nearby" : "Node " + pretty(k)]);
+  return [["density", "How many rows are nearby"], ...SRC.cols.filter(c => c !== O.x && c !== O.y).map(c => [c, pretty(c)])];
 }
-opts($("ds-pick"), BUILTIN.map(([k, t]) => [k, t]), "lesmis");
-$("ds-pick").onchange = e => { const b = BUILTIN.find(x => x[0] === e.target.value); $("ds-msg").textContent = ""; loadDS(b[2]()); };
-$("ds-x").onchange = e => { DS.xcol = e.target.value; placePoints(); render(); };
-$("ds-y").onchange = e => { DS.ycol = e.target.value; placePoints(); render(); };
-$("vis-col").onchange = e => { VIS.col = e.target.value; cache.key = ""; render(); };
-$("vis-size").onchange = e => { VIS.size = e.target.value || null; render(); };
+function setSource(src, key, keepO) {
+  SRC = src; SRCKEY = key;
+  if (!keepO) {
+    O.height = src.kind === "raster" ? Object.keys(src.cols)[0] : src.kind === "network" ? "density" : "density";
+    O.x = src.x || (src.cols && src.cols[0]); O.y = src.y || (src.cols && src.cols[1]);
+    O.smooth = src.kind === "raster" && src.blocky ? 0 : 0; O.spread = src.kind === "points" ? 12 : 14; O.tau = src.kind === "raster" && src.unit ? 12 : 8;
+  }
+  if (SRC.kind === "points") pointsXY();
+  $("ds-title").textContent = SRC.name; $("ds-cite").textContent = SRC.cite;
+  syncUI(); buildSurface(); render();
+}
+function syncUI() {
+  const pts = SRC.kind === "points", item = SRC.kind !== "raster";
+  $("xy-w").hidden = !pts; $("spread-w").hidden = !item; $("overlay-w").hidden = !item; $("pnet-w").hidden = !item;
+  $("overlay-n").textContent = SRC.noun || "items"; $("pnet-n").textContent = SRC.kind === "network" ? "network (nodes and links)" : "rows as small bumps";
+  if (pts) { const nums = SRC.cols.map(c => [c, pretty(c)]); opts($("o-x"), nums, O.x); opts($("o-y"), nums, O.y); }
+  opts($("o-height"), heightList(), O.height);
+  opts($("o-feel"), [["friction", "Friction: high ground is sticky"], ["slope", "Slope: uphill slow, downhill fast"], ["contour", "Contours: a catch at each contour line"]], O.feel);
+  [["o-spread", O.spread, v => v + " px"], ["o-smooth", O.smooth, v => v ? v + " cells" : "none"], ["o-tau", O.tau, v => String(v)], ["o-k", O.k, v => (+v).toFixed(2)], ["o-iv", O.iv, v => String(v)], ["o-relief", O.relief, v => v + " mm"]].forEach(([id, v, f]) => { $(id).value = v; $(id + "-o").textContent = f(v); });
+  $("o-overlay").checked = O.overlay; $("o-pcontour").checked = O.pcontour; $("o-pnet").checked = O.pnet;
+  $("pr-btns").innerHTML = CAN_DOWNLOAD ? `<button class="sbtn primary" id="pr-stl">Download STL</button>` : "";
+  $("spec-btns").innerHTML = CAN_DOWNLOAD ? `<button class="sbtn" id="spec-save">Save sketch</button>` : "";
+  $("pr-msg").textContent = CAN_DOWNLOAD ? "120 mm wide with a 3 mm base. You print exactly the simplified surface you feel." : "Downloads are blocked in this preview. Open the version on aretnanto.com to download files.";
+  if (CAN_DOWNLOAD) { $("pr-stl").onclick = exportSTL; $("spec-save").onclick = saveSpec; }
+}
+opts($("ds-pick"), SOURCES.map(([k, t]) => [k, t]), "maungawhau");
+$("ds-pick").onchange = e => { const s = SOURCES.find(x => x[0] === e.target.value); $("ds-msg").textContent = ""; setSource(s[2](), s[0]); };
+const num = (id, key, f, rebuild) => { $(id).oninput = e => { O[key] = +e.target.value; $(id + "-o").textContent = f(O[key]); if (rebuild) buildSurface(); render(); }; };
+num("o-spread", "spread", v => v + " px", true); num("o-smooth", "smooth", v => v ? v + " cells" : "none", true);
+num("o-tau", "tau", v => String(v), false); num("o-k", "k", v => v.toFixed(2), false); num("o-iv", "iv", v => String(v), false); num("o-relief", "relief", v => v + " mm", false);
+$("o-height").onchange = e => { O.height = e.target.value; buildSurface(); render(); };
+$("o-feel").onchange = e => { O.feel = e.target.value; render(); };
+$("o-x").onchange = e => { O.x = e.target.value; pointsXY(); if (O.height === O.x) O.height = "density"; syncUI(); buildSurface(); render(); };
+$("o-y").onchange = e => { O.y = e.target.value; pointsXY(); if (O.height === O.y) O.height = "density"; syncUI(); buildSurface(); render(); };
+$("o-overlay").onchange = e => { O.overlay = e.target.checked; render(); };
+$("o-pcontour").onchange = e => { O.pcontour = e.target.checked; };
+$("o-pnet").onchange = e => { O.pnet = e.target.checked; };
+function toggle(id, key, onT, offT) { $(id).onclick = e => { S[key] = !S[key]; e.currentTarget.setAttribute("aria-pressed", S[key]); if (onT) e.currentTarget.textContent = S[key] ? onT : offT; layerKey = ""; render(); }; }
+toggle("c-on", "on", "Illusion on", "Illusion off"); toggle("c-hide", "hide"); toggle("c-cursor", "nocursor"); toggle("c-ghost", "ghost");
+$("c-full").onclick = () => { const el = $("app"); if (document.fullscreenElement) { document.exitFullscreen(); return; } const r = el.requestFullscreen ? el.requestFullscreen() : null; if (r && r.catch) r.catch(() => { $("status").textContent = "Full screen was blocked here."; }); };
+document.addEventListener("fullscreenchange", () => { $("c-full").textContent = document.fullscreenElement ? "Exit full screen" : "Full screen"; render(); });
+
+// your own data
 $("ds-file").onchange = e => {
   const f = e.target.files[0]; if (!f) return;
-  const fail = msg => { $("ds-msg").textContent = msg; };
+  const say = m => { $("ds-msg").textContent = m; };
   if (f.type.startsWith("image/")) {
     const img = new Image(), url = URL.createObjectURL(f);
     img.onload = () => {
-      const k = Math.min(1, 200 / Math.max(img.width, img.height)), w = Math.max(8, Math.round(img.width * k)), h = Math.max(8, Math.round(img.height * k));
+      const k = Math.min(1, 220 / Math.max(img.width, img.height)), w = Math.max(8, Math.round(img.width * k)), h = Math.max(8, Math.round(img.height * k));
       const c = document.createElement("canvas"); c.width = w; c.height = h; const b = c.getContext("2d"); b.drawImage(img, 0, 0, w, h);
-      const px = b.getImageData(0, 0, w, h).data, v = new Float32Array(w * h);
-      for (let i = 0; i < w * h; i++) v[i] = .299 * px[4 * i] + .587 * px[4 * i + 1] + .114 * px[4 * i + 2];
-      URL.revokeObjectURL(url); loadDS(gridDS(f.name, `Your image, read as elevation (lighter is higher), ${w} × ${h}.`, w, h, { elevation: v }, true)); fail(`Loaded ${f.name}.`);
+      const px = b.getImageData(0, 0, w, h).data, v = new Float32Array(w * h); for (let i = 0; i < w * h; i++) v[i] = .299 * px[4 * i] + .587 * px[4 * i + 1] + .114 * px[4 * i + 2];
+      URL.revokeObjectURL(url); setSource({ kind: "raster", name: f.name, cite: `Your image, read as elevation (lighter is higher), ${w} × ${h}.`, w, h, cols: { brightness: v } }, "file"); say(`Loaded ${f.name}.`);
     };
-    img.onerror = () => fail("That file could not be read as an image."); img.src = url; return;
+    img.onerror = () => say("That file could not be read as an image."); img.src = url; return;
   }
   f.text().then(txt => {
     try {
       if (/\.json$/i.test(f.name)) {
         const j = JSON.parse(txt), N = j.nodes, E = j.links || j.edges;
-        if (!Array.isArray(N) || !Array.isArray(E)) return fail("The JSON needs a nodes array and a links (or edges) array.");
+        if (!Array.isArray(N) || !Array.isArray(E)) return say("The JSON needs a nodes array and a links (or edges) array.");
+        if (N.length > 400) return say("That network has more than 400 nodes; this tool lays out at most 400.");
         const ids = new Map(N.map((n, i) => [n.id ?? n.name ?? i, i]));
-        const nodes = N.map((n, i) => { const a = {}; Object.entries(n).forEach(([k, v]) => { if (typeof v === "number" && !["x", "y", "index", "vx", "vy"].includes(k)) a[k] = v; }); return { label: String(n.name ?? n.id ?? i), a }; });
-        const edges = E.map(l => { const at = {}; Object.entries(l).forEach(([k, v]) => { if (typeof v === "number" && !["source", "target", "index"].includes(k)) at[k] = v; }); if (!Object.keys(at).length) at.weight = 1;
-          const s = typeof l.source === "object" ? ids.get(l.source.id) : ids.has(l.source) ? ids.get(l.source) : l.source, t = typeof l.target === "object" ? ids.get(l.target.id) : ids.has(l.target) ? ids.get(l.target) : l.target;
-          return { a: s, b: t, at }; }).filter(e => Number.isInteger(e.a) && Number.isInteger(e.b) && e.a < nodes.length && e.b < nodes.length);
-        if (nodes.length > 400) return fail("That network has more than 400 nodes; this sketch tool lays out at most 400.");
-        const cat = Object.keys(nodes[0]?.a || {}).filter(k => /group|community|cluster|class/i.test(k));
-        loadDS(networkDS(f.name, `Your network: ${nodes.length} nodes, ${edges.length} links.`, nodes, edges, cat)); fail(`Loaded ${f.name}.`);
+        const nodes = N.map((n, i) => { const a = {}; Object.entries(n).forEach(([k, v]) => { if (typeof v === "number" && !["x", "y", "index", "vx", "vy", "fx", "fy"].includes(k)) a[k] = v; }); return { label: String(n.name ?? n.id ?? i), a }; });
+        const ref = v => typeof v === "object" && v ? ids.get(v.id ?? v.name) : ids.has(v) ? ids.get(v) : v;
+        const edges = E.map(l => ({ a: ref(l.source), b: ref(l.target), w: typeof l.value === "number" ? l.value : typeof l.weight === "number" ? l.weight : 1 })).filter(e => Number.isInteger(e.a) && Number.isInteger(e.b) && e.a < nodes.length && e.b < nodes.length);
+        setSource(networkSrc(f.name, `Your network: ${nodes.length} nodes, ${edges.length} links, laid out with a force-directed layout.`, nodes, edges), "file"); say(`Loaded ${f.name}.`);
       } else {
-        const lines = txt.trim().split(/\r?\n/).map(l => l.split(",").map(s => s.trim().replace(/^"|"$/g, "")));
-        const head = lines[0], body = lines.slice(1).filter(r => r.length === head.length);
-        const numeric = head.map((h, i) => body.filter(r => r[i] !== "" && isFinite(+r[i])).length > body.length * .8);
-        const cols = head.filter((h, i) => numeric[i]), idx = head.map((h, i) => i).filter(i => numeric[i]), labelCol = head.findIndex((h, i) => !numeric[i]);
-        if (cols.length < 2) return fail("The CSV needs a header row and at least two numeric columns.");
-        const rows = body.map(r => idx.map(i => r[i] === "" ? null : +r[i])), labels = body.map((r, k) => labelCol >= 0 ? r[labelCol] : "row " + (k + 1));
-        loadDS(pointsDS(f.name, `Your table: ${rows.length} rows.`, cols, rows, labels)); fail(`Loaded ${f.name}. Pick the X and Y columns above.`);
+        const lines = txt.trim().split(/\r?\n/).map(l => l.split(",").map(s => s.trim().replace(/^"|"$/g, ""))), head = lines[0], body = lines.slice(1).filter(r => r.length === head.length);
+        const numeric = head.map((h, i) => body.filter(r => r[i] !== "" && isFinite(+r[i])).length > body.length * .8), idx = head.map((h, i) => i).filter(i => numeric[i]), labelCol = head.findIndex((h, i) => !numeric[i]);
+        if (idx.length < 2) return say("The CSV needs a header row and at least two numeric columns.");
+        const cols = idx.map(i => head[i]), rows = body.map(r => idx.map(i => r[i] === "" ? null : +r[i])), labels = body.map((r, k) => labelCol >= 0 ? r[labelCol] : "row " + (k + 1));
+        setSource({ kind: "points", name: f.name, cite: `Your table: ${rows.length} rows. Each row raises the ground around it.`, cols, rows, labels, x: cols[0], y: cols[1], noun: "rows" }, "file"); say(`Loaded ${f.name}. Pick the X and Y columns above.`);
       }
-    } catch (err) { fail("That file could not be read: " + err.message); }
+    } catch (err) { say("That file could not be read: " + err.message); }
   });
 };
 
-// ---------------------------------------------------------------- UI: layers
-function uiLayers() {
-  const box = $("layers"); box.innerHTML = "";
-  LAYERS.forEach((L, i) => {
-    const d = document.createElement("div"); d.className = "layer";
-    const tlist = TARGETS[DS.kind], alist = attrs(L.target);
-    d.innerHTML = `<div class="layer-h"><span>Layer ${i + 1}</span><button aria-label="Remove layer ${i + 1}">Remove</button></div>
-      <div class="two"><label class="field">Element<select data-k="target"></select></label><label class="field">Attribute<select data-k="attr"></select></label></div>
-      <label class="field">Feels like<select data-k="ch"></select></label>
-      <div class="ctrl"><label>Strength <output>${L.k.toFixed(2)}</output></label><input type="range" data-k="k" min="0" max="1" step="0.05" value="${L.k}" aria-label="Layer ${i + 1} strength"></div>
-      ${L.target === "cells" ? "" : `<div class="ctrl"><label>Reach <output>${L.zone} px</output></label><input type="range" data-k="zone" min="4" max="60" step="1" value="${L.zone}" aria-label="Layer ${i + 1} reach"></div>`}
-      <label class="check"><input type="checkbox" data-k="invert"${L.invert ? " checked" : ""}> Invert (low values feel strongest)</label>`;
-    opts(d.querySelector('[data-k="target"]'), tlist, L.target);
-    opts(d.querySelector('[data-k="attr"]'), alist.map(a => [a, pretty(a)]), L.attr);
-    opts(d.querySelector('[data-k="ch"]'), CHANNELS, L.ch);
-    d.querySelector("button").onclick = () => { LAYERS.splice(i, 1); uiLayers(); uiPrint(); render(); };
-    d.querySelectorAll("[data-k]").forEach(inp => {
-      inp.oninput = inp.onchange = () => {
-        const k = inp.dataset.k;
-        if (k === "k") { L.k = +inp.value; inp.previousElementSibling.querySelector("output").textContent = L.k.toFixed(2); }
-        else if (k === "zone") { L.zone = +inp.value; inp.previousElementSibling.querySelector("output").textContent = L.zone + " px"; }
-        else if (k === "invert") L.invert = inp.checked;
-        else { L[k] = inp.value; if (k === "target") { L.attr = attrs(L.target)[0]; L.zone = L.target === "edges" ? 10 : 20; uiLayers(); } uiPrint(); }
-        render();
-      };
-    });
-    box.appendChild(d);
-  });
-}
-$("add-layer").onclick = () => { const t = TARGETS[DS.kind][0][0]; LAYERS.push({ id: uid++, target: t, attr: attrs(t)[0], ch: "size", k: .7, zone: 20, invert: false }); uiLayers(); uiPrint(); render(); };
-
-// ---------------------------------------------------------------- UI: feel
-function toggle(id, key, onT, offT) { $(id).onclick = e => { S[key] = !S[key]; e.currentTarget.setAttribute("aria-pressed", S[key]); if (onT) e.currentTarget.textContent = S[key] ? onT : offT; cache.key = ""; render(); }; }
-toggle("c-on", "on", "Illusion on", "Illusion off"); toggle("c-hide", "hide"); toggle("c-cursor", "nocursor"); toggle("c-ghost", "ghost");
-$("c-on").setAttribute("aria-pressed", "true");
-$("c-full").onclick = () => { const el = $("app"); if (document.fullscreenElement) { document.exitFullscreen(); return; } const r = el.requestFullscreen ? el.requestFullscreen() : null; if (r && r.catch) r.catch(() => { $("status").textContent = "Full screen was blocked here."; }); };
-document.addEventListener("fullscreenchange", () => { $("c-full").textContent = document.fullscreenElement ? "Exit full screen" : "Full screen"; render(); });
-
-// ---------------------------------------------------------------- UI: print (a heightfield: relief from one attribute, grit from roughness layers)
-const PRINTABLE = { friction: ["no", "A print has the same surface everywhere; friction would need a coating or a second material."], roughness: ["yes", "Printed as grit whose height follows the same attribute."], size: ["no", "There is no cursor on a print."], snap: ["partly", "Could become dimples that catch a fingertip; not exported yet."] };
-function uiPrint() {
-  const targets = TARGETS[DS.kind].map(t => t[0]), list = [];
-  targets.forEach(t => attrs(t).forEach(a => list.push([t + ":" + a, (t === "cells" ? "" : (t === "nodes" ? "Node " : t === "edges" ? "Edge " : "Point ")) + pretty(a)])));
-  list.unshift(["none", "Flat (texture only)"]);
-  const def = DS.kind === "grid" ? "cells:" + Object.keys(DS.cols)[0] : DS.kind === "network" ? "nodes:degree" : "points:" + (VIS.col || attrs("points")[0]);
-  const cur = $("pr-relief").value && list.some(l => l[0] === $("pr-relief").value) ? $("pr-relief").value : def;
-  opts($("pr-relief"), list, cur);
-  $("pr-map").innerHTML = LAYERS.map((L, i) => { const [ok, why] = PRINTABLE[L.ch]; return `<tr><td>Layer ${i + 1} · ${CHANNELS.find(c => c[0] === L.ch)[1].split(":")[0]}<br><span class="cite">${why}</span></td><td><span class="chip ${ok === "yes" ? "yes" : ""}">${ok === "yes" ? "printed" : ok === "partly" ? "not yet" : "screen only"}</span></td></tr>`; }).join("");
-  $("pr-btns").innerHTML = CAN_DOWNLOAD ? `<button class="sbtn primary" id="pr-stl">Download STL</button>` : "";
-  $("pr-msg").textContent = CAN_DOWNLOAD ? "120 mm wide, 2 mm base." : "Downloads are blocked in this preview. Open the version on aretnanto.com to download files.";
-  $("spec-btns").innerHTML = CAN_DOWNLOAD ? `<button class="sbtn" id="spec-save">Save sketch</button>` : "";
-  if (CAN_DOWNLOAD) { $("pr-stl").onclick = exportSTL; $("spec-save").onclick = saveSpec; }
-}
-$("pr-h").oninput = e => { $("pr-h-o").textContent = e.target.value + " mm"; };
-function download(name, data, type) {
-  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type })); a.download = name; document.body.appendChild(a); a.click(); a.remove();
-}
-function heightfield() {
-  // sample the plot (or the terrain's own rectangle) on a raster, in millimetres
-  const rect = DS.kind === "grid" ? DS.rect : AREA, W = 180, H = Math.max(8, Math.round(W * (rect.y1 - rect.y0) / (rect.x1 - rect.x0)));
-  const wmm = 120, mmPerPx = wmm / (rect.x1 - rect.x0), relief = +$("pr-h").value, base = 2, hgt = new Float32Array(W * H).fill(base);
-  const [rt, ra] = $("pr-relief").value.split(":"), rnd = seeded(99);
-  for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
-    const x = rect.x0 + i / (W - 1) * (rect.x1 - rect.x0), y = rect.y0 + j / (H - 1) * (rect.y1 - rect.y0), k = j * W + i;
-    let z = base;
-    if (rt === "cells") { const g = gridValue(ra, x, y); if (g) z += relief * (norm("cells", ra, g.v) ?? 0); }
-    if (DS.kind === "network") {
-      DS.edges.forEach(e => { if (seg(DS.nodes[e.a], DS.nodes[e.b], x, y).d * mmPerPx < .6) z = Math.max(z, base + .8); });
-      DS.nodes.forEach(q => { const rmm = 1.6 + (VIS.size ? 1.6 * Math.sqrt(norm("nodes", VIS.size, q.a[VIS.size]) ?? 0) : 0); if (Math.hypot(q.x - x, q.y - y) * mmPerPx < rmm) z = Math.max(z, base + 1 + (rt === "nodes" ? relief * (norm("nodes", ra, q.a[ra]) ?? 0) : 1)); });
+// ---------------------------------------------------------------- print
+function download(name, data, type) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
+function exportSTL() {
+  topo();
+  const r = RECT, W = r.x1 - r.x0 + 1, H = r.y1 - r.y0 + 1, pxW = (AREA.x1 - AREA.x0) / (TG.W - 1), pxH = (AREA.y1 - AREA.y0) / (TG.H - 1);
+  const wmm = 120, sx = wmm / (W - 1), sy = sx * pxH / pxW, mmPerPx = sx / pxW, base = 3;
+  const hz = new Float32Array(W * H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) hz[y * W + x] = base + G[(y + r.y0) * TG.W + x + r.x0] / 100 * O.relief;
+  const band = k => Math.floor(G[k] / O.iv);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const k = (y + r.y0) * TG.W + x + r.x0, X = gx(k), Y = gy(k); let add = 0;
+    if (O.pcontour && ((x < W - 1 && band(k) !== band(k + 1)) || (y < H - 1 && band(k) !== band(k + TG.W)))) add = .8;
+    if (O.pnet && SRC.kind === "network") {
+      for (const e of SRC.edges) { const A = SRC.nodes[e.a], B = SRC.nodes[e.b], vx = B.x - A.x, vy = B.y - A.y, t = clamp(((X - A.x) * vx + (Y - A.y) * vy) / (vx * vx + vy * vy || 1), 0, 1); if (Math.hypot(X - A.x - t * vx, Y - A.y - t * vy) * mmPerPx < .5) { add = Math.max(add, .7); break; } }
+      for (const q of SRC.nodes) if (Math.hypot(q.x - X, q.y - Y) * mmPerPx < 1.4) { add = Math.max(add, 1.4); break; }
     }
-    if (DS.kind === "points") { const ai = DS.cols.indexOf(ra); DS.pts.forEach(p => { const d = Math.hypot(p.x - x, p.y - y) * mmPerPx; if (d < 1.4) z = Math.max(z, base + (1 + (rt === "points" ? relief * (norm("points", ra, DS.rows[p.i][ai]) ?? 0) : 1)) * Math.sqrt(1 - (d / 1.4) ** 2)); }); }
-    LAYERS.forEach(L => { if (L.ch !== "roughness") return; const h = strengthAt(L, x, y); if (h) z += (rnd() - .5) * 1.2 * L.k * h.t; });
-    hgt[k] = Math.max(.4, z);
+    if (O.pnet && SRC.kind === "points") for (const p of SRC.pts) { const d = Math.hypot(p.x - X, p.y - Y) * mmPerPx; if (d < .9) { add = Math.max(add, .9 * Math.sqrt(1 - (d / .9) ** 2)); } }
+    hz[y * W + x] += add;
   }
-  return { hgt, W, H, sx: wmm / (W - 1), sy: wmm / (W - 1) * ((rect.y1 - rect.y0) / (H - 1)) / ((rect.x1 - rect.x0) / (W - 1)) };
-}
-function stlFromHeights({ hgt, W, H, sx, sy }) {
-  const P = (x, y) => [x * sx, (H - 1 - y) * sy, hgt[y * W + x]], Q = (x, y) => [x * sx, (H - 1 - y) * sy, 0], tris = [];
-  for (let y = 0; y < H - 1; y++) for (let x = 0; x < W - 1; x++) {
-    const a = P(x, y), b = P(x + 1, y), c = P(x, y + 1), d = P(x + 1, y + 1); tris.push([a, c, b], [b, c, d]);
-    const A = Q(x, y), B = Q(x + 1, y), C = Q(x, y + 1), D = Q(x + 1, y + 1); tris.push([A, B, C], [B, D, C]);
-  }
+  const P = (x, y) => [x * sx, (H - 1 - y) * sy, hz[y * W + x]], Q = (x, y) => [x * sx, (H - 1 - y) * sy, 0], tris = [];
+  for (let y = 0; y < H - 1; y++) for (let x = 0; x < W - 1; x++) { tris.push([P(x, y), P(x, y + 1), P(x + 1, y)], [P(x + 1, y), P(x, y + 1), P(x + 1, y + 1)], [Q(x, y), Q(x + 1, y), Q(x, y + 1)], [Q(x + 1, y), Q(x + 1, y + 1), Q(x, y + 1)]); }
   const wall = (p0, p1, b0, b1) => tris.push([p0, b0, p1], [p1, b0, b1]);
   for (let x = 0; x < W - 1; x++) { wall(P(x + 1, 0), P(x, 0), Q(x + 1, 0), Q(x, 0)); wall(P(x, H - 1), P(x + 1, H - 1), Q(x, H - 1), Q(x + 1, H - 1)); }
   for (let y = 0; y < H - 1; y++) { wall(P(0, y), P(0, y + 1), Q(0, y), Q(0, y + 1)); wall(P(W - 1, y + 1), P(W - 1, y), Q(W - 1, y + 1), Q(W - 1, y)); }
   const buf = new ArrayBuffer(84 + 50 * tris.length), dv = new DataView(buf); dv.setUint32(80, tris.length, true);
   tris.forEach((t, n) => {
-    const o = 84 + 50 * n, [p, q, r] = t, ux = q[0] - p[0], uy = q[1] - p[1], uz = q[2] - p[2], vx = r[0] - p[0], vy = r[1] - p[1], vz = r[2] - p[2];
+    const o = 84 + 50 * n, [p, q, s] = t, ux = q[0] - p[0], uy = q[1] - p[1], uz = q[2] - p[2], vx = s[0] - p[0], vy = s[1] - p[1], vz = s[2] - p[2];
     let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx; const L = Math.hypot(nx, ny, nz) || 1;
-    [nx / L, ny / L, nz / L, ...p, ...q, ...r].forEach((v, m) => dv.setFloat32(o + 4 * m, v, true));
+    [nx / L, ny / L, nz / L, ...p, ...q, ...s].forEach((v, m) => dv.setFloat32(o + 4 * m, v, true));
   });
-  return buf;
+  const name = SRC.name.toLowerCase().replace(/\.[a-z]+$/, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + `-tau${O.tau}.stl`;
+  download(name, buf, "model/stl");
+  let note = `Saved ${name}: ${Math.round(sx * (W - 1))} × ${Math.round(sy * (H - 1))} mm, ${kept().length} peaks, ${Math.round(buf.byteLength / 1024)} KB.`;
+  if (META && META.spacing) { const widthM = (META.cols - 1) * META.spacing, ex = (O.relief / (META.hi - META.lo)) / (wmm / widthM); note += ` Vertical exaggeration about ${ex.toFixed(1)}×.`; }
+  $("pr-msg").textContent = note;
 }
-function slug(s) { return s.toLowerCase().replace(/\.[a-z]+$/, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
-function exportSTL() {
-  $("pr-msg").textContent = "Building the mesh…";
-  setTimeout(() => {
-    const hf = heightfield(), buf = stlFromHeights(hf), name = `${slug(DS.name)}.stl`;
-    download(name, buf, "model/stl");
-    $("pr-msg").textContent = `Saved ${name}: ${Math.round(hf.sx * (hf.W - 1))} × ${Math.round(hf.sy * (hf.H - 1))} mm, ${Math.round(buf.byteLength / 1024)} KB.`;
-  }, 20);
-}
-function spec() { const b = BUILTIN.find(x => x[0] === $("ds-pick").value); return { tool: "haptic-sketch", version: 1, dataset: { builtin: b ? b[0] : null, name: DS.name, x: DS.xcol, y: DS.ycol }, visual: { ...VIS }, layers: LAYERS.map(({ id, ...L }) => L), print: { relief: $("pr-relief").value, height: +$("pr-h").value } }; }
-function saveSpec() { download(`${slug(DS.name)}-sketch.json`, JSON.stringify(spec(), null, 2), "application/json"); }
+function saveSpec() { download(SRC.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-sketch.json", JSON.stringify({ tool: "haptic-sketch", version: 2, dataset: SRCKEY === "file" ? { file: SRC.name } : { builtin: SRCKEY }, options: { ...O } }, null, 2), "application/json"); }
 $("spec-file").onchange = e => {
   const f = e.target.files[0]; if (!f) return;
   f.text().then(t => {
     try {
-      const s = JSON.parse(t); if (s.tool !== "haptic-sketch") throw new Error("not a Haptic Sketch file");
-      const b = s.dataset.builtin && BUILTIN.find(x => x[0] === s.dataset.builtin);
-      if (b) { $("ds-pick").value = b[0]; const ds = b[2](); if (s.dataset.x) { ds.xcol = s.dataset.x; ds.ycol = s.dataset.y; } loadDS(ds, s.layers); }
-      else { LAYERS = s.layers.filter(L => attrs(L.target).includes(L.attr)).map(L => ({ id: uid++, ...L })); uiLayers(); }
-      if (s.visual) { VIS.col = s.visual.col ?? VIS.col; VIS.size = s.visual.size ?? VIS.size; uiData(); cache.key = ""; }
-      if (s.print) { $("pr-h").value = s.print.height; $("pr-h-o").textContent = s.print.height + " mm"; uiPrint(); if ([...$("pr-relief").options].some(o => o.value === s.print.relief)) $("pr-relief").value = s.print.relief; }
-      $("ds-msg").textContent = `Loaded sketch ${f.name}` + (b ? "." : " onto the current dataset (it was made with your own data).");
-      render();
+      const s = JSON.parse(t); if (s.tool !== "haptic-sketch" || !s.options) throw 0;
+      const b = s.dataset && s.dataset.builtin && SOURCES.find(x => x[0] === s.dataset.builtin);
+      Object.assign(O, s.options);
+      if (b) { $("ds-pick").value = b[0]; setSource(b[2](), b[0], true); $("ds-msg").textContent = `Loaded sketch ${f.name}.`; }
+      else { setSource(SRC, SRCKEY, true); $("ds-msg").textContent = `Loaded the settings from ${f.name}. Load ${s.dataset?.file || "its data file"} to see the same surface.`; }
     } catch (err) { $("ds-msg").textContent = "That file is not a Haptic Sketch file."; }
   });
 };
 
-loadDS(BUILTIN[0][2]());
+setSource(SOURCES[0][2](), SOURCES[0][0]);
 document.fonts && document.fonts.ready.then(render);
 })();
 </script>
