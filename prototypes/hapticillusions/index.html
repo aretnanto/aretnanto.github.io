@@ -589,7 +589,7 @@ const TOPO = { id: "topology", name: "Topology", wide: true, title: "Feel the im
     { key: "feel", label: "Feel", type: "choice", options: [["friction", "Friction: high ground is sticky"], ["slope", "Slope: uphill slow, downhill fast"], ["contour", "Contours: a catch at each contour line"]], value: "friction" },
     { key: "tau", label: "Keep peaks more prominent than", min: 0, max: 60, step: 1, value: 12 },
     { key: "k", label: "Strength", min: 0, max: 0.95, step: 0.05, value: 0.85 },
-    { key: "iv", label: "Contour interval", min: 4, max: 25, step: 1, value: 10 },
+    { key: "iv", label: "Contour interval", min: 2, max: 25, step: 1, value: 4 },
     { key: "colour", label: "Surface", type: "choice", options: [["plain", "Plain: contour lines only"], ["height", "Coloured by height"]], value: "plain" },
     { key: "marks", label: "Peak markers", type: "choice", options: [["off", "Hidden"], ["on", "Show the kept peaks and their saddles"]], value: "off" },
     { key: "show", label: "What you see", type: "choice", options: [["simple", "The simplified terrain you feel"], ["orig", "The original terrain"]], value: "simple" },
@@ -724,6 +724,188 @@ const TOPO = { id: "topology", name: "Topology", wide: true, title: "Feel the im
     const ty = base - (base - top) * this.P.tau / mx; b.strokeStyle = "#0b0b0b"; b.setLineDash([6, 4]); b.lineWidth = 2; b.beginPath(); b.moveTo(4, ty); b.lineTo(w - 4, ty); b.stroke(); b.setLineDash([]);
   },
 };
+
+
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+// ---------- sandbox: sculpt sand you can feel; every brush step is recorded for history views and replay ----------
+const SANDBOX = { id: "sandbox", name: "Sandbox", wide: true, title: "A sandbox you can feel", sub: "Sculpt a terrain · history and replay",
+  task: "Click to lock the pointer, then <b>hold the mouse button to sculpt</b>: raise sand, dig it out, push it around, or smooth it. Keys 1–4 switch tools while the pointer is locked. Pushing a big load feels heavy. Every touch is recorded, so you can see where you worked, what was added and lost, and replay the whole session.",
+  how: "The sand is a grid of heights. Raise and Dig add or remove sand under the brush. Push lifts sand under the brush and sets it down a step ahead in the direction you move, so no sand is created or destroyed and it piles up where you stop. Smooth evens it out. While you push, the cursor slows in proportion to the sand you are carrying. The history stores every brush step, so the session can be rebuilt and replayed exactly.",
+  cite: "Pseudo-haptic weight through the control/display ratio (Samad et al., CHI 2019) · Maunga Whau from the Topology tab",
+  params: [
+    { key: "start", label: "Start from", type: "choice", options: [["flat", "Flat sand"], ["hills", "Gentle hills"], ["maungawhau", "Maunga Whau volcano"]], value: "flat", reinit: true },
+    { key: "view", label: "Show", type: "choice", options: [["sand", "The sand"], ["touch", "Where you touched"], ["delta", "What was added and lost"]], value: "sand" },
+    { key: "feel", label: "Feel", type: "choice", options: [["both", "The load you push, and high ground"], ["load", "Only the load you push"], ["height", "Only high ground (sticky)"]], value: "both" },
+    { key: "k", label: "Strength of the feel", min: 0, max: 0.95, step: 0.05, value: 0.8 },
+    { key: "brush", label: "Brush size", min: 6, max: 50, step: 1, value: 18, unit: " px" },
+    { key: "rate", label: "Tool strength", min: 0.1, max: 1, step: 0.05, value: 0.5 },
+    { key: "iv", label: "Contour interval", min: 2, max: 20, step: 1, value: 4 },
+  ],
+  TOOLS: [["raise", "Raise", "1"], ["lower", "Dig", "2"], ["push", "Push", "3"], ["smooth", "Smooth", "4"]],
+  tool: "push",
+  init() {
+    const { W, H } = TG, P = this.P;
+    let h;
+    if (P.start === "maungawhau") h = Float32Array.from(fitGrid(VOLCANO.v, VOLCANO.w, VOLCANO.h).f);
+    else if (P.start === "hills") { h = terrainField("random", 5); for (let i = 0; i < h.length; i++) h[i] = 10 + h[i] * .5; }
+    else h = new Float32Array(W * H).fill(25);
+    this.h0 = Float32Array.from(h); this.h = h; this.touch = new Float32Array(W * H);
+    this.events = []; this.strokeN = 0; this.pressing = false; this.load = 0; this.moved = 0; this.ver = 1; this.g = 1;
+    this.rp = { on: false, i: 0, t: 0, speed: 4 }; this.lkey = ""; this.lastBuild = 0; this.clock = 0; this.lastStamp = null;
+  },
+  cw() { return (AREA.x1 - AREA.x0) / (TG.W - 1); },
+  ch() { return (AREA.y1 - AREA.y0) / (TG.H - 1); },
+  // one brush step; returns the amount of sand carried (push) so the feel can respond to it
+  apply(e, h, touch) {
+    const { W, H } = TG, cw = this.cw(), ch = this.ch(), r = e.r;
+    const i0 = Math.max(0, Math.floor((e.x - r - AREA.x0) / cw)), i1 = Math.min(W - 1, Math.ceil((e.x + r - AREA.x0) / cw));
+    const j0 = Math.max(0, Math.floor((e.y - r - AREA.y0) / ch)), j1 = Math.min(H - 1, Math.ceil((e.y + r - AREA.y0) / ch));
+    const m = Math.hypot(e.vx, e.vy), moves = []; let carried = 0;
+    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+      const px = AREA.x0 + i * cw, py = AREA.y0 + j * ch, d = Math.hypot(px - e.x, py - e.y); if (d >= r) continue;
+      const w = (1 - (d / r) ** 2) ** 2, k = j * W + i; touch[k] += w;
+      if (e.tool === "raise") h[k] = Math.min(100, h[k] + e.s * w * 1.5);
+      else if (e.tool === "lower") h[k] = Math.max(0, h[k] - e.s * w * 1.5);
+      else if (e.tool === "smooth") {
+        let a = 0, n = 0; for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) { const ii = i + di, jj = j + dj; if (ii >= 0 && jj >= 0 && ii < W && jj < H) { a += h[jj * W + ii]; n++; } }
+        h[k] += e.s * w * .5 * (a / n - h[k]);
+      } else if (e.tool === "push" && m > 0) {
+        const t = h[k] * Math.min(.8, e.s * w * m / r * 1.5); if (t > 0) moves.push([k, t, px + e.vx, py + e.vy]);
+      }
+    }
+    for (const [k, t] of moves) { h[k] -= t; carried += t; }
+    for (const [, t, tx, ty] of moves) {   // set the sand down a step ahead (bilinear, so nothing is lost)
+      const u = clamp((tx - AREA.x0) / cw, 0, W - 1.001), v = clamp((ty - AREA.y0) / ch, 0, H - 1.001), i = u | 0, j = v | 0, a = u - i, b = v - j, k = j * W + i;
+      h[k] += t * (1 - a) * (1 - b); h[k + 1] += t * a * (1 - b); h[k + W] += t * (1 - a) * b; h[k + W + 1] += t * a * b;
+    }
+    return carried;
+  },
+  brushCells() { const r = this.P.brush; return Math.max(1, Math.PI * r * r / (this.cw() * this.ch())); },
+  live() { if (this.rp.i < this.events.length || this.rp.on) { this.rp.on = false; this.rebuild(this.events.length); this.syncUI(); } },
+  record(vx, vy) {
+    const now = performance.now(), gap = this.lastStamp === null ? 0 : Math.min(now - this.lastStamp, 120);
+    this.clock += gap; this.lastStamp = now;
+    const ev = { stroke: this.strokeN, tool: this.tool, x: S.x, y: S.y, vx, vy, r: this.P.brush, s: this.P.rate, t: this.clock };
+    this.events.push(ev); this.rp.i = this.events.length;
+    const c = this.apply(ev, this.h, this.touch); if (ev.tool === "push") this.moved += c;
+    this.load = this.load * .6 + c * .4; this.ver++;
+  },
+  down() { this.live(); this.pressing = true; this.strokeN++; this.load = 0; if (this.lastStamp !== null) this.clock += 300; this.lastStamp = null; if (this.tool !== "push") this.record(0, 0); this.syncUI(); },
+  up() { if (!this.pressing) return; this.pressing = false; this.load = 0; this.syncUI(); },
+  move(dx, dy) {
+    const P = this.P, hh = gridAt(this.h, S.x, S.y); let g = 1;
+    if (S.on && P.feel !== "load") g *= 1 - P.k * .8 * hh / 100;
+    if (S.on && P.feel !== "height" && this.pressing && this.tool === "push") g *= 1 - P.k * clamp(this.load / (this.brushCells() * 1.2), 0, 1);
+    const x0 = S.x, y0 = S.y; S.x = cx(S.x + dx * g); S.y = cy(S.y + dy * g); this.g = g;
+    if (this.pressing) this.record(S.x - x0, S.y - y0);
+  },
+  rebuild(n) {
+    this.h = Float32Array.from(this.h0); this.touch = new Float32Array(this.h.length); this.moved = 0;
+    for (let i = 0; i < n; i++) { const c = this.apply(this.events[i], this.h, this.touch); if (this.events[i].tool === "push") this.moved += c; }
+    this.rp.i = n; this.rp.t = n ? this.events[n - 1].t : 0; this.ver++;
+  },
+  play() {
+    if (!this.events.length) return;
+    if (document.pointerLockElement) document.exitPointerLock();
+    if (this.rp.i >= this.events.length) this.rebuild(0);
+    this.rp.on = true; let last = performance.now();
+    const tick = now => {
+      if (!this.rp.on || cur !== this) { this.rp.on = false; this.syncUI(); return; }
+      this.rp.t += (now - last) * this.rp.speed; last = now;
+      while (this.rp.i < this.events.length && this.events[this.rp.i].t <= this.rp.t) { const e = this.events[this.rp.i]; const c = this.apply(e, this.h, this.touch); if (e.tool === "push") this.moved += c; this.rp.i++; }
+      this.ver++; this.syncUI(); render();
+      if (this.rp.i >= this.events.length) { this.rp.on = false; this.syncUI(); } else requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick); this.syncUI();
+  },
+  totals() {
+    let add = 0, lost = 0; for (let i = 0; i < this.h.length; i++) { const d = this.h[i] - this.h0[i]; if (d > 0) add += d; else lost -= d; }
+    const cell = this.cw() * this.ch() / 100;   // report sand in rough "brushfuls": height units × area, scaled
+    return { add: add * cell, lost: lost * cell, moved: this.moved * cell };
+  },
+  layer() {
+    const P = this.P, key = [this.ver, P.view, S.hide, P.iv].join("|"), now = performance.now();
+    if (key === this.lkey && this.lc) return this.lc;
+    if (this.lc && now - this.lastBuild < 33) { if (!this.pending) { this.pending = true; requestAnimationFrame(() => { this.pending = false; render(); }); } return this.lc; }
+    this.lkey = key; this.lastBuild = now;
+    const c = this.lc || (this.lc = document.createElement("canvas")); c.width = LW; c.height = LH;
+    const b = c.getContext("2d"), img = b.createImageData(LW, LH), d = img.data, bands = new Int16Array(LW * LH).fill(-1);
+    let maxT = 0; for (const t of this.touch) maxT = Math.max(maxT, t); const lt = Math.log1p(maxT || 1);
+    for (let py = 0; py < LH; py++) {
+      const y = py + .5; if (y < AREA.y0 || y > AREA.y1) continue;
+      for (let px = 0; px < LW; px++) {
+        const x = px + .5; if (x < AREA.x0 || x > AREA.x1) continue;
+        const p = py * LW + px, o = p * 4, v = gridAt(this.h, x, y);
+        bands[p] = Math.floor(v / P.iv);
+        if (S.hide) { d[o] = 240; d[o + 1] = 239; d[o + 2] = 236; d[o + 3] = 255; continue; }
+        const sx = gridAt(this.h, x + 2, y) - gridAt(this.h, x - 2, y), sy = gridAt(this.h, x, y + 2) - gridAt(this.h, x, y - 2);
+        const shade = clamp(1 - (sx + sy) * .045, .55, 1.18);
+        let r = 236 * shade, g = 224 * shade, bl = 196 * shade;
+        if (P.view === "touch") { const t = this.touch[Math.round((y - AREA.y0) / this.ch()) * TG.W + Math.round((x - AREA.x0) / this.cw())]; const a = t > 0 ? .15 + .75 * Math.log1p(t) / lt : 0; r = r * (1 - a) + 232 * a; g = g * (1 - a) + 113 * a; bl = bl * (1 - a) + 10 * a; }
+        if (P.view === "delta") { const dv = v - gridAt(this.h0, x, y), a = Math.min(.9, Math.abs(dv) / 20); const [tr, tg, tb] = dv > 0 ? [232, 113, 10] : [0, 15, 161]; r = r * (1 - a) + tr * a; g = g * (1 - a) + tg * a; bl = bl * (1 - a) + tb * a; }
+        const edge = (px > 0 && bands[p - 1] >= 0 && bands[p - 1] !== bands[p]) || (py > 0 && bands[p - LW] >= 0 && bands[p - LW] !== bands[p]);
+        if (edge) { const major = Math.max(bands[p], px > 0 ? bands[p - 1] : 0) % 5 === 0; const f = major ? .45 : .72; r *= f; g *= f; bl *= f; }
+        d[o] = r; d[o + 1] = g; d[o + 2] = bl; d[o + 3] = 255;
+      }
+    }
+    b.putImageData(img, 0, 0); return c;
+  },
+  draw() {
+    ctx.drawImage(this.layer(), 0, 0, LW, LH);
+    if (S.locked && !S.nocursor) {   // brush ring around the cursor
+      ctx.strokeStyle = this.pressing ? "#e8710a" : "rgba(11,11,11,.45)"; ctx.lineWidth = this.pressing ? 2 : 1.2; ctx.setLineDash(this.pressing ? [] : [4, 3]);
+      ctx.beginPath(); ctx.arc(S.x, S.y, this.P.brush, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+    }
+    const n = this.events.length;
+    if ((this.rp.on || this.rp.i < n) && this.rp.i > 0 && !S.hide) {   // where the hand was at this moment of the replay
+      const e = this.events[this.rp.i - 1];
+      ctx.strokeStyle = "#e8710a"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, 7); ctx.stroke();
+      ctx.fillStyle = "#0b0b0b"; ctx.font = "600 11px 'DM Sans', sans-serif"; ctx.textAlign = "left";
+      ctx.fillText(this.TOOLS.find(t => t[0] === e.tool)[1] + " · stroke " + e.stroke, Math.min(e.x + e.r + 4, LW - 90), e.y + 4);
+    }
+  },
+  read() {
+    const T = this.totals(), k = Math.round((S.y - AREA.y0) / this.ch()) * TG.W + Math.round((S.x - AREA.x0) / this.cw()), dv = gridAt(this.h, S.x, S.y) - gridAt(this.h0, S.x, S.y);
+    return [["Tool", this.TOOLS.find(t => t[0] === this.tool)[1] + (this.pressing ? " · sculpting" : "")], ["Height here", gridAt(this.h, S.x, S.y).toFixed(0)],
+      ["Change here", (dv >= 0 ? "+" : "") + dv.toFixed(1)], ["Touches here", (this.touch[k] || 0).toFixed(0)],
+      ["Sand added", T.add.toFixed(0)], ["Sand lost", T.lost.toFixed(0)], ["Sand pushed", T.moved.toFixed(0)], ["Speed", "×" + this.g.toFixed(2)]];
+  },
+  panel(el) {
+    const d = document.createElement("div"); d.style.display = "flex"; d.style.flexDirection = "column"; d.style.gap = "10px";
+    d.innerHTML = `<p class="sub">Tool (keys 1–4 while sculpting)</p>
+      <div class="row">${this.TOOLS.map(([k, t, n]) => `<button class="sbtn" data-tool="${k}">${n} · ${t}</button>`).join("")}</div>
+      <p class="sub" style="margin-top:6px">History</p>
+      <div class="ctrl"><label for="sb-scrub">Step <output id="sb-pos"></output></label><input type="range" id="sb-scrub" min="0" max="0" step="1" value="0"></div>
+      <div class="row"><button class="sbtn" id="sb-play">Replay</button>
+        <label class="check" style="gap:4px">Speed <select id="sb-speed" style="font-size:13px;padding:3px 4px;border:1px solid var(--border);border-radius:6px;background:#fff"><option value="1">1×</option><option value="4" selected>4×</option><option value="16">16×</option></select></label>
+        <button class="sbtn" id="sb-undo">Undo last stroke</button><button class="sbtn" id="sb-reset">Start over</button></div>
+      <p class="cite" id="sb-msg"></p>`;
+    el.appendChild(d); this.ui = d;
+    d.querySelectorAll("[data-tool]").forEach(b => b.onclick = () => { this.tool = b.dataset.tool; this.syncUI(); render(); });
+    d.querySelector("#sb-play").onclick = () => { if (this.rp.on) { this.rp.on = false; this.syncUI(); } else this.play(); };
+    d.querySelector("#sb-speed").onchange = e => { this.rp.speed = +e.target.value; };
+    d.querySelector("#sb-scrub").oninput = e => { this.rp.on = false; this.rebuild(+e.target.value); this.syncUI(); render(); };
+    d.querySelector("#sb-undo").onclick = () => { this.live(); const last = this.events.length ? this.events[this.events.length - 1].stroke : null; if (last === null) return; this.events = this.events.filter(e => e.stroke !== last); this.clock = this.events.length ? this.events[this.events.length - 1].t : 0; this.rebuild(this.events.length); this.syncUI(); render(); };
+    let armed = false;
+    d.querySelector("#sb-reset").onclick = e => { if (!armed) { armed = true; e.currentTarget.textContent = "Click again to clear"; return; } armed = false; this.init(false); this.syncUI(); render(); };
+    d.querySelector("#sb-speed").value = String(this.rp.speed);
+    this.syncUI();
+  },
+  syncUI() {
+    const d = this.ui; if (!d || !d.isConnected) return;
+    d.querySelectorAll("[data-tool]").forEach(b => b.setAttribute("aria-pressed", b.dataset.tool === this.tool));
+    const n = this.events.length, sc = d.querySelector("#sb-scrub"); sc.max = n; sc.value = this.rp.i;
+    const strokes = new Set(this.events.map(e => e.stroke)).size;
+    d.querySelector("#sb-pos").textContent = `${this.rp.i} of ${n}`;
+    d.querySelector("#sb-play").textContent = this.rp.on ? "Pause" : this.rp.i < n ? "Resume replay" : "Replay";
+    d.querySelector("#sb-play").setAttribute("aria-pressed", this.rp.on);
+    d.querySelector("#sb-msg").textContent = n ? `${strokes} ${strokes === 1 ? "stroke" : "strokes"}, ${n} brush steps recorded.${this.rp.i < n && !this.rp.on ? " Sculpting again jumps back to the end." : ""}` : "Nothing recorded yet. Lock the pointer and hold the button to sculpt.";
+  },
+};
+document.addEventListener("keydown", e => {
+  if (cur !== SANDBOX || !S.locked) return;
+  const t = SANDBOX.TOOLS.find(t => t[2] === e.key); if (t) { SANDBOX.tool = t[0]; SANDBOX.syncUI(); render(); }
+});
 
 const PROTOS = [
 HEAT_FRICTION,
@@ -919,6 +1101,7 @@ LASSO,
   },
 },
 TOPO,
+SANDBOX,
 ];
 
 // ---------- drawing ----------
