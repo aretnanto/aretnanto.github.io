@@ -45,7 +45,7 @@ main { padding: 20px; max-width: 1400px; margin: 0 auto; display: flex; flex-dir
 .view { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0 }
 .view h3 { font-size: 15px; display: flex; justify-content: space-between; gap: 8px; align-items: baseline }
 .view h3 span { font-weight: 400; color: var(--text-muted); font-size: 13px }
-#ph { width: 100%; height: auto; display: block; border-radius: 6px; cursor: pointer; touch-action: none; border: 1px solid var(--border) }
+#ph { width: 100%; height: auto; aspect-ratio: 640 / 340; display: block; border-radius: 6px; cursor: pointer; touch-action: none; border: 1px solid var(--border) }
 .side { display: flex; flex-direction: column; gap: 12px; min-width: 0 }
 .row { display: flex; gap: 6px; flex-wrap: wrap }
 .sbtn { font-size: 13px; padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text-muted); cursor: pointer }
@@ -73,6 +73,11 @@ main { padding: 20px; max-width: 1400px; margin: 0 auto; display: flex; flex-dir
 .btn:disabled { visibility: hidden }
 .page-count { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums }
 
+.demo.wide { grid-template-columns: minmax(0, 1fr) }
+.demo.wide .side { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: start }
+.demo:fullscreen { background: var(--bg); padding: 16px; overflow: auto; grid-template-columns: minmax(0, 1fr) 300px }
+.demo:fullscreen #ph { width: min(100%, calc((100vh - 90px) * 640 / 340)); margin: 0 auto }
+.demo:fullscreen .side { max-height: calc(100vh - 32px); overflow: auto; display: flex }
 @media (max-width: 1000px) { .demo { grid-template-columns: minmax(0,1fr) } }
 @media (max-width: 700px) { main { padding: 12px 16px } }
 </style>
@@ -93,7 +98,7 @@ main { padding: 20px; max-width: 1400px; margin: 0 auto; display: flex; flex-dir
 
   <div class="demo">
     <div class="view">
-      <h3>Network <span id="status">Click the chart to lock the pointer</span></h3>
+      <h3>Plot <span id="status">Click the chart to lock the pointer</span></h3>
       <canvas id="ph" width="1280" height="680" aria-label="Prototype canvas. Click to lock the pointer."></canvas>
     </div>
     <div class="side">
@@ -105,6 +110,7 @@ main { padding: 20px; max-width: 1400px; margin: 0 auto; display: flex; flex-dir
           <button class="sbtn" id="c-cursor" aria-pressed="false">Hide cursor</button>
           <button class="sbtn" id="c-ghost" aria-pressed="false">Show real pointer</button>
           <button class="sbtn" id="c-new">New data</button>
+          <button class="sbtn" id="c-full">Full screen</button>
         </div>
         <p class="cite" id="cursor-note" hidden>Cursor hidden. The mouse itself never changes, so if the effect is a visual illusion it should disappear now. The readout is hidden too, so it can’t give the answer away.</p>
       </div>
@@ -587,7 +593,7 @@ function terrainSTL(g, opt) {
   return buf;
 }
 
-const TOPO = { id: "topology", name: "Topology", title: "Feel the important peaks", sub: "Terrain · persistent homology · STL export",
+const TOPO = { id: "topology", name: "Topology", wide: true, title: "Feel the important peaks", sub: "Terrain · persistent homology · STL export",
   task: "Click to lock the pointer and explore the terrain. <b>Raise “Keep peaks more prominent than” to flatten the small bumps</b>, so only the significant peaks remain to be felt. Try the tasks from Herman et al.: trace a path downhill, compare two heights, find the highest point in a region. Then download the same terrain as an STL and print it.",
   how: "Peak prominence is the 0-dimensional persistence of the terrain: each peak is born at its height and dies at the saddle where it joins a higher peak. Peaks below the threshold are flattened to their saddle height, and you feel that simplified terrain. Friction makes high ground sticky; slope slows you climbing and speeds you descending; contours give a catch at each contour line. The STL is the same simplified terrain, with contour ridges raised if you choose, so the screen and the print can be compared on the same data.",
   cite: "Persistence: Edelsbrunner, Letscher & Zomorodian 2002 · tasks: Herman, Jackson & Keefe, TVCG 2024 · bumps: Lécuyer et al., CHI 2004",
@@ -849,6 +855,72 @@ LASSO,
   },
   read() { const q = this.q; return [["Nearest node", q ? q.id : "–"], ["Value", q ? q.v : "–"], ["Pull", this.pull.toFixed(1) + " px"]]; },
 },
+{ id: "snap", name: "Snap", title: "Snap nodes into place", sub: "Drag nodes · magnetic detents",
+  task: "The network is scrambled. <b>Drag each node back to its dashed slot</b>; near its slot it is pulled in and clicks into place. Bigger values hold on harder, so you have to pull further to break away. Hide visuals to remove the slots and find each one by feel.",
+  how: "Within the snap reach, each step of a held node is bent toward its slot. In the slot the node locks: it stays put until your hand has moved the breakaway distance, which grows with the node’s value. The lock and the sudden release are what make snapping feel like a physical detent.",
+  cite: "Snap-dragging (Bier & Stone, SIGGRAPH 1986) · pseudo-haptic attraction (Lécuyer 2009)",
+  params: [
+    { key: "snap", label: "Pull toward the slot", min: 0, max: 0.95, step: 0.05, value: 0.6 },
+    { key: "reach", label: "Snap reach", min: 10, max: 90, step: 5, value: 40, unit: " px" },
+    { key: "brk", label: "Breakaway at value 100", min: 4, max: 80, step: 2, value: 40, unit: " px" },
+    { key: "n", label: "Nodes", min: 4, max: 16, step: 1, value: 9, reinit: true },
+  ],
+  init() {
+    this.g = makeGraph(this.P.n); this.held = null; this.lock = false; this.acc = [0, 0];
+    this.scramble();
+  },
+  scramble() {
+    this.g.nodes.forEach(q => {
+      q.hx = q.hx ?? q.x; q.hy = q.hy ?? q.y; q.placed = false;
+      let t = 0; do { q.x = R(AREA.x0 + 20, AREA.x1 - 20); q.y = R(AREA.y0 + 20, AREA.y1 - 20); } while (Math.hypot(q.x - q.hx, q.y - q.hy) < 90 && t++ < 50);
+    });
+  },
+  home(q) { return Math.hypot(q.x - q.hx, q.y - q.hy); },
+  brkPx(q) { return 4 + (this.P.brk - 4) * q.v / 100; },
+  down() { const q = nearestNode(this.g, S.x, S.y, 18); if (q) { this.held = q; this.ox = q.x - S.x; this.oy = q.y - S.y; this.lock = q.placed && S.on; this.acc = [0, 0]; } },
+  up() { if (this.held) { this.held.placed = this.home(this.held) < 1; this.held = null; this.lock = false; } },
+  move(dx, dy) {
+    const q = this.held;
+    if (!q) { S.x += dx; S.y += dy; return; }
+    if (this.lock) {
+      this.acc[0] += dx; this.acc[1] += dy;
+      if (Math.hypot(...this.acc) > this.brkPx(q)) { this.lock = false; S.x += this.acc[0]; S.y += this.acc[1]; this.released = true; }
+    } else {
+      S.x += dx; S.y += dy;
+      const nx = S.x + this.ox, ny = S.y + this.oy, d = Math.hypot(nx - q.hx, ny - q.hy), m = Math.hypot(dx, dy);
+      if (S.on && d < this.P.reach && m) {
+        const p = Math.min(d, m * this.P.snap + (d < 6 ? d : 0));
+        S.x += (q.hx - nx) / (d || 1) * p; S.y += (q.hy - ny) / (d || 1) * p;
+        if (Math.hypot(S.x + this.ox - q.hx, S.y + this.oy - q.hy) < 1.5) { S.x = q.hx - this.ox; S.y = q.hy - this.oy; this.lock = true; this.acc = [0, 0]; }
+      }
+    }
+    q.x = cx(S.x + this.ox); q.y = cy(S.y + this.oy);
+  },
+  draw() {
+    if (!S.hide) this.g.nodes.forEach(q => {
+      if (this.home(q) < 1) return;
+      ctx.setLineDash([4, 3]); ctx.strokeStyle = NAVY; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(q.hx, q.hy, nodeR(q, true) + 2, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = NAVY; ctx.font = "500 10px 'DM Sans', sans-serif"; ctx.textAlign = "center"; ctx.fillText(q.id, q.hx, q.hy + 4);
+    });
+    this.g.edges.forEach(e => drawEdge(this.g, e));
+    this.g.nodes.forEach(q => {
+      const r = nodeR(q, true);
+      drawNode(q, r, nodeFill(q), q.placed || this.home(q) < 1 ? "#e8710a" : nodeStroke(), q === this.held);
+    });
+  },
+  read() {
+    const q = this.held, done = this.g.nodes.filter(n => this.home(n) < 1).length;
+    return [["Holding", q ? q.id : "–"], ["Value", q ? q.v : "–"], ["To its slot", q ? Math.round(this.home(q)) + " px" : "–"],
+      ["State", q ? (this.lock ? `locked · ${Math.round(Math.max(0, this.brkPx(q) - Math.hypot(...this.acc)))} px to break away` : "free") : "–"], ["In place", `${done} of ${this.g.nodes.length}`]];
+  },
+  panel(el) {
+    const d = document.createElement("div");
+    d.innerHTML = `<div class="row"><button class="sbtn" id="sn-scr">Scramble again</button></div>`;
+    el.appendChild(d);
+    d.querySelector("#sn-scr").onclick = () => { this.scramble(); render(); };
+  },
+},
 { id: "draw", name: "Draw", title: "Draw community textures", sub: "Freehand regions · five textures",
   task: "Pick a texture and <b>drag to draw a region</b>, for example around a cluster of nodes. Then switch to <b>Feel</b>, click to lock the pointer, and move between regions. Hide visuals to feel the boundaries blind.",
   how: "Each texture is one cursor trick: sticky lowers the gain, slippery raises it, ridged alternates slow and fast stripes, rough shakes the cursor, magnetic pulls toward the region’s centre. The fill pattern hints at the feel; ridged stripes match the felt spacing exactly.",
@@ -998,6 +1070,13 @@ toggle("c-hide", "hide");
 toggle("c-ghost", "ghost");
 $("c-cursor").onclick = e => { S.nocursor = !S.nocursor; e.currentTarget.setAttribute("aria-pressed", S.nocursor); $("cursor-note").hidden = !S.nocursor; render(); };
 $("c-new").onclick = () => { cur.init(false); render(); };
+$("c-full").onclick = () => {
+  const el = document.querySelector(".demo");
+  if (document.fullscreenElement) { document.exitFullscreen(); return; }
+  const r = el.requestFullscreen ? el.requestFullscreen() : null;
+  if (r && r.catch) r.catch(() => { $("status").textContent = "Full screen was blocked here. Open the page directly in your browser."; });
+};
+document.addEventListener("fullscreenchange", () => { $("c-full").textContent = document.fullscreenElement ? "Exit full screen" : "Full screen"; $("c-full").setAttribute("aria-pressed", !!document.fullscreenElement); render(); });
 function renderParams() {
   const el = $("params"); el.innerHTML = "";
   const fmt = (p, v) => (p.step < 1 ? v.toFixed(2) : String(v)) + (p.unit || "");
@@ -1030,6 +1109,7 @@ function show(i) {
   if (!cur.P) { cur.P = {}; cur.params.forEach(p => cur.P[p.key] = p.value); }
   if (!cur.ready) { cur.init(true); cur.ready = true; }
   cv.style.cursor = drawing() ? "crosshair" : "pointer";
+  document.querySelector(".demo").classList.toggle("wide", !!cur.wide);
   $("status").textContent = drawing() ? "Drag to draw" : S.locked ? "Esc to release" : "Click the chart to lock the pointer";
   S.jx = S.jy = 0;
   $("p-title").textContent = cur.title; $("p-sub").textContent = cur.sub; $("p-task").innerHTML = cur.task;
