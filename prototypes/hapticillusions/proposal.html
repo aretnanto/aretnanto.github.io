@@ -167,10 +167,10 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 <!-- 3 -->
 <section class="step" data-sec="why" id="illusions" hidden>
   <p class="eyebrow">Theory</p>
-  <h2>Illusions</h2>
-  <p class="lede">An illusion is a perception that does not match the physical world. Illusions are not failures of the senses. They show how perception works.</p>
+  <h2>Sensation and perception</h2>
+  <p class="lede"><b>Sensation</b> is the signal the eye registers. <b>Perception</b> is what we experience. Illusions show that the two can come apart.</p>
   <div class="grid2">
-    <div class="card"><span class="k">Seeing</span><h3>Müller-Lyer</h3>
+    <div class="card"><span class="k">Length</span><h3>Müller-Lyer</h3>
       <figure style="max-width:360px;width:100%;margin:0 auto">
       <svg class="fig" viewBox="80 25 320 170" role="img" aria-label="Two equal lines look unequal because of their arrowheads">
         <g stroke="#000fa1" stroke-width="4" fill="none" stroke-linecap="round">
@@ -180,19 +180,15 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
       </svg>
     </figure>
       <p>Two lines of the same length look different.</p></div>
-    <div class="card"><span class="k">Touch</span><h3>Size-weight</h3>
-      <figure style="max-width:360px;width:100%;margin:0 auto"><svg class="fig" viewBox="30 30 420 180" role="img" aria-label="A small box and a large box with the same weight; the small one feels heavier">
-        <line x1="40" y1="170" x2="440" y2="170" stroke="#5a63b5" stroke-width="2"/>
-        <rect x="110" y="120" width="60" height="50" rx="4" fill="#000fa1"/>
-        <rect x="270" y="50" width="140" height="120" rx="6" fill="#f3f4fb" stroke="#000fa1" stroke-width="2"/>
-        <text x="140" y="200" text-anchor="middle" font-size="22" fill="#000fa1">500 g</text>
-        <text x="340" y="200" text-anchor="middle" font-size="22" fill="#000fa1">500 g</text>
-        <text x="140" y="100" text-anchor="middle" font-size="22" font-weight="700" fill="#b85a07">feels heavier</text>
+    <div class="card"><span class="k">Brightness</span><h3>Simultaneous contrast</h3>
+      <figure style="max-width:360px;width:100%;margin:0 auto"><svg class="fig" viewBox="0 0 320 170" role="img" aria-label="Two identical grey squares, one on black and one on white">
+        <rect x="0" y="10" width="160" height="150" fill="#1a1a1a"/><rect x="160" y="10" width="160" height="150" fill="#f2f2f2"/>
+        <rect x="50" y="55" width="60" height="60" fill="#808080"/><rect x="210" y="55" width="60" height="60" fill="#808080"/>
       </svg></figure>
-      <p>Of two objects with the same weight, the smaller one feels heavier (Charpentier 1891).</p></div>
+      <p>Two squares of the same grey look different.</p></div>
   </div>
-  <p class="plain">Pseudo-haptics is an illusion too. The cursor slows down and the hand feels a resistance that is not there.</p>
-  <details class="notes"><summary>Notes</summary><p>Ask the room which line is longer, then which box would feel heavier. The size-weight illusion is useful because it is touch being shaped by what the eyes saw.</p></details>
+  <p class="plain">Same sensation, different perception.</p>
+  <details class="notes"><summary>Notes</summary><p>Ask the room which line is longer and which square is lighter. The light reaching the eye is identical in each pair. What changes is how the brain interprets it.</p></details>
 </section>
 
 <!-- illusions above, theory below -->
@@ -200,7 +196,7 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
   <p class="eyebrow">Theory</p>
   <h2>Bottom-up and top-down</h2>
   <div class="grid2">
-    <div class="card"><span class="k">Bottom-up</span><h3>Driven by the signal</h3><p>What the eye or the skin registers.</p></div>
+    <div class="card"><span class="k">Bottom-up</span><h3>Driven by the signal</h3><p>What the eye registers.</p></div>
     <div class="card"><span class="k">Top-down</span><h3>Driven by expectation</h3><p>What knowledge and context say the signal means.</p></div>
   </div>
   <div class="cols" style="align-items:center">
@@ -209,7 +205,7 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
         <rect x="160" y="96" width="160" height="48" rx="8" fill="#f3f4fb" stroke="#000fa1" stroke-width="2"/>
         <text x="240" y="126" text-anchor="middle" font-size="16" font-weight="700" fill="#000fa1">perception</text>
         <text x="240" y="28" text-anchor="middle" font-size="15" fill="#000fa1">knowledge, context, goals</text>
-        <text x="240" y="226" text-anchor="middle" font-size="15" fill="#000fa1">light, pressure, motion</text>
+        <text x="240" y="226" text-anchor="middle" font-size="15" fill="#000fa1">light on the retina</text>
         <path d="M240 40 L240 88" stroke="#e8710a" stroke-width="3" marker-end="url(#td)"/>
         <path d="M240 208 L240 152" stroke="#000fa1" stroke-width="3" marker-end="url(#bu)"/>
         <text x="252" y="70" font-size="14" fill="#b85a07">top-down</text>
@@ -471,7 +467,6 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
     <li>Bertin, J. (1967). Sémiologie graphique. Gauthier-Villars.</li>
     <li>Botvinick, M., &amp; Cohen, J. (1998). Rubber hands “feel” touch that eyes see. Nature 391.</li>
     <li>Card, S. K., Mackinlay, J. D., &amp; Shneiderman, B. (1999). Readings in information visualization. Morgan Kaufmann.</li>
-    <li>Charpentier, A. (1891). Analyse expérimentale de quelques éléments de la sensation de poids. Archives de Physiologie Normale et Pathologique 3.</li>
     <li>Cleveland, W. S., &amp; McGill, R. (1984). Graphical perception. JASA 79(387).</li>
     <li>Costes, A., et al. (2019). Touchy, a visual approach for simulating haptic effects on touchscreens. Frontiers in ICT 6.</li>
     <li>Edelsbrunner, H., Letscher, D., &amp; Zomorodian, A. (2002). Topological persistence and simplification. Discrete &amp; Computational Geometry.</li>
