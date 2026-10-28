@@ -165,6 +165,37 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 </section>
 
 <!-- 3 -->
+<section class="step" data-sec="why" id="illusions" hidden>
+  <p class="eyebrow">Theory</p>
+  <h2>Illusions</h2>
+  <p class="lede">An illusion is a perception that does not match the physical world. Illusions are not failures of the senses. They show how perception works.</p>
+  <div class="grid2">
+    <div class="card"><span class="k">Seeing</span><h3>Müller-Lyer</h3>
+      <figure style="max-width:360px;width:100%;margin:0 auto">
+      <svg class="fig" viewBox="80 25 320 170" role="img" aria-label="Two equal lines look unequal because of their arrowheads">
+        <g stroke="#000fa1" stroke-width="4" fill="none" stroke-linecap="round">
+          <line x1="120" y1="60" x2="360" y2="60"/><path d="M140 40 L120 60 L140 80 M340 40 L360 60 L340 80"/>
+          <line x1="120" y1="160" x2="360" y2="160"/><path d="M100 140 L120 160 L100 180 M380 140 L360 160 L380 180"/>
+        </g>
+      </svg>
+    </figure>
+      <p>Two lines of the same length look different.</p></div>
+    <div class="card"><span class="k">Touch</span><h3>Size-weight</h3>
+      <figure style="max-width:360px;width:100%;margin:0 auto"><svg class="fig" viewBox="30 30 420 180" role="img" aria-label="A small box and a large box with the same weight; the small one feels heavier">
+        <line x1="40" y1="170" x2="440" y2="170" stroke="#5a63b5" stroke-width="2"/>
+        <rect x="110" y="120" width="60" height="50" rx="4" fill="#000fa1"/>
+        <rect x="270" y="50" width="140" height="120" rx="6" fill="#f3f4fb" stroke="#000fa1" stroke-width="2"/>
+        <text x="140" y="200" text-anchor="middle" font-size="22" fill="#000fa1">500 g</text>
+        <text x="340" y="200" text-anchor="middle" font-size="22" fill="#000fa1">500 g</text>
+        <text x="140" y="100" text-anchor="middle" font-size="22" font-weight="700" fill="#b85a07">feels heavier</text>
+      </svg></figure>
+      <p>Of two objects with the same weight, the smaller one feels heavier (Charpentier 1891).</p></div>
+  </div>
+  <p class="plain">Pseudo-haptics is an illusion too. The cursor slows down and the hand feels a resistance that is not there.</p>
+  <details class="notes"><summary>Notes</summary><p>Ask the room which line is longer, then which box would feel heavier. The size-weight illusion is useful because it is touch being shaped by what the eyes saw.</p></details>
+</section>
+
+<!-- illusions above, theory below -->
 <section class="step" data-sec="why" id="theory" hidden>
   <p class="eyebrow">Theory</p>
   <h2>Bottom-up and top-down</h2>
@@ -174,18 +205,23 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
   </div>
   <div class="cols" style="align-items:center">
     <figure style="max-width:520px">
-      <svg class="fig" viewBox="0 0 480 220" role="img" aria-label="Two equal lines look unequal because of their arrowheads">
-        <g stroke="#000fa1" stroke-width="4" fill="none" stroke-linecap="round">
-          <line x1="120" y1="60" x2="360" y2="60"/><path d="M140 40 L120 60 L140 80 M340 40 L360 60 L340 80"/>
-          <line x1="120" y1="160" x2="360" y2="160"/><path d="M100 140 L120 160 L100 180 M380 140 L360 160 L380 180"/>
-        </g>
-        <text x="240" y="212" text-anchor="middle" font-size="14" fill="#5a63b5">Same length on the retina, different length in perception (Müller-Lyer)</text>
+      <svg class="fig" viewBox="0 0 480 240" role="img" aria-label="The signal rises into perception from below while expectation shapes it from above">
+        <rect x="160" y="96" width="160" height="48" rx="8" fill="#f3f4fb" stroke="#000fa1" stroke-width="2"/>
+        <text x="240" y="126" text-anchor="middle" font-size="16" font-weight="700" fill="#000fa1">perception</text>
+        <text x="240" y="28" text-anchor="middle" font-size="15" fill="#000fa1">knowledge, context, goals</text>
+        <text x="240" y="226" text-anchor="middle" font-size="15" fill="#000fa1">light, pressure, motion</text>
+        <path d="M240 40 L240 88" stroke="#e8710a" stroke-width="3" marker-end="url(#td)"/>
+        <path d="M240 208 L240 152" stroke="#000fa1" stroke-width="3" marker-end="url(#bu)"/>
+        <text x="252" y="70" font-size="14" fill="#b85a07">top-down</text>
+        <text x="252" y="186" font-size="14" fill="#5a63b5">bottom-up</text>
+        <defs><marker id="td" viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#e8710a"/></marker>
+          <marker id="bu" viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#000fa1"/></marker></defs>
       </svg>
     </figure>
     <p class="plain">Every percept mixes both. Illusions show the top-down side, where the signal stays the same and the brain settles on a different cause.</p>
   </div>
   <p class="cite">Helmholtz 1867 · Gregory 1980 · Goldstein, Sensation and Perception</p>
-  <details class="notes"><summary>Notes</summary><p>Ask the room which line is longer. The signal is identical, so the difference comes from top-down interpretation. Helmholtz called this unconscious inference, and Gregory called perceptions hypotheses. Pseudo-haptics lives in the same gap.</p></details>
+  <details class="notes"><summary>Notes</summary><p>The illusions on the last slide come from the top-down arrow. Helmholtz called this unconscious inference, and Gregory called perceptions hypotheses. Pseudo-haptics lives in the same gap.</p></details>
 </section>
 
 <!-- 4 -->
@@ -435,6 +471,7 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
     <li>Bertin, J. (1967). Sémiologie graphique. Gauthier-Villars.</li>
     <li>Botvinick, M., &amp; Cohen, J. (1998). Rubber hands “feel” touch that eyes see. Nature 391.</li>
     <li>Card, S. K., Mackinlay, J. D., &amp; Shneiderman, B. (1999). Readings in information visualization. Morgan Kaufmann.</li>
+    <li>Charpentier, A. (1891). Analyse expérimentale de quelques éléments de la sensation de poids. Archives de Physiologie Normale et Pathologique 3.</li>
     <li>Cleveland, W. S., &amp; McGill, R. (1984). Graphical perception. JASA 79(387).</li>
     <li>Costes, A., et al. (2019). Touchy, a visual approach for simulating haptic effects on touchscreens. Frontiers in ICT 6.</li>
     <li>Edelsbrunner, H., Letscher, D., &amp; Zomorodian, A. (2002). Topological persistence and simplification. Discrete &amp; Computational Geometry.</li>
