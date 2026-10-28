@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Perception Without Sensation</title>
+<title>Feel Data on Screen</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Project proposal for CSC 596 Visual Analytics. Prototyping touch for visual analytics with pseudo-haptics. Aditya Retnanto.">
+<meta name="description" content="Project proposal for CSC 596 Visual Analytics. A pseudo-haptic prototyping tool for visualization. Aditya Retnanto.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap">
 <style>
@@ -97,6 +97,7 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 /* demo slide */
 .dash-head { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 12px 16px }
 .dash-head h2 { font-size: 22px; margin-right: auto }
+.feelcv { width: 100%; max-width: calc((100vh - 465px) * var(--ar)); min-width: min(100%, 420px); height: auto; display: block; border: 1px solid #dcdff0; border-radius: 8px; cursor: pointer; touch-action: none; background: #fff }
 .demo-frame { width: 100%; height: calc(100vh - 330px); min-height: 360px; border: 1px solid #e1e0d9; border-radius: 8px; background: #fff }
 .demo-steps { display: flex; gap: 8px; flex-wrap: wrap }
 .demo-steps button { font-size: 13px; padding: 6px 12px; border: 1px solid #e1e0d9; border-radius: 6px; background: #fcfcfb; color: #52514e; cursor: pointer }
@@ -111,7 +112,7 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 </head>
 <body>
 <header class="bar"><div class="bar-in">
-  <h1>Perception without sensation · CSC 596 proposal</h1>
+  <h1>Feel Data on Screen · CSC 596 proposal</h1>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
 </div></header>
 
@@ -119,28 +120,28 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 
 <!-- 1 -->
 <section class="step" data-sec="why" id="title">
-  <div class="title-slide"><div>
+<div class="title-slide"><div>
     <p class="eyebrow">CSC 596 Visual Analytics · project proposal</p>
-    <h2 class="title-main">Perception without sensation</h2>
-    <p class="title-sub">Prototyping touch for visual analytics with pseudo-haptics, on the computer everyone already has.</p>
+    <h2 class="title-main">Feel Data on Screen</h2>
+    <p class="title-sub">A Pseudo-Haptic Prototyping Tool for Vis</p>
     <p class="title-meta"><strong>Aditya Retnanto</strong> · November 4, 2026</p>
   </div></div>
-  <details class="notes"><summary>Notes</summary><p>I want to add touch to visual analytics without new hardware. The way it works says something about how much the field relies on vision.</p></details>
+  <details class="notes"><summary>Notes</summary><p>Pseudo-haptics creates a feeling of touch with an ordinary mouse and screen. I want to use it to prototype touch for visualization.</p></details>
 </section>
 
 <!-- 2 -->
 <section class="step" data-sec="why" id="vision" hidden>
-  <p class="eyebrow">Motivation</p>
+<p class="eyebrow">Motivation</p>
   <h2>Visual analytics runs on vision</h2>
   <div class="grid2">
     <p class="quote">Visualization is “the use of computer-supported, interactive, <b>visual</b> representations of data to <b>amplify cognition</b>.”<br><span class="cite" style="font-size:14px">Card, Mackinlay &amp; Shneiderman 1999</span></p>
     <p class="quote">Visual analytics is “the science of analytical reasoning facilitated by <b>interactive visual interfaces</b>.”<br><span class="cite" style="font-size:14px">Thomas &amp; Cook 2005</span></p>
   </div>
   <div class="cols">
-    <ul class="bul">
-      <li>The most common setting is still a desktop with a mouse and keyboard.</li>
-      <li>The hand only sends input.</li>
-      <li>The data and the feedback from every action come back through the eyes.</li>
+    <ul class="bul sm">
+      <li>Interaction is a loop of input and output, and on a desktop the output is visual. The result of every action comes back through the eyes.</li>
+      <li>Direct manipulation made that loop feel physical (Shneiderman 1983). Yet the hand still works through a peripheral.</li>
+      <li>A mouse senses movement and gives nothing back. Touch is where this limit shows, and adding it usually means new hardware.</li>
     </ul>
     <figure>
       <svg class="fig" viewBox="0 0 520 220" role="img" aria-label="The hand acts through the mouse; everything returns to the eye">
@@ -149,34 +150,35 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
         <circle cx="70" cy="78" r="30" fill="#ffffff" stroke="#000fa1" stroke-width="2"/><circle cx="70" cy="78" r="10" fill="#000fa1"/>
         <text x="70" y="132" text-anchor="middle" font-size="15" fill="#000fa1">eye</text>
         <rect x="420" y="150" width="56" height="42" rx="18" fill="#ffffff" stroke="#000fa1" stroke-width="2"/>
-        <text x="448" y="214" text-anchor="middle" font-size="15" fill="#000fa1">hand</text>
+        <text x="448" y="214" text-anchor="middle" font-size="15" fill="#000fa1">hand + mouse</text>
         <path d="M418 160 C380 150 360 135 334 112" fill="none" stroke="#000fa1" stroke-width="2" marker-end="url(#a1)"/>
-        <text x="392" y="128" font-size="14" fill="#5a63b5">acts</text>
+        <text x="392" y="128" font-size="14" fill="#5a63b5">input</text>
         <path d="M186 64 L106 70" fill="none" stroke="#e8710a" stroke-width="3" marker-end="url(#a2)"/>
         <path d="M186 96 L106 88" fill="none" stroke="#e8710a" stroke-width="3" marker-end="url(#a2)"/>
         <text x="146" y="54" text-anchor="middle" font-size="14" fill="#b85a07">data</text>
         <text x="146" y="114" text-anchor="middle" font-size="14" fill="#b85a07">feedback</text>
+        <path d="M336 128 C370 160 390 172 414 176" fill="none" stroke="#5a63b5" stroke-width="2" stroke-dasharray="5 5"/>
+        <text x="262" y="150" text-anchor="middle" font-size="13" fill="#5a63b5">no output to the hand</text>
         <defs><marker id="a1" viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#000fa1"/></marker>
           <marker id="a2" viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#e8710a"/></marker></defs>
       </svg>
     </figure>
   </div>
-  <details class="notes"><summary>Notes</summary><p>Both definitions keep the word I want to question, visual. Interaction is central to visual analytics, but on the desktop it only flows one way.</p></details>
+  <details class="notes"><summary>Notes</summary><p>Both definitions keep the word visual. Input comes from the hand, but output only goes to the eyes. Direct manipulation brings touch to mind, and that is where the peripheral becomes the limit.</p></details>
 </section>
 
 <!-- 3 -->
 <section class="step" data-sec="why" id="theory" hidden>
-  <p class="eyebrow">Theory</p>
-  <h2>Sensation is not perception</h2>
+<p class="eyebrow">Theory</p>
+  <h2>Bottom-up and top-down</h2>
   <div class="grid2">
-    <div class="card"><span class="k">Sensation</span><h3>The signal</h3><p>What the receptors register. Light on the retina, pressure on the skin, the stretch of a muscle.</p></div>
-    <div class="card main"><span class="k">Perception</span><h3>The interpretation</h3><p>What the brain concludes from those signals, using context and expectation.</p></div>
+    <div class="card"><span class="k">Bottom-up</span><h3>From the signal</h3><p>Perception built from what the receptors register. Features such as colour, size and motion are picked up before attention (Treisman &amp; Gelade 1980).</p></div>
+    <div class="card main"><span class="k">Top-down</span><h3>From what we expect</h3><p>Perception shaped by knowledge, context and goals. Helmholtz called it unconscious inference, and Gregory called perceptions hypotheses.</p></div>
   </div>
   <div class="cols">
     <ul class="bul">
-      <li>Helmholtz called perception <b>unconscious inference</b>. The brain guesses the most likely cause of what it senses.</li>
-      <li>Gregory described perceptions as <b>hypotheses</b>. Illusions are the cases where the guess is wrong.</li>
-      <li>So the same sensation can produce different perceptions, and different sensations can produce the same one.</li>
+      <li>Every percept mixes both.</li>
+      <li>Illusions expose the top-down part. The brain settles on the most likely cause of a signal, and sometimes it is wrong.</li>
     </ul>
     <figure>
       <svg class="fig" viewBox="0 0 480 220" role="img" aria-label="Two equal lines look unequal because of their arrowheads">
@@ -188,20 +190,21 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
       </svg>
     </figure>
   </div>
-  <p class="cite">Helmholtz 1867 · Gregory 1980 · Goldstein, Sensation and Perception</p>
-  <details class="notes"><summary>Notes</summary><p>Ask the room which line is longer. Then point out they are the same length. That is the gap between sensation and perception, and everything in this project lives in it.</p></details>
+  <p class="cite">Treisman &amp; Gelade 1980 · Helmholtz 1867 · Gregory 1980 · Goldstein, Sensation and Perception</p>
+  <details class="notes"><summary>Notes</summary><p>Ask the room which line is longer. The signal is identical, so the difference comes from top-down interpretation. Pseudo-haptics lives in the same gap.</p></details>
 </section>
 
 <!-- 4 -->
 <section class="step" data-sec="why" id="multisensory" hidden>
-  <p class="eyebrow">Theory</p>
-  <h2>When senses disagree, vision usually wins</h2>
+<p class="eyebrow">Theory</p>
+  <h2>Multisensory conflict</h2>
   <div class="cols">
     <div style="display:flex;flex-direction:column;gap:14px">
-      <ul class="bul">
+      <ul class="bul sm">
         <li>Rock &amp; Victor showed people a square through a lens that distorted it. They felt the shape they saw.</li>
         <li>Seeing a rubber hand stroked shifts where people feel their own hand.</li>
-        <li>Ernst &amp; Banks explained why. The brain weights each sense by how reliable it is, and vision is usually the most precise.</li>
+        <li>Ernst &amp; Banks explained why. Each sense is weighted by how reliable it is, and vision is usually the most precise.</li>
+        <li>Pseudo-haptics creates this conflict on purpose. The hand moves the same, the cursor slows, and the brain explains the difference as resistance.</li>
       </ul>
       <div class="ctrl" style="font-size:15px;color:#5a63b5;max-width:30em"><label for="rel" style="display:flex;justify-content:space-between">How noisy is vision? <output id="rel-o" style="font-weight:700;color:#000fa1">low</output></label><input type="range" id="rel" min="0.4" max="3" step="0.1" value="0.6" style="width:100%;accent-color:#000fa1"></div>
     </div>
@@ -209,48 +212,45 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
       <svg class="fig" id="ernst" viewBox="0 0 520 260" role="img" aria-label="Vision, touch and the combined estimate as probability curves"></svg>
     </figure>
   </div>
-  <p class="cite">Rock &amp; Victor 1964 · Botvinick &amp; Cohen 1998 · Ernst &amp; Banks 2002</p>
-  <details class="notes"><summary>Notes</summary><p>Drag the slider. When vision is precise, the combined estimate sits on the visual value. Blur vision and touch takes over. Pseudo-haptics works because on a screen the cursor is precise and the hand’s sense of its own movement is not.</p></details>
+  <p class="cite">Rock &amp; Victor 1964 · Botvinick &amp; Cohen 1998 · Ernst &amp; Banks 2002 · Lécuyer 2009</p>
+  <details class="notes"><summary>Notes</summary><p>Drag the slider. When vision is precise, the combined estimate sits on the visual value. Blur vision and touch takes over. On a screen the cursor is precise and the hand’s sense of its own movement is not, so vision wins the conflict.</p></details>
 </section>
 
 <!-- 5 -->
 <section class="step" data-sec="why" id="assumption" hidden>
-  <p class="eyebrow">Theory</p>
+<p class="eyebrow">Theory</p>
   <h2>What visualization assumed</h2>
   <div class="cols">
-    <div><h3 class="colh">The foundation</h3>
+    <div><h3 class="colh">Mostly bottom-up</h3>
       <ul class="bul sm">
         <li>Bertin’s visual variables and Cleveland &amp; McGill’s graphical perception measure how accurately people decode a visual signal.</li>
-        <li>They assume perception follows the stimulus. A longer bar looks longer, with some error.</li>
+        <li>Preattentive features decide which encodings pop out (Healey &amp; Enns 2012).</li>
       </ul></div>
-    <div><h3 class="colh">The cracks</h3>
+    <div><h3 class="colh">Top-down gets in</h3>
       <ul class="bul sm">
-        <li>Many perceptual “facts” in visualization rest on thin evidence (Kosara 2016).</li>
+        <li>What people already know changes what they see in a chart (Xiong et al. 2020).</li>
         <li>People compare charts through shortcuts such as average length, and these can be fooled on purpose (Jardine et al. 2020, Ondov et al. 2020).</li>
       </ul></div>
   </div>
-  <p class="plain">Pseudo-haptics is the extreme case. Perception changes while sensation stays the same.</p>
-  <p class="cite">Bertin 1967 · Cleveland &amp; McGill 1984 · Kosara 2016 · Jardine et al. 2020 · Ondov et al. 2020</p>
+  <p class="plain">Pseudo-haptics uses both. A bottom-up conflict between hand and eye is resolved top-down into a sense of touch.</p>
+  <p class="cite">Bertin 1967 · Cleveland &amp; McGill 1984 · Healey &amp; Enns 2012 · Xiong et al. 2020 · Jardine et al. 2020 · Ondov et al. 2020</p>
 </section>
 
 <!-- 6 -->
 <section class="step" data-sec="why" id="feel" hidden>
-  <p class="eyebrow">Live demo</p>
+<p class="eyebrow">Live demo</p>
   <h2>Feel it yourself</h2>
   <div class="cols" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
-    <canvas id="mini" width="1200" height="520" style="width:100%;height:auto;border:1px solid #dcdff0;border-radius:8px;cursor:pointer;touch-action:none" aria-label="Bar chart you can feel. Click to lock the pointer, Esc releases it."></canvas>
+    <canvas id="mini" class="feelcv" style="--ar:2.31" aria-label="Feel it yourself. Click to lock the pointer, Esc releases it."></canvas>
     <div style="display:flex;flex-direction:column;gap:12px">
       <p class="lede" style="font-size:18px">Click the chart and move across the bars. Taller bars slow the cursor down.</p>
-      <div class="demo-steps"><button id="m-on" aria-pressed="true">Illusion on</button><button id="m-bars" aria-pressed="false">Hide bars</button><button id="m-cursor" aria-pressed="false">Hide cursor</button><button id="m-new">New data</button></div>
-      <ul class="bul sm">
-        <li><b>Hide bars.</b> Can you still find the tallest one?</li>
-        <li><b>Hide cursor.</b> The feeling should disappear, because the mouse itself never changes.</li>
-      </ul>
-      <p class="cite" id="m-status">Esc releases the pointer.</p>
+      <div class="demo-steps"><button data-act="on" aria-pressed="false">Illusion on</button><button data-act="data" aria-pressed="false">Hide bars</button><button data-act="conflict" aria-pressed="false">Conflict</button><button data-act="cursor" aria-pressed="false">Hide cursor</button><button data-act="new" aria-pressed="false">New data</button></div>
+      <ul class="bul sm"><li><b>Hide bars.</b> Only the motion is left. Can you still find the tallest one?</li><li><b>Conflict.</b> The feel now follows other data than what you see. Which one wins?</li><li><b>Hide cursor.</b> No visual signal, so no feeling. The mouse itself never changes.</li></ul>
+      <p class="cite">Esc releases the pointer.</p>
     </div>
   </div>
   <p class="cite">Lécuyer et al. 2004 · Lécuyer 2009</p>
-  <details class="notes"><summary>Notes</summary><p>Let someone try it. The hand moves the same everywhere. Only what the eye sees changes. That is perception without sensation.</p></details>
+  <details class="notes"><summary>Notes</summary><p>Let someone try it and call out a letter. The hand moves the same everywhere. Only what the eye sees changes.</p></details>
 </section>
 
 <!-- 7 -->
@@ -304,8 +304,8 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 
 <!-- 9 -->
 <section class="step" data-sec="what" id="project" hidden>
-  <p class="eyebrow">The project</p>
-  <h2>A prototyping tool for felt data</h2>
+<p class="eyebrow">The project</p>
+  <h2>A pseudo-haptic prototyping tool for vis</h2>
   <p class="lede">A browser tool where designers map data to a feel, test whether it comes across without vision, and decide what is worth fabricating.</p>
   <div class="grid2">
     <div class="card main"><span class="k">Understand</span><h3>What touch can carry</h3><p>Measure which felt differences people tell apart, and turn them into design requirements such as tactile palettes, before anything is printed.</p></div>
@@ -319,24 +319,54 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 </section>
 
 <!-- 10 -->
-<section class="step wide" data-sec="what" id="demo-heat" hidden>
-  <div class="dash-head"><h2>Live · find a pattern by feel</h2><p style="font-size:14px;color:#52514e;flex-basis:100%">Press <b>Mystery pattern</b>, feel the grid with the colours hidden, then reveal. Try <b>Hide cursor</b> for the control.</p></div>
-  <iframe class="demo-frame" data-src="index.html#heatfriction" title="Heat friction prototype" src="about:blank" allow="fullscreen"></iframe>
-  <details class="notes"><summary>Notes</summary><p>This is the analytical task in its simplest form. Known patterns mean we know the right answer.</p></details>
+<section class="step" data-sec="what" id="demo-heat" hidden>
+<p class="eyebrow">Live demo · find a pattern</p>
+  <h2>Find a pattern by feel</h2>
+  <div class="cols" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+    <canvas id="heat" class="feelcv" style="--ar:1.76" aria-label="Find a pattern by feel. Click to lock the pointer, Esc releases it."></canvas>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <p class="lede" style="font-size:18px">Press <b>Mystery</b>, feel the grid with the colours hidden, then reveal it.</p>
+      <div class="demo-steps"><button data-act="mystery" aria-pressed="false">Mystery</button><button data-act="data" aria-pressed="false">Hide colours</button><button data-act="cursor" aria-pressed="false">Hide cursor</button><button data-act="on" aria-pressed="false">Illusion on</button></div>
+      <ul class="bul sm"><li>Darker cells are stickier.</li><li>Known patterns mean we know the right answer.</li></ul>
+      <p class="cite">Esc releases the pointer.</p>
+    </div>
+  </div>
+  <p class="cite">Heat friction prototype</p>
+  <details class="notes"><summary>Notes</summary><p>This is the analytical task in its simplest form. Ask the room what shape they felt before revealing.</p></details>
 </section>
 
 <!-- 11 -->
-<section class="step wide" data-sec="what" id="demo-topo" hidden>
-  <div class="dash-head"><h2>Live · feel the peaks that matter</h2><p style="font-size:14px;color:#52514e;flex-basis:100%">Maunga Whau volcano. Raise <b>Keep peaks more prominent than</b> and the small peaks flatten, in what you feel too. Computed with persistent homology.</p></div>
-  <iframe class="demo-frame" data-src="index.html#topology" title="Topology prototype" src="about:blank" allow="fullscreen"></iframe>
-  <details class="notes"><summary>Notes</summary><p>Computation decides what is felt. Each peak is ranked by how far it rises above the saddle that joins it to a higher peak, and peaks below the threshold are flattened.</p></details>
+<section class="step" data-sec="what" id="demo-topo" hidden>
+<p class="eyebrow">Live demo · terrain</p>
+  <h2>Feel the peaks that matter</h2>
+  <div class="cols" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+    <canvas id="terr" class="feelcv" style="--ar:1.43" aria-label="Feel the peaks that matter. Click to lock the pointer, Esc releases it."></canvas>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <p class="lede" style="font-size:18px">Maunga Whau volcano. High ground is sticky. <b>Flatten small peaks</b> keeps only the prominent ones, in what you see and what you feel.</p>
+      <div class="demo-steps"><button data-act="simp" aria-pressed="false">Flatten small peaks</button><button data-act="data" aria-pressed="false">Hide map</button><button data-act="cursor" aria-pressed="false">Hide cursor</button><button data-act="on" aria-pressed="false">Illusion on</button></div>
+      <ul class="bul sm"><li>A peak’s prominence is how far it rises above the saddle joining it to a higher peak.</li><li>Peaks below the threshold are flattened to their saddle.</li></ul>
+      <p class="cite">Esc releases the pointer.</p>
+    </div>
+  </div>
+  <p class="cite">Edelsbrunner et al. 2002 · Herman et al. 2024 · R volcano dataset</p>
+  <details class="notes"><summary>Notes</summary><p>Computation decides what is felt. This is persistent homology, applied to a felt surface.</p></details>
 </section>
 
 <!-- 12 -->
-<section class="step wide" data-sec="what" id="demo-sand" hidden>
-  <div class="dash-head"><h2>Live · reshape the data, then replay</h2><p style="font-size:14px;color:#52514e;flex-basis:100%">Hold the button and push sand into a hill. The heavier the load, the slower it moves. Switch <b>Show</b> to see where you worked, then press <b>Replay</b>.</p></div>
-  <iframe class="demo-frame" data-src="index.html#sandbox" title="Sandbox prototype" src="about:blank" allow="fullscreen"></iframe>
-  <details class="notes"><summary>Notes</summary><p>Every brush step is recorded, so the session can be rebuilt exactly. This is the provenance side of visual analytics, applied to a felt surface.</p></details>
+<section class="step" data-sec="what" id="demo-sand" hidden>
+<p class="eyebrow">Live demo · provenance</p>
+  <h2>Reshape it, then replay</h2>
+  <div class="cols" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+    <canvas id="sand" class="feelcv" style="--ar:1.61" aria-label="Reshape it, then replay. Click to lock the pointer, Esc releases it."></canvas>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <p class="lede" style="font-size:18px">Hold the mouse button to raise sand. High ground is harder to move through. Every touch is recorded.</p>
+      <div class="demo-steps"><button data-act="dig" aria-pressed="false">Dig</button><button data-act="touched" aria-pressed="false">Show where touched</button><button data-act="replay" aria-pressed="false">Replay</button><button data-act="clear" aria-pressed="false">Clear</button></div>
+      <ul class="bul sm"><li><b>Show where touched</b> maps the history of the session.</li><li><b>Replay</b> rebuilds the session from the record.</li></ul>
+      <p class="cite">Esc releases the pointer.</p>
+    </div>
+  </div>
+  <p class="cite">Sandbox prototype</p>
+  <details class="notes"><summary>Notes</summary><p>This is the provenance side of visual analytics, applied to a felt surface.</p></details>
 </section>
 
 <!-- 13 -->
@@ -396,7 +426,7 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
     <li>Is a prototyping tool the right frame for a visual analytics project, or does it need a stronger analysis task?</li>
     <li>Which evaluation would convince you without a user study?</li>
     <li>Which data would you most want to feel?</li>
-  </ol>
+    </ol>
 </section>
 
 <!-- 16 -->
@@ -418,6 +448,7 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
     <li>Follmer, S., et al. (2013). inFORM, dynamic physical affordances and constraints through shape and object actuation. UIST.</li>
     <li>Goldstein, E. B., &amp; Brockmole, J. R. Sensation and perception. Cengage.</li>
     <li>Gregory, R. L. (1980). Perceptions as hypotheses. Philosophical Transactions of the Royal Society B.</li>
+    <li>Healey, C. G., &amp; Enns, J. T. (2012). Attention and visual memory in visualization and computer graphics. IEEE TVCG 18(7).</li>
     <li>Helmholtz, H. von (1867). Handbuch der physiologischen Optik.</li>
     <li>Herman, B., Jackson, C. D., &amp; Keefe, D. F. (2024). Touching the ground. IEEE TVCG.</li>
     <li>Jansen, Y., et al. (2015). Opportunities and challenges for data physicalization. CHI.</li>
@@ -430,8 +461,11 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
     <li>Mueller, S., et al. (2014). WirePrint, 3D printed previews for fast prototyping. UIST.</li>
     <li>Ondov, B. D., et al. (2020). Revealing perceptual proxies with adversarial examples. IEEE VIS.</li>
     <li>Rock, I., &amp; Victor, J. (1964). Vision and touch, an experimentally created conflict between the two senses. Science 143.</li>
+    <li>Shneiderman, B. (1983). Direct manipulation, a step beyond programming languages. IEEE Computer 16(8).</li>
     <li>Thomas, J. J., &amp; Cook, K. A. (2005). Illuminating the path, the research and development agenda for visual analytics. IEEE.</li>
+    <li>Treisman, A. M., &amp; Gelade, G. (1980). A feature-integration theory of attention. Cognitive Psychology 12(1).</li>
     <li>Wickens, C. D. (2008). Multiple resources and mental workload. Human Factors.</li>
+    <li>Xiong, C., Van Weelden, L., &amp; Franconeri, S. (2020). The curse of knowledge in visual data communication. IEEE TVCG 26(10).</li>
     <li>Xu, Z., Williams, K., &amp; Wall, E. (2023). Let’s get vysical, perceptual accuracy in visual and tactile encodings.</li>
   </ol>
 </section>
@@ -464,7 +498,7 @@ function show(i) {
   tabs.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-current", t.dataset.sec === steps[cur].dataset.sec));
   try { history.replaceState(null, "", "#" + steps[cur].id); } catch (e) {}
   window.scrollTo(0, 0); frames();
-  if (steps[cur].id === "feel") mini.draw();
+  DEMOS.forEach(x => x.draw());
 }
 document.addEventListener("keydown", e => {
   if (document.pointerLockElement || (document.activeElement && document.activeElement.tagName === "IFRAME")) return;
@@ -491,48 +525,197 @@ function drawErnst() {
 }
 rel.oninput = drawErnst; drawErnst();
 
-// ---------- slide 6: a bar chart you can feel ----------
-const mini = (() => {
-  const cv = document.getElementById("mini"), ctx = cv.getContext("2d"), W = 600, H = 260, PT = 20, BASE = 220, PLOT = 200;
-  ctx.scale(cv.width / W, cv.height / H);
-  let V = [30, 70, 45, 90, 20, 60, 80, 35], on = true, hideBars = false, hideCursor = false, locked = false, x = 300, y = 120, start = null;
-  const bw = 520 / V.length, x0 = 40;
-  const idx = px => { const i = Math.floor((px - x0) / bw); return i >= 0 && i < V.length ? i : -1; };
-  const gain = () => { const i = idx(x); return on && i >= 0 ? 1 - .85 * V[i] / 100 : 1; };
+const VOLCANO = { w: 87, h: 61, v: [103,104,104,105,105,106,106,106,107,107,106,106,105,105,104,104,104,104,105,107,107,106,105,105,107,108,109,110,110,110,110,110,110,109,109,109,109,109,109,108,107,107,107,107,106,106,105,104,104,104,104,104,104,104,103,103,103,103,102,102,101,101,100,100,100,100,100,99,98,97,97,96,96,96,96,96,96,96,95,95,95,94,94,94,94,94,94,104,104,105,105,106,106,107,107,107,107,107,107,107,106,106,106,106,106,106,108,108,108,106,106,108,109,110,110,112,112,113,112,111,110,110,110,110,109,109,109,108,107,107,107,107,106,106,105,104,104,104,104,104,104,104,103,103,103,103,102,102,101,101,100,100,100,100,99,99,98,97,97,96,96,96,96,96,96,96,95,95,95,94,94,94,94,94,104,105,105,106,106,107,107,108,108,108,108,108,108,108,108,108,108,108,108,108,110,110,110,110,110,110,110,111,113,115,116,115,113,112,110,110,110,110,110,110,109,108,108,108,108,107,106,105,105,105,105,105,105,104,104,104,104,103,103,103,102,102,102,101,100,100,100,99,99,98,97,97,96,96,96,96,96,96,96,96,95,95,94,94,94,94,94,105,105,106,106,107,107,108,108,109,109,109,109,109,110,110,110,110,110,110,110,111,112,115,115,115,115,115,116,116,117,119,118,117,116,114,113,112,110,110,110,110,110,110,109,109,108,107,106,106,106,106,106,105,105,105,104,104,104,103,103,103,102,102,102,101,100,100,99,99,98,97,97,96,96,96,96,96,96,96,96,95,95,94,94,94,94,94,105,106,106,107,107,108,108,109,109,110,110,110,110,111,110,110,110,110,111,114,115,116,121,121,121,121,121,122,123,124,124,123,121,119,118,117,115,114,112,111,110,110,110,110,110,110,109,109,108,109,107,107,106,106,105,105,104,104,104,104,103,103,102,102,102,101,100,100,99,99,98,97,96,96,96,96,96,96,96,96,95,95,94,94,94,94,94,106,106,107,107,107,108,109,109,110,110,111,111,112,113,112,111,111,112,115,118,118,119,126,128,128,127,128,128,129,130,129,128,127,125,122,120,118,117,115,114,112,110,110,110,110,110,111,110,110,110,109,109,108,107,106,105,105,105,104,104,104,103,103,102,102,102,101,100,99,99,98,97,96,96,96,96,96,96,96,96,95,95,94,94,94,94,94,106,107,107,108,108,108,109,110,110,111,112,113,114,115,114,115,116,116,119,123,125,130,133,134,134,134,134,135,135,136,135,134,132,130,128,124,121,119,118,116,114,112,111,111,111,112,112,111,110,110,110,109,108,108,107,108,107,106,105,104,104,104,103,103,103,102,101,100,99,99,98,97,96,96,96,96,96,96,96,96,95,95,95,94,94,94,94,107,107,108,108,109,109,110,110,112,113,114,115,116,117,117,120,120,121,123,129,134,136,138,139,139,139,140,142,142,141,141,140,137,134,131,127,124,122,120,118,117,115,113,114,113,114,114,113,112,111,110,110,109,108,107,106,105,105,105,104,104,104,103,103,103,101,100,100,99,99,98,97,96,96,96,96,96,96,96,96,96,95,95,94,94,94,94,107,108,108,109,109,110,111,112,114,115,116,117,118,119,121,125,125,127,131,136,140,141,142,144,144,145,148,149,148,147,146,144,140,138,136,130,127,125,123,121,119,118,117,117,116,116,116,115,114,113,113,111,110,109,108,107,106,105,105,103,103,102,102,102,103,101,100,100,100,99,98,98,97,96,96,96,96,96,96,96,96,95,95,95,94,94,94,107,108,109,109,110,110,110,113,115,117,118,119,120,123,126,129,131,134,139,142,144,145,147,148,150,152,154,154,153,154,151,149,146,143,140,136,130,128,126,124,122,121,120,119,118,117,117,117,116,116,115,113,112,110,109,108,107,106,106,105,104,103,102,101,101,100,100,100,100,99,99,98,97,96,96,96,96,96,96,96,96,95,95,95,94,94,94,107,108,109,109,110,110,110,112,115,117,119,122,125,127,130,133,137,141,143,145,148,149,152,155,157,159,160,160,161,162,159,156,153,149,146,142,139,134,130,128,126,125,122,120,120,120,119,119,119,118,117,115,113,111,110,110,109,108,107,106,106,105,104,104,103,102,100,100,100,99,99,98,97,96,96,96,96,96,96,96,96,95,95,95,95,94,94,108,108,109,109,110,110,110,112,115,118,121,125,128,131,134,138,141,145,147,149,152,157,160,161,163,166,169,170,170,171,168,162,158,155,152,148,144,140,136,132,129,127,124,122,121,120,120,120,120,120,119,117,115,113,110,110,110,110,109,108,108,107,107,106,105,104,102,100,100,100,99,98,97,96,96,96,96,96,96,96,96,96,95,95,95,94,94,108,109,109,110,110,111,112,114,117,120,124,128,131,135,138,142,145,149,152,155,158,163,166,167,170,173,175,175,175,173,171,169,164,160,156,153,149,144,140,136,131,129,126,124,123,123,122,121,120,120,120,119,117,115,111,110,110,110,110,110,109,109,110,109,108,106,103,101,100,100,100,98,97,96,96,96,96,96,96,96,96,96,95,95,95,95,94,108,109,110,110,110,113,114,116,119,122,126,131,134,138,141,145,149,152,156,160,164,169,171,174,177,175,178,179,177,175,174,172,168,163,160,157,151,147,143,138,133,130,128,125,125,124,123,122,121,121,120,120,118,116,115,111,110,110,110,110,113,114,113,112,110,107,105,102,100,100,100,98,97,96,96,96,96,96,96,96,96,96,96,95,95,95,94,108,109,110,110,112,115,116,118,122,125,129,133,137,140,144,149,152,157,161,165,169,173,176,179,179,180,180,180,178,178,176,175,171,165,163,160,153,148,143,139,135,132,129,128,127,125,124,124,123,123,122,122,120,118,117,118,115,117,118,118,119,117,116,115,112,109,107,105,100,100,100,100,97,96,96,96,96,96,96,96,96,96,96,95,95,95,95,108,109,110,111,114,116,118,122,127,130,133,136,140,144,148,153,157,161,165,169,173,177,180,180,180,180,181,180,180,180,179,178,173,168,165,161,156,149,143,139,136,133,130,129,128,126,126,125,125,125,125,124,122,121,120,120,120,120,121,122,123,122,120,117,114,111,108,106,105,100,100,100,100,96,96,96,96,96,96,96,96,96,96,96,95,95,95,107,108,110,113,115,118,121,126,131,134,137,140,143,148,152,157,162,165,169,173,177,181,181,181,180,181,181,181,180,180,180,178,176,170,167,163,158,152,145,140,137,134,132,130,129,127,127,126,127,128,128,126,125,125,125,123,126,128,129,130,130,125,124,119,116,114,112,110,107,106,105,100,100,100,96,96,96,96,96,96,96,96,96,96,96,95,95,107,109,111,116,119,122,125,130,135,137,140,144,148,152,156,161,165,168,172,177,181,184,181,181,181,180,180,180,180,180,180,178,178,173,168,163,158,152,146,141,138,136,134,132,130,129,128,128,130,130,130,129,128,129,129,130,132,133,133,134,134,132,128,122,119,116,114,112,108,106,105,105,100,100,100,97,97,97,97,97,97,97,96,96,96,96,95,108,110,112,117,122,126,129,135,139,141,144,149,153,156,160,165,168,171,177,181,184,185,182,180,180,179,178,178,180,179,179,178,176,173,168,163,157,152,148,143,139,137,135,133,131,130,130,131,132,132,132,131,132,132,133,134,136,137,137,137,136,134,131,124,121,118,116,114,111,109,107,106,105,100,100,100,97,97,97,97,97,97,97,96,96,96,96,108,110,114,120,126,129,134,139,142,144,146,152,158,161,164,168,171,175,181,184,186,186,183,179,178,178,177,175,178,177,177,176,175,173,168,162,156,153,149,145,142,140,138,136,133,132,132,132,134,134,134,134,135,136,137,138,140,140,140,140,139,137,133,127,123,120,118,115,112,108,108,106,106,105,100,100,100,98,98,98,98,98,98,97,96,96,96,108,110,116,122,128,133,137,141,143,146,149,154,161,165,168,172,175,180,184,188,189,187,182,178,176,176,175,173,174,173,175,174,173,171,168,161,157,154,150,148,145,143,141,138,135,135,134,135,135,136,136,137,138,139,140,140,140,140,140,140,140,139,135,130,126,123,120,117,114,111,109,108,107,106,105,100,100,100,99,99,98,98,98,98,97,97,96,110,112,118,124,130,135,139,142,145,148,151,157,163,169,172,176,179,183,187,190,190,186,180,177,175,173,170,169,169,170,171,172,170,170,167,163,160,157,154,152,149,147,144,140,137,137,136,137,138,138,139,140,141,140,140,140,140,140,140,140,140,138,134,131,128,124,121,118,115,112,110,109,108,107,106,105,100,100,100,99,99,99,98,98,98,97,97,110,114,120,126,131,136,140,143,146,149,154,159,166,171,177,180,182,186,190,190,190,185,179,174,171,168,166,163,164,163,166,169,170,170,168,164,162,161,158,155,153,150,147,143,139,139,139,139,140,141,141,142,142,141,140,140,140,140,140,140,140,137,134,131,128,125,122,119,116,114,112,110,109,109,108,107,105,100,100,100,99,99,99,98,98,97,97,110,115,121,127,132,136,140,144,148,151,157,162,169,174,178,181,186,188,190,191,190,184,177,172,168,165,162,159,158,158,159,161,166,167,169,166,164,163,161,159,156,153,149,146,142,142,141,142,143,143,143,143,144,142,141,140,140,140,140,140,140,138,134,131,128,125,123,120,117,116,114,112,110,109,108,107,106,105,102,101,100,99,99,99,98,98,97,110,116,121,127,132,136,140,144,148,154,160,166,171,176,180,184,189,190,191,191,191,183,176,170,166,163,159,156,154,155,155,158,161,165,170,167,166,165,163,161,158,155,152,150,146,145,145,145,146,146,144,145,145,144,142,141,140,140,140,140,138,136,134,131,128,125,123,121,119,117,115,113,112,111,111,110,108,106,105,102,100,100,99,99,99,98,98,110,114,119,126,131,135,140,144,149,158,164,168,172,176,183,184,189,190,191,191,190,183,174,169,165,161,158,154,150,151,152,155,159,164,168,168,168,167,165,163,160,158,155,153,150,148,148,148,148,148,147,146,146,145,143,142,141,140,139,138,136,134,132,131,128,126,124,122,120,118,116,114,113,113,112,111,108,107,106,105,104,102,100,99,99,99,99,110,113,119,125,131,136,141,145,150,158,164,168,172,177,183,187,189,191,192,191,190,183,174,168,164,160,157,153,150,149,150,154,158,162,166,170,170,168,166,164,162,160,158,155,152,151,151,151,151,151,149,148,147,146,145,143,142,140,139,137,135,134,132,131,129,127,125,123,121,119,117,116,114,114,113,112,110,108,107,105,103,100,100,100,100,99,99,110,112,118,124,130,136,142,146,151,157,163,168,174,178,183,187,189,190,191,192,189,182,174,168,164,160,157,153,149,148,149,153,157,161,167,170,170,170,168,166,165,163,159,156,154,153,155,155,155,155,152,150,149,147,145,143,141,140,139,138,136,134,133,131,130,128,126,124,122,120,119,117,116,115,114,113,111,110,107,106,105,105,102,101,100,100,100,110,111,116,122,129,137,142,146,151,158,164,168,172,179,183,186,189,190,192,193,188,182,174,168,164,161,157,154,151,149,151,154,158,161,167,170,170,170,170,169,168,166,160,157,156,156,157,158,159,159,156,153,150,148,146,144,141,140,140,138,136,135,134,133,131,129,127,125,123,122,120,118,117,116,115,114,112,111,110,108,107,106,105,104,102,100,100,108,110,115,121,131,137,142,147,152,159,163,167,170,177,182,184,187,189,192,194,189,183,174,169,165,161,158,156,154,153,154,157,160,164,167,171,172,174,174,173,171,168,161,159,158,158,159,161,161,160,158,155,151,149,147,144,142,141,140,138,137,136,135,134,132,130,128,126,125,123,121,119,118,117,116,115,113,112,112,111,110,109,108,107,105,101,100,108,110,114,120,128,134,140,146,152,158,162,166,169,175,180,183,186,189,193,195,190,184,176,171,167,163,160,158,157,156,157,159,163,166,170,174,176,178,178,176,172,167,164,161,161,160,161,163,163,163,160,157,153,150,148,146,144,142,141,140,139,138,136,135,134,133,129,127,126,124,122,121,119,118,117,116,114,113,112,111,110,110,109,109,107,104,100,107,110,115,119,123,129,135,141,146,156,161,165,168,173,179,182,186,189,193,194,191,184,179,175,170,166,162,161,160,160,161,162,165,169,172,176,178,179,179,176,172,168,165,163,163,163,163,165,166,164,161,158,155,152,150,147,146,144,143,142,141,139,139,138,137,135,131,128,127,125,124,122,121,119,118,116,115,113,112,111,111,110,110,109,109,105,100,107,110,114,117,121,126,130,135,142,151,159,163,167,171,177,182,185,189,192,193,191,187,183,179,174,169,167,166,164,164,165,166,169,171,174,178,179,180,180,178,173,169,166,165,165,166,165,168,169,166,163,159,157,154,152,149,148,147,146,145,143,142,141,140,139,138,133,130,128,127,125,124,122,120,118,117,115,112,111,111,111,111,110,109,108,106,100,107,109,113,118,122,126,129,134,139,150,156,160,165,170,175,181,184,188,191,192,192,189,185,181,177,173,171,169,168,167,169,170,172,174,176,178,179,180,180,179,175,170,168,166,166,168,168,170,170,168,164,160,158,155,152,151,150,149,149,148,147,145,144,143,142,141,136,133,130,129,127,125,123,120,119,118,115,112,111,111,111,110,109,109,109,105,100,105,107,111,117,121,124,127,131,137,148,154,159,164,168,174,181,184,187,190,191,191,190,187,184,180,178,175,174,172,171,173,173,173,176,178,179,180,180,180,179,175,170,168,166,168,169,170,170,170,170,166,161,158,156,154,153,151,150,150,150,150,148,147,146,145,143,139,135,133,131,129,126,124,121,120,118,114,111,111,111,110,110,109,107,106,104,100,104,106,110,114,118,121,125,129,135,142,150,157,162,167,173,180,183,186,188,190,190,190,189,184,183,181,180,179,179,176,177,176,176,177,178,179,180,180,179,177,173,169,167,166,167,169,170,170,170,170,167,161,159,157,155,153,151,150,150,150,150,150,150,149,147,145,141,138,135,133,130,127,125,123,121,118,113,111,110,110,109,109,107,106,105,103,100,104,106,108,111,115,119,123,128,134,141,148,154,161,166,172,179,182,184,186,189,190,190,190,187,185,183,180,180,180,179,179,177,176,177,178,178,178,177,176,174,171,168,166,164,166,168,170,170,170,170,168,162,159,157,155,153,151,150,150,150,150,150,150,150,150,148,144,140,137,134,132,129,127,125,122,117,111,110,107,107,106,105,104,103,102,101,100,103,105,107,110,114,118,122,127,132,140,146,153,159,165,171,176,180,183,185,186,189,190,188,187,184,182,180,180,180,179,178,176,176,176,176,174,174,173,172,170,168,167,165,163,164,165,169,170,170,170,166,162,159,157,155,153,151,150,150,150,150,150,150,150,150,150,146,142,139,136,133,131,128,125,122,117,110,108,106,105,104,103,103,101,101,101,101,102,103,106,108,112,116,121,125,130,138,145,151,157,163,170,174,178,181,181,184,186,186,187,186,184,181,180,180,180,179,178,174,173,173,171,170,170,169,168,167,166,164,163,162,161,164,167,169,170,168,164,160,158,157,155,153,151,150,150,150,150,150,150,150,150,150,147,144,141,138,135,133,128,125,122,116,109,107,104,104,103,102,101,101,101,101,101,101,102,105,107,110,115,120,124,129,136,143,149,155,162,168,170,174,176,178,179,181,182,184,184,183,181,180,180,179,177,174,172,170,168,166,165,164,164,164,164,162,160,159,159,158,160,162,164,166,166,163,159,157,156,155,153,151,150,150,150,150,150,150,150,150,150,149,146,143,140,137,133,129,124,119,112,108,105,103,103,102,101,101,101,101,100,100,101,102,104,106,109,113,118,122,127,133,141,149,155,161,165,168,170,172,175,176,177,179,181,181,181,180,180,179,177,174,171,167,165,163,161,160,160,160,160,160,157,155,155,154,154,155,157,159,161,161,161,159,156,154,154,153,151,150,150,150,150,150,150,150,150,150,149,147,144,141,137,133,129,123,116,110,107,104,102,102,101,101,101,100,100,100,100,102,103,104,106,108,112,116,120,125,129,137,146,154,161,163,165,166,169,172,173,174,175,177,178,178,178,178,177,174,171,168,164,160,158,157,157,156,156,156,155,152,151,150,150,151,151,152,154,156,157,157,156,155,153,152,152,151,150,150,150,150,150,150,150,150,150,150,147,144,141,138,133,127,120,113,109,106,103,101,101,101,100,100,100,100,100,100,103,104,105,106,108,110,114,118,123,127,133,143,150,156,160,160,161,162,167,170,171,172,173,175,175,174,174,173,171,168,164,160,156,155,154,153,153,152,152,150,149,148,148,148,148,148,149,149,150,152,152,152,152,151,150,150,150,150,150,150,150,150,150,150,150,150,149,147,144,141,138,132,125,118,111,108,105,103,102,101,101,101,100,100,100,100,100,104,105,106,107,108,110,113,117,120,125,129,138,145,151,156,156,157,158,160,164,166,168,170,171,172,171,171,169,166,163,160,156,153,151,150,150,149,149,149,148,146,146,146,146,146,146,146,147,148,148,149,149,149,148,148,148,148,149,149,150,150,150,150,150,150,150,148,146,143,141,136,129,123,117,110,108,105,104,103,102,102,101,101,100,100,100,100,103,104,105,106,107,109,111,115,118,122,127,133,140,143,150,152,153,155,157,159,162,164,167,168,168,168,167,166,163,160,157,153,150,148,148,147,147,147,145,145,144,143,143,143,144,144,144,144,145,145,145,145,146,146,146,146,146,147,147,148,149,150,150,150,150,149,147,145,143,141,134,127,123,117,111,108,105,105,104,104,103,103,102,101,100,100,100,102,103,104,105,106,107,109,113,116,120,125,129,133,137,143,147,149,151,152,154,158,161,164,165,164,164,163,163,160,157,154,151,149,147,145,145,144,143,141,140,141,141,141,141,141,142,142,142,142,142,142,142,143,143,143,144,144,145,146,146,146,147,148,148,148,148,145,143,142,140,134,128,123,117,112,108,106,105,105,104,104,103,102,101,100,100,99,102,103,104,105,105,106,108,110,113,118,123,127,129,132,137,141,142,142,145,150,154,157,161,161,160,160,160,159,157,154,151,148,146,145,143,142,142,139,137,136,137,137,138,138,139,139,139,139,139,139,139,139,140,140,141,142,142,143,144,144,144,145,145,145,145,145,144,142,140,139,136,129,124,119,113,109,106,106,105,104,103,102,101,101,100,99,99,102,103,104,104,105,106,107,108,111,116,121,124,126,128,131,134,135,137,139,143,147,152,156,157,157,157,156,155,153,151,148,146,143,142,141,140,138,135,133,132,132,133,133,133,134,135,135,135,135,136,136,137,137,138,138,139,140,141,141,142,142,143,142,142,141,141,140,139,137,134,133,129,125,121,114,110,107,106,106,104,103,102,101,100,99,99,99,102,103,104,104,105,105,106,108,110,113,118,121,124,126,128,130,132,134,136,139,143,147,150,154,154,154,153,151,149,148,146,143,141,139,137,136,132,130,128,128,128,129,129,130,130,131,132,132,132,133,134,134,135,135,136,137,138,139,139,140,140,140,139,139,138,137,137,135,132,130,129,127,124,120,116,112,109,106,105,103,102,101,101,100,99,99,99,101,102,103,104,104,105,106,107,108,110,114,119,121,124,126,128,129,132,134,137,140,143,147,149,151,151,151,149,147,145,143,141,138,136,134,131,128,126,124,125,125,126,126,127,128,128,129,129,130,130,131,131,132,132,133,134,135,135,136,136,137,137,136,136,135,134,133,131,129,128,127,126,123,119,115,111,109,107,105,104,103,102,101,100,100,100,99,101,102,103,103,104,104,105,106,108,110,112,116,119,121,124,125,127,130,132,135,137,140,143,147,149,149,149,147,145,143,141,139,136,133,131,128,125,122,121,122,122,122,123,125,125,126,127,127,127,128,128,128,129,129,130,131,131,132,132,133,133,133,132,132,131,131,130,129,128,126,125,124,121,117,111,109,108,106,105,104,103,102,101,101,100,100,100,100,101,102,103,103,104,105,106,107,108,110,114,117,119,121,123,126,128,130,133,136,139,141,144,146,147,146,145,143,141,138,136,133,130,127,124,121,120,120,120,120,120,121,122,123,124,124,125,125,126,126,125,126,126,126,125,126,127,128,128,129,129,128,128,128,128,128,128,126,125,123,122,119,114,109,108,107,106,105,104,103,103,102,102,101,100,100,100,101,102,103,104,105,106,107,108,109,110,112,115,117,120,122,125,127,130,132,135,137,139,142,144,144,144,142,140,138,136,132,129,126,123,120,120,119,119,118,119,119,120,120,120,121,122,122,123,123,123,123,122,123,122,122,121,122,122,122,123,123,123,124,125,125,126,126,125,124,122,120,116,113,109,107,106,105,104,104,103,102,102,101,101,100,100,100,101,102,103,104,105,106,107,108,109,110,112,114,117,119,122,124,127,129,131,134,136,138,140,142,142,142,140,138,136,133,129,125,122,120,119,118,118,117,116,117,117,118,119,119,120,120,120,121,121,121,122,121,120,120,120,119,119,120,120,120,120,120,120,123,123,124,124,124,123,121,119,114,112,108,106,106,104,104,103,102,102,101,101,100,100,99,101,102,103,104,105,106,107,108,109,110,111,113,114,116,119,121,124,126,128,130,133,135,137,138,140,140,139,137,135,133,131,127,122,120,118,118,117,117,116,115,116,116,117,118,118,118,119,119,120,120,121,121,120,119,119,118,117,117,118,119,118,118,118,119,120,122,123,123,123,122,120,117,113,110,108,106,105,104,103,103,102,101,101,100,100,99,99,101,102,103,104,105,106,107,108,109,110,111,111,113,115,118,121,123,125,127,129,131,133,135,137,138,138,137,134,132,130,127,122,120,118,116,116,116,116,115,113,114,115,116,117,117,118,118,119,119,119,120,120,119,118,117,117,116,116,117,117,117,118,119,119,119,120,121,121,121,121,119,116,113,110,107,105,105,103,103,103,102,101,100,100,99,99,99,101,102,103,104,105,106,107,108,109,110,111,112,114,116,117,120,122,124,126,129,130,132,133,135,136,136,134,132,129,126,122,120,118,116,114,114,114,114,114,113,113,114,115,116,116,117,117,117,118,118,119,119,118,117,116,116,115,115,116,116,116,117,117,118,118,119,120,120,120,120,119,116,113,109,106,104,104,103,102,102,101,101,100,99,99,99,98,101,102,103,104,105,106,107,108,109,110,111,113,115,117,117,118,121,123,126,128,130,130,131,132,133,134,131,129,125,122,120,118,116,114,113,112,112,113,112,112,111,112,113,113,114,115,116,116,117,117,118,118,116,116,115,115,115,114,114,115,116,116,117,117,118,118,119,119,120,120,117,115,112,108,106,104,103,102,102,102,101,100,99,99,99,98,98,101,102,103,104,105,105,106,107,108,109,110,111,113,115,117,118,120,122,125,126,127,128,129,130,131,131,128,125,121,120,118,116,114,113,113,111,111,111,111,110,109,110,111,112,113,113,114,115,115,116,117,117,116,115,114,114,113,113,114,114,115,115,116,116,117,118,118,119,119,118,116,114,112,108,105,103,103,102,101,101,100,100,99,99,98,98,97,100,101,102,103,104,105,106,107,108,109,110,110,111,113,115,118,120,121,122,124,125,125,126,127,128,127,124,121,120,118,116,114,113,112,112,110,109,109,108,108,108,109,110,111,112,112,113,114,114,115,116,116,115,114,113,112,112,113,113,114,114,115,115,116,116,117,117,118,118,117,115,113,111,107,105,103,102,101,101,100,100,100,99,99,98,98,97,100,101,102,103,104,105,105,106,107,108,109,110,110,111,114,116,118,120,120,121,122,122,123,124,123,123,120,118,117,115,114,115,113,111,110,109,108,108,107,107,107,108,109,110,111,111,112,113,113,114,115,115,114,113,112,111,111,112,112,112,113,114,114,115,115,116,116,117,117,116,114,112,109,106,104,102,101,100,100,99,99,99,99,98,98,97,97] };
+
+// ---------- felt demos: one small engine, four datasets ----------
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const mix = (t, a, b) => a.map((c, i) => Math.round(c + (b[i] - c) * t));
+const PALE = [243, 244, 251], NAVY = [0, 15, 161];
+function feel(id, o) {
+  const cv = document.getElementById(id), ctx = cv.getContext("2d"), W = o.W, H = o.H, B = o.box;
+  cv.width = W * 2; cv.height = H * 2; ctx.scale(2, 2);
+  const st = { locked: false, x: (B.x0 + B.x1) / 2, y: (B.y0 + B.y1) / 2, on: true, hideData: false, hideCursor: false, pressing: false, start: null };
   function draw() {
-    ctx.clearRect(0, 0, W, H); ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, W, H);
-    V.forEach((v, i) => {
-      const bx = x0 + i * bw + 6, w = bw - 12;
-      if (hideBars) { ctx.fillStyle = "#f3f4fb"; ctx.fillRect(bx, PT, w, PLOT); ctx.setLineDash([4, 4]); ctx.strokeStyle = "#dcdff0"; ctx.strokeRect(bx + .5, PT + .5, w - 1, PLOT - 1); ctx.setLineDash([]); }
-      else { ctx.fillStyle = "#000fa1"; ctx.fillRect(bx, BASE - PLOT * v / 100, w, PLOT * v / 100); }
-    });
-    ctx.strokeStyle = "#5a63b5"; ctx.beginPath(); ctx.moveTo(20, BASE + .5); ctx.lineTo(W - 20, BASE + .5); ctx.stroke();
-    if (locked && !hideCursor) { ctx.fillStyle = "#e8710a"; ctx.beginPath(); ctx.arc(x, y, 7, 0, 7); ctx.fill(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke(); ctx.lineWidth = 1; }
-    if (!locked) { ctx.fillStyle = "rgba(11,11,11,.72)"; ctx.fillRect(W / 2 - 110, H / 2 - 22, 220, 44); ctx.fillStyle = "#fff"; ctx.font = "500 15px 'DM Sans', sans-serif"; ctx.textAlign = "center"; ctx.fillText("Click to start", W / 2, H / 2 + 5); }
+    ctx.save(); ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, W, H); o.paint(ctx, st); ctx.restore();
+    if (st.locked && !st.hideCursor) { ctx.fillStyle = "#e8710a"; ctx.beginPath(); ctx.arc(st.x, st.y, 7, 0, 7); ctx.fill(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke(); ctx.lineWidth = 1; }
+    if (!st.locked) { ctx.fillStyle = "rgba(11,11,11,.72)"; ctx.fillRect(W / 2 - 110, H / 2 - 22, 220, 44); ctx.fillStyle = "#fff"; ctx.font = "500 15px 'DM Sans', sans-serif"; ctx.textAlign = "center"; ctx.fillText("Click to start", W / 2, H / 2 + 5); ctx.textAlign = "start"; }
   }
   cv.addEventListener("click", e => {
-    if (locked) return; const r = cv.getBoundingClientRect(); start = [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height];
+    if (st.locked) return; const r = cv.getBoundingClientRect(); st.start = [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height];
     try { const p = cv.requestPointerLock({ unadjustedMovement: true }); if (p && p.catch) p.catch(() => cv.requestPointerLock()); } catch (err) { cv.requestPointerLock(); }
   });
   document.addEventListener("pointerlockchange", () => {
-    locked = document.pointerLockElement === cv;
-    if (locked && start) { x = start[0]; y = start[1]; start = null; }
-    document.getElementById("m-status").textContent = locked ? "Esc releases the pointer." : "Click the chart to start.";
-    draw();
+    const was = st.locked; st.locked = document.pointerLockElement === cv;
+    if (st.locked && st.start) { st.x = clamp(st.start[0], B.x0, B.x1); st.y = clamp(st.start[1], B.y0, B.y1); st.start = null; }
+    if (!st.locked) st.pressing = false;
+    if (was !== st.locked) draw();
   });
   document.addEventListener("mousemove", e => {
-    if (!locked || Math.abs(e.movementX) > 200 || Math.abs(e.movementY) > 200) return;
-    const s = W / cv.getBoundingClientRect().width, g = gain();
-    x = Math.max(x0, Math.min(x0 + 520, x + e.movementX * s * g)); y = Math.max(PT, Math.min(BASE, y + e.movementY * s * g)); draw();
+    if (!st.locked || Math.abs(e.movementX) > 200 || Math.abs(e.movementY) > 200) return;
+    const s = W / cv.getBoundingClientRect().width, g = st.on ? o.gain(st.x, st.y, st) : 1;
+    st.x = clamp(st.x + e.movementX * s * g, B.x0, B.x1); st.y = clamp(st.y + e.movementY * s * g, B.y0, B.y1); draw();
   });
-  const tog = (id, f) => { const b = document.getElementById(id); b.onclick = () => { const v = f(); b.setAttribute("aria-pressed", v); draw(); }; };
-  tog("m-on", () => { on = !on; document.getElementById("m-on").textContent = on ? "Illusion on" : "Illusion off"; return on; });
-  tog("m-bars", () => (hideBars = !hideBars));
-  tog("m-cursor", () => (hideCursor = !hideCursor));
-  document.getElementById("m-new").onclick = () => { V = V.map(() => Math.round(10 + Math.random() * 85)); draw(); };
-  draw();
-  return { draw };
+  cv.addEventListener("mousedown", () => { if (st.locked) st.pressing = true; });
+  document.addEventListener("mouseup", () => { st.pressing = false; });
+  return { st, draw, W, H, B };
+}
+// buttons: each act returns nothing; state() reports which buttons are pressed and their labels
+function wire(slide, d, acts, state) {
+  const bs = [...document.querySelectorAll(`#${slide} [data-act]`)];
+  const sync = () => { const m = state(); bs.forEach(b => { const v = m[b.dataset.act]; if (v === undefined) return; if (Array.isArray(v)) { b.setAttribute("aria-pressed", v[0]); b.textContent = v[1]; } else b.setAttribute("aria-pressed", v); }); };
+  bs.forEach(b => b.onclick = () => { acts[b.dataset.act](); sync(); d.draw(); });
+  sync();
+}
+const common = d => ({ on: () => (d.st.on = !d.st.on), data: () => (d.st.hideData = !d.st.hideData), cursor: () => (d.st.hideCursor = !d.st.hideCursor) });
+
+// slide 6, bars: the feel can follow the bars, or other data (conflict)
+const bars = (() => {
+  let V = [30, 70, 45, 90, 20, 60, 80, 35], conflict = false;
+  const x0 = 40, bw = 520 / 8, PT = 20, BASE = 220, PLOT = 200;
+  const FV = () => conflict ? V.slice().reverse() : V;
+  const idx = px => { const i = Math.floor((px - x0) / bw); return i >= 0 && i < V.length ? i : -1; };
+  const d = feel("mini", { W: 600, H: 260, box: { x0, x1: x0 + 520, y0: PT, y1: BASE },
+    gain: x => { const i = idx(x); return i >= 0 ? 1 - .85 * FV()[i] / 100 : 1; },
+    paint(ctx, st) {
+      V.forEach((v, i) => {
+        const bx = x0 + i * bw + 6, w = bw - 12;
+        if (st.hideData) { ctx.fillStyle = "#f3f4fb"; ctx.fillRect(bx, PT, w, PLOT); ctx.setLineDash([4, 4]); ctx.strokeStyle = "#dcdff0"; ctx.strokeRect(bx + .5, PT + .5, w - 1, PLOT - 1); ctx.setLineDash([]); }
+        else { ctx.fillStyle = "#000fa1"; ctx.fillRect(bx, BASE - PLOT * v / 100, w, PLOT * v / 100); }
+        ctx.fillStyle = "#5a63b5"; ctx.font = "600 14px 'DM Sans', sans-serif"; ctx.textAlign = "center"; ctx.fillText("ABCDEFGH"[i], bx + w / 2, BASE + 22); ctx.textAlign = "start";
+      });
+      ctx.strokeStyle = "#5a63b5"; ctx.beginPath(); ctx.moveTo(20, BASE + .5); ctx.lineTo(580, BASE + .5); ctx.stroke();
+    } });
+  wire("feel", d, { ...common(d), conflict: () => (conflict = !conflict), new: () => { V = V.map(() => Math.round(10 + Math.random() * 85)); } },
+    () => ({ on: [d.st.on, d.st.on ? "Illusion on" : "Illusion off"], data: d.st.hideData, cursor: d.st.hideCursor, conflict }));
+  return d;
 })();
+
+// slide 10, heat: a grid of four levels with sharp borders, which feel strongest
+const heat = (() => {
+  const C = 16, R = 9, B = { x0: 20, y0: 20, x1: 580, y1: 320 }, cw = (B.x1 - B.x0) / C, ch = (B.y1 - B.y0) / R;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  function pattern(k) {
+    const m = new Float32Array(C * R), a = rnd(.2, .8), b = rnd(.25, .75), a2 = rnd(.15, .85), b2 = rnd(.25, .75);
+    for (let j = 0; j < R; j++) for (let i = 0; i < C; i++) {
+      const u = (i + .5) / C, v = (j + .5) / R, X = u * 16 / 9; let t;
+      if (k === "gradient") t = u;
+      else if (k === "spot") t = Math.exp(-((X - a * 16 / 9) ** 2 + (v - b) ** 2) / .08);
+      else if (k === "two") t = Math.max(Math.exp(-((X - .5) ** 2 + (v - .5) ** 2) / .05), Math.exp(-((X - 1.3) ** 2 + (v - .5) ** 2) / .05));
+      else if (k === "ring") t = Math.exp(-((Math.hypot(X - 8 / 9, v - .5) - .32) ** 2) / .008);
+      else if (k === "band") t = Math.abs(v - (1 - u)) < .18 ? 1 : 0;
+      else t = 1 - u;
+      m[j * C + i] = Math.round(clamp(t, 0, 1) * 3) / 3;
+    }
+    return m;
+  }
+  let M = pattern("gradient"), last = "gradient";
+  const at = (x, y) => M[clamp(Math.floor((y - B.y0) / ch), 0, R - 1) * C + clamp(Math.floor((x - B.x0) / cw), 0, C - 1)];
+  const d = feel("heat", { W: 600, H: 340, box: B, gain: (x, y) => 1 - .85 * at(x, y),
+    paint(ctx, st) {
+      for (let j = 0; j < R; j++) for (let i = 0; i < C; i++) {
+        const x = B.x0 + i * cw, y = B.y0 + j * ch;
+        if (st.hideData) { ctx.fillStyle = "#f3f4fb"; ctx.fillRect(x, y, cw, ch); ctx.strokeStyle = "#dcdff0"; ctx.strokeRect(x + .5, y + .5, cw - 1, ch - 1); }
+        else { ctx.fillStyle = `rgb(${mix(M[j * C + i], PALE, NAVY)})`; ctx.fillRect(x, y, cw + .5, ch + .5); }
+      }
+    } });
+  wire("demo-heat", d, { ...common(d), mystery: () => { const ks = ["spot", "two", "ring", "band", "reverse"].filter(k => k !== last); last = ks[Math.floor(Math.random() * ks.length)]; M = pattern(last); d.st.hideData = true; } },
+    () => ({ on: [d.st.on, d.st.on ? "Illusion on" : "Illusion off"], data: [d.st.hideData, d.st.hideData ? "Reveal" : "Hide colours"], cursor: d.st.hideCursor }));
+  return d;
+})();
+
+// slide 11, terrain: Maunga Whau, optionally simplified with 0-dimensional persistence
+const terr = (() => {
+  const w = VOLCANO.w, h = VOLCANO.h, N = w * h, B = { x0: 10, y0: 10, x1: 590, y1: 410 };
+  let lo = Infinity, hi = -Infinity; for (const v of VOLCANO.v) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+  const F = Float32Array.from(VOLCANO.v, v => 100 * (v - lo) / (hi - lo));
+  function simplify(f, tau) {   // union-find over superlevel sets; peaks below tau are flattened to their saddle
+    const order = [...f.keys()].sort((a, b) => f[b] - f[a]), g = Float32Array.from(f);
+    const parent = new Int32Array(N).fill(-1), peak = new Int32Array(N), mem = new Array(N);
+    const find = i => { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+    for (const i of order) {
+      parent[i] = i; peak[i] = i; mem[i] = [i];
+      const x = i % w, y = (i / w) | 0, nb = [];
+      if (x > 0) nb.push(i - 1); if (x < w - 1) nb.push(i + 1); if (y > 0) nb.push(i - w); if (y < h - 1) nb.push(i + w);
+      for (const n of nb) {
+        if (parent[n] === -1) continue;
+        const ra = find(i), rb = find(n); if (ra === rb) continue;
+        const [keep, die] = f[peak[ra]] >= f[peak[rb]] ? [ra, rb] : [rb, ra];
+        if (f[peak[die]] - f[i] < tau) for (const c of mem[die]) if (g[c] > f[i]) g[c] = f[i];
+        const A = mem[keep], Bm = mem[die]; if (A.length < Bm.length) { for (const c of A) Bm.push(c); mem[keep] = Bm; } else for (const c of Bm) A.push(c);
+        mem[die] = null; parent[die] = keep;
+      }
+    }
+    return g;
+  }
+  const G = simplify(F, 12);
+  const sx = (B.x1 - B.x0) / (w - 1), sy = (B.y1 - B.y0) / (h - 1);
+  function contours(f) {   // marching squares every 4 units, a thicker line every 20
+    const thin = new Path2D(), thick = new Path2D();
+    for (let L = 2; L < 100; L += 4) {
+      const P = L % 20 === 2 ? thick : thin;
+      for (let j = 0; j < h - 1; j++) for (let i = 0; i < w - 1; i++) {
+        const a = f[j * w + i], b = f[j * w + i + 1], c = f[(j + 1) * w + i + 1], dd = f[(j + 1) * w + i], pts = [];
+        const e = (p, q, x1, y1, x2, y2) => { if ((p < L) !== (q < L)) { const t = (L - p) / (q - p); pts.push([B.x0 + (x1 + (x2 - x1) * t) * sx, B.y0 + (y1 + (y2 - y1) * t) * sy]); } };
+        e(a, b, i, j, i + 1, j); e(b, c, i + 1, j, i + 1, j + 1); e(dd, c, i, j + 1, i + 1, j + 1); e(a, dd, i, j, i, j + 1);
+        for (let k = 0; k + 1 < pts.length; k += 2) { P.moveTo(pts[k][0], pts[k][1]); P.lineTo(pts[k + 1][0], pts[k + 1][1]); }
+      }
+    }
+    return { thin, thick };
+  }
+  const CF = contours(F), CG = contours(G);
+  let simp = false;
+  const at = (f, x, y) => { const u = clamp((x - B.x0) / sx, 0, w - 1.001), v = clamp((y - B.y0) / sy, 0, h - 1.001), i = u | 0, j = v | 0, a = u - i, b = v - j, k = j * w + i;
+    return f[k] * (1 - a) * (1 - b) + f[k + 1] * a * (1 - b) + f[k + w] * (1 - a) * b + f[k + w + 1] * a * b; };
+  const d = feel("terr", { W: 600, H: 420, box: B, gain: (x, y) => 1 - .85 * at(simp ? G : F, x, y) / 100,
+    paint(ctx, st) {
+      ctx.strokeStyle = "#dcdff0"; ctx.strokeRect(B.x0 + .5, B.y0 + .5, B.x1 - B.x0 - 1, B.y1 - B.y0 - 1);
+      if (st.hideData) return;
+      const c = simp ? CG : CF;
+      ctx.strokeStyle = "#5a63b5"; ctx.lineWidth = 1; ctx.stroke(c.thin); ctx.strokeStyle = "#000fa1"; ctx.lineWidth = 2; ctx.stroke(c.thick); ctx.lineWidth = 1;
+    } });
+  wire("demo-topo", d, { ...common(d), simp: () => (simp = !simp) },
+    () => ({ on: [d.st.on, d.st.on ? "Illusion on" : "Illusion off"], data: d.st.hideData, cursor: d.st.hideCursor, simp }));
+  return d;
+})();
+
+// slide 12, sandbox: hold to raise or dig; every brush step is recorded and can be replayed
+const sand = (() => {
+  const C = 64, R = 40, B = { x0: 10, y0: 10, x1: 630, y1: 390 }, cw = (B.x1 - B.x0) / (C - 1), ch = (B.y1 - B.y0) / (R - 1), BR = 30;
+  let hgt = new Float32Array(C * R).fill(10), touch = new Float32Array(C * R), ev = [], dig = false, showTouch = false, rp = null, clock = 0;
+  const off = document.createElement("canvas"); off.width = C; off.height = R; const octx = off.getContext("2d"), img = octx.createImageData(C, R);
+  function brush(e, H, T) {
+    const i0 = Math.max(0, Math.floor((e.x - BR - B.x0) / cw)), i1 = Math.min(C - 1, Math.ceil((e.x + BR - B.x0) / cw));
+    const j0 = Math.max(0, Math.floor((e.y - BR - B.y0) / ch)), j1 = Math.min(R - 1, Math.ceil((e.y + BR - B.y0) / ch));
+    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+      const dd = Math.hypot(B.x0 + i * cw - e.x, B.y0 + j * ch - e.y); if (dd >= BR) continue;
+      const wt = (1 - (dd / BR) ** 2) ** 2, k = j * C + i; T[k] += wt; H[k] = clamp(H[k] + (e.dig ? -2.5 : 2.5) * wt, 0, 100);
+    }
+  }
+  const at = (x, y) => hgt[clamp(Math.round((y - B.y0) / ch), 0, R - 1) * C + clamp(Math.round((x - B.x0) / cw), 0, C - 1)];
+  const d = feel("sand", { W: 640, H: 400, box: B, gain: (x, y) => 1 - .8 * at(x, y) / 100,
+    paint(ctx) {
+      let mt = 0; if (showTouch) for (const t of touch) mt = Math.max(mt, t);
+      for (let k = 0; k < C * R; k++) {
+        let c = mix(hgt[k] / 100, [252, 252, 251], NAVY);
+        if (showTouch && touch[k] > 0) { const a = .2 + .7 * Math.log1p(touch[k]) / Math.log1p(mt); c = mix(a, c, [232, 113, 10]); }
+        img.data.set([c[0], c[1], c[2], 255], k * 4);
+      }
+      octx.putImageData(img, 0, 0); ctx.imageSmoothingEnabled = true; ctx.drawImage(off, B.x0, B.y0, B.x1 - B.x0, B.y1 - B.y0);
+      if (rp) { ctx.fillStyle = "#0b0b0b"; ctx.font = "600 13px 'DM Sans', sans-serif"; ctx.fillText("Replaying " + rp.i + " / " + ev.length, B.x0 + 10, B.y0 + 20); }
+    } });
+  setInterval(() => { if (!d.st.pressing || rp) return; clock += 40; const e = { x: d.st.x, y: d.st.y, dig, t: clock }; ev.push(e); brush(e, hgt, touch); d.draw(); }, 40);
+  function replay() {
+    if (!ev.length) return;
+    hgt = new Float32Array(C * R).fill(10); touch = new Float32Array(C * R); rp = { i: 0, t0: performance.now(), base: ev[0].t };
+    const tick = now => { if (!rp) return; const tt = (now - rp.t0) * 4 + rp.base; while (rp.i < ev.length && ev[rp.i].t <= tt) brush(ev[rp.i++], hgt, touch); d.draw(); if (rp.i < ev.length) requestAnimationFrame(tick); else { rp = null; d.draw(); } };
+    requestAnimationFrame(tick);
+  }
+  wire("demo-sand", d, { dig: () => (dig = !dig), touched: () => (showTouch = !showTouch), replay, clear: () => { rp = null; ev = []; clock = 0; hgt = new Float32Array(C * R).fill(10); touch = new Float32Array(C * R); } },
+    () => ({ dig: [dig, dig ? "Digging" : "Dig"], touched: showTouch }));
+  return d;
+})();
+const DEMOS = [bars, heat, terr, sand];
+[bars, heat, terr, sand].forEach(x => x.draw());
 
 const startAt = steps.findIndex(s => s.id === location.hash.slice(1));
 show(startAt >= 0 ? startAt : 0);
