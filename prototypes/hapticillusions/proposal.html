@@ -247,12 +247,15 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 
 <section class="step" data-sec="why" id="design" hidden>
 <p class="eyebrow">Motivation</p>
-  <h2>Can we design illusions that create other perceptions?</h2>
-  <div class="grid2">
-    <div class="card"><span class="k">Found</span><h3>Illusions we notice</h3><p>Lines that look longer, squares that look lighter. They expose how perception works.</p></div>
-    <div class="card"><span class="k">Designed</span><h3>Illusions we build</h3><p>If vision usually wins, a visual signal can be designed on purpose to make people perceive something through another sense.</p></div>
+  <h2>Can we design multisensory illusions?</h2>
+  <p class="lede">If vision usually wins a conflict, the visual signal can be designed on purpose to change what another sense perceives.</p>
+  <div class="grid3">
+    <div class="card"><span class="k">Desktop</span><h3>Pseudo-haptics</h3><p>Slowing the cursor makes people feel friction and resistance through a plain mouse.</p><p class="cite" style="margin-top:auto">Lécuyer et al. 2000</p></div>
+    <div class="card"><span class="k">Virtual reality</span><h3>Haptic retargeting</h3><p>Shifting where the virtual hand appears lets one physical prop feel like many.</p><p class="cite" style="margin-top:auto">Azmandian et al. 2016</p></div>
+    <div class="card"><span class="k">Shape displays</span><h3>Visuo-haptic illusions</h3><p>Visual tricks make a coarse pin display feel finer and faster than it is.</p><p class="cite" style="margin-top:auto">Abtahi &amp; Follmer 2018</p></div>
   </div>
-  <details class="notes"><summary>Notes</summary><p>This is the turn of the talk. So far illusions were things that happen to us. Now we use them as a design material.</p></details>
+  <p class="plain">This project builds on the first one, because it needs no special hardware.</p>
+  <details class="notes"><summary>Notes</summary><p>So far illusions were things that happen to us. Here they become a design material. All three use vision to change touch.</p></details>
 </section>
 
 <section class="step" data-sec="why" id="pseudo" hidden>
@@ -310,32 +313,36 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 
 <!-- 8 -->
 <section class="step" data-sec="why" id="spectrum" hidden>
-  <p class="eyebrow">Motivation</p>
+<p class="eyebrow">Motivation</p>
   <h2>Touch costs time and hardware</h2>
-  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)">
-    <ul class="bul sm">
-      <li>Physicalization encodes data in objects people can touch (Jansen et al. 2015).</li>
-      <li>They are usually 3D printed, and can even sense touch (Bae et al. 2022, 2023).</li>
-      <li>A print takes from minutes to overnight, so designers iterate about once a day (Mueller et al. 2014).</li>
-      <li>Almost everyone has a computer and a mouse. Few people have a printer.</li>
-    </ul>
-    <figure>
-      <svg class="fig" viewBox="0 0 640 300" role="img" aria-label="Pseudo-haptics is fastest and lowest fidelity, shape displays are in the middle, fabrication is slowest and highest fidelity">
-        <line x1="60" y1="220" x2="610" y2="220" stroke="#000fa1" stroke-width="3" marker-end="url(#c1)"/>
-        <line x1="40" y1="220" x2="40" y2="40" stroke="#000fa1" stroke-width="3" marker-end="url(#c1)"/>
-        <text x="50" y="30" font-size="14" fill="#5a63b5">tactile fidelity</text>
-        <text x="60" y="250" font-size="14" fill="#5a63b5">instant · any computer</text>
-        <text x="610" y="250" text-anchor="end" font-size="14" fill="#5a63b5">hours · a printer</text>
-        <text x="335" y="285" text-anchor="middle" font-size="13" fill="#5a63b5">rendering time and hardware needed →</text>
-        <circle cx="120" cy="185" r="13" fill="#e8710a"/><text x="120" y="155" text-anchor="middle" font-size="16" font-weight="700" fill="#b85a07">pseudo-haptics</text><text x="120" y="137" text-anchor="middle" font-size="12" fill="#b85a07">this project</text>
-        <circle cx="330" cy="125" r="13" fill="#000fa1"/><text x="330" y="97" text-anchor="middle" font-size="16" font-weight="700" fill="#000fa1">shape displays</text>
-        <circle cx="550" cy="65" r="13" fill="#000fa1"/><text x="550" y="105" text-anchor="middle" font-size="16" font-weight="700" fill="#000fa1">fabrication</text>
-        <defs><marker id="c1" viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#000fa1"/></marker></defs>
-      </svg>
-    </figure>
-  </div>
-  <p class="plain">Pseudo-haptics is a low-fidelity version of the touch that fabrication provides. It renders instantly, changes with the data, and needs only a mouse.</p>
-  <p class="cite">Follmer et al. 2013 · Abtahi &amp; Follmer 2018 · Mueller et al. 2014</p>
+  <figure style="width:100%;max-width:calc((100vh - 520px) * 2.7);margin:0 auto">
+    <svg class="fig" viewBox="0 0 1000 370" role="img" aria-label="Rendering speed against tactile perception. Pseudo-haptics is instant and simulated, shape displays take seconds, 3D printing takes hours and gives real touch.">
+      <line x1="90" y1="300" x2="960" y2="300" stroke="#000fa1" stroke-width="3" marker-end="url(#sp1)"/>
+      <line x1="90" y1="300" x2="90" y2="30" stroke="#000fa1" stroke-width="3" marker-end="url(#sp1)"/>
+      <text x="525" y="352" text-anchor="middle" font-size="17" fill="#000fa1" font-weight="700">rendering speed</text>
+      <text x="100" y="326" font-size="15" fill="#5a63b5">instant</text><text x="950" y="326" text-anchor="end" font-size="15" fill="#5a63b5">hours</text>
+      <text x="60" y="170" text-anchor="middle" font-size="17" fill="#000fa1" font-weight="700" transform="rotate(-90 60 170)">tactile perception</text>
+      <text x="104" y="290" font-size="13" fill="#5a63b5">simulated by vision</text><text x="104" y="50" font-size="13" fill="#5a63b5">real touch</text>
+      <circle cx="190" cy="250" r="15" fill="#e8710a"/>
+      <text x="215" y="236" font-size="19" font-weight="700" fill="#b85a07">pseudo-haptics</text>
+      <text x="215" y="258" font-size="14" fill="#b85a07">instant · any computer</text>
+      <text x="215" y="277" font-size="14" fill="#b85a07">senses through the cursor</text>
+      <circle cx="520" cy="165" r="15" fill="#000fa1"/>
+      <text x="545" y="151" font-size="19" font-weight="700" fill="#000fa1">shape displays</text>
+      <text x="545" y="173" font-size="14" fill="#5a63b5">seconds · lab hardware</text>
+      <text x="545" y="192" font-size="14" fill="#5a63b5">pins sense when pushed</text>
+      <circle cx="850" cy="75" r="15" fill="#ffffff" stroke="#000fa1" stroke-width="3"/>
+      <text x="825" y="61" text-anchor="end" font-size="19" font-weight="700" fill="#000fa1">3D printing</text>
+      <text x="825" y="83" text-anchor="end" font-size="14" fill="#5a63b5">minutes to overnight · a printer</text>
+      <text x="825" y="102" text-anchor="end" font-size="14" fill="#5a63b5">sensing is open, it must be designed in</text>
+      <circle cx="700" cy="255" r="8" fill="#000fa1"/><text x="714" y="260" font-size="14" fill="#5a63b5">senses touch</text>
+      <circle cx="830" cy="255" r="8" fill="#ffffff" stroke="#000fa1" stroke-width="2"/><text x="844" y="260" font-size="14" fill="#5a63b5">sensing open</text>
+      <defs><marker id="sp1" viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#000fa1"/></marker></defs>
+    </svg>
+  </figure>
+  <p class="plain">Almost everyone has a computer and a mouse. Few people have a printer.</p>
+  <p class="cite">Jansen et al. 2015 · Follmer et al. 2013 · Bae et al. 2022, 2023 · Mueller et al. 2014 · Lécuyer 2009</p>
+  <details class="notes"><summary>Notes</summary><p>Physicalizations give real touch, and Bae et al. showed prints can even sense touch, but only when sensing is designed into the print. A print takes minutes to overnight, so designers iterate about once a day. Pseudo-haptics is the fast, low-fidelity end, and the cursor already knows where the hand is.</p></details>
 </section>
 
 <!-- 9 -->
@@ -473,6 +480,7 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
     <li>Abtahi, P., &amp; Follmer, S. (2018). Visuo-haptic illusions for improving the perceived performance of shape displays. CHI.</li>
     <li>Afzaal, H., &amp; Alim, U. (2024). Evaluating force-based haptics for immersive tangible interactions with surface visualizations. IEEE VIS.</li>
     <li>Alais, D., &amp; Burr, D. (2004). The ventriloquist effect results from near-optimal bimodal integration. Current Biology 14(3).</li>
+    <li>Azmandian, M., Hancock, M., Benko, H., Ofek, E., &amp; Wilson, A. D. (2016). Haptic retargeting, dynamic repurposing of passive haptics for enhanced virtual reality experiences. CHI.</li>
     <li>Bae, S. S., et al. (2022). Making data tangible, a cross-disciplinary design space for data physicalization. CHI.</li>
     <li>Bae, S. S., Fujiwara, T., Ynnerman, A., Do, E. Y.-L., Rivera, M. L., &amp; Szafir, D. A. (2023). A computational design pipeline to fabricate sensing network physicalizations. IEEE TVCG.</li>
     <li>Bertin, J. (1967). Sémiologie graphique. Gauthier-Villars.</li>
