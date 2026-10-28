@@ -216,15 +216,31 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 </section>
 
 <!-- 4 -->
+<section class="step" data-sec="why" id="senses" hidden>
+  <p class="eyebrow">Theory</p>
+  <h2>Separate senses, one percept</h2>
+  <div class="grid2">
+    <div class="card"><span class="k">Studied apart</span><h3>Each sense has its own field</h3><p>Vision, hearing and touch have their own receptors, brain areas and research communities.</p></div>
+    <div class="card"><span class="k">Perceived together</span><h3>The brain merges them</h3><p>We experience one world, and one sense can change what another reports.</p></div>
+  </div>
+  <div class="grid4">
+    <div class="card"><span class="k">Sight changes hearing</span><h3>McGurk effect</h3><p>Seeing lips say “ga” while hearing “ba” makes people hear “da”.</p><p class="cite" style="margin-top:auto">McGurk &amp; MacDonald 1976</p></div>
+    <div class="card"><span class="k">Sight moves sound</span><h3>Ventriloquism</h3><p>A voice seems to come from the puppet’s moving mouth.</p><p class="cite" style="margin-top:auto">Alais &amp; Burr 2004</p></div>
+    <div class="card"><span class="k">Sight changes the body</span><h3>Rubber hand</h3><p>Watching a rubber hand being stroked makes people feel it as their own.</p><p class="cite" style="margin-top:auto">Botvinick &amp; Cohen 1998</p></div>
+    <div class="card"><span class="k">Sight changes touch</span><h3>Visual capture</h3><p>Through a lens that distorts a square, people feel the shape they see.</p><p class="cite" style="margin-top:auto">Rock &amp; Victor 1964</p></div>
+  </div>
+  <p class="plain">When the senses disagree, the brain has to settle the conflict.</p>
+  <details class="notes"><summary>Notes</summary><p>Each of these is studied in its own field, yet none of them makes sense with one sense alone. Ask if anyone has tried the McGurk effect. It works even when you know about it.</p></details>
+</section>
+
 <section class="step" data-sec="why" id="multisensory" hidden>
-<p class="eyebrow">Theory</p>
+  <p class="eyebrow">Theory</p>
   <h2>Multisensory conflict</h2>
   <div class="cols">
     <div style="display:flex;flex-direction:column;gap:14px">
       <ul class="bul sm">
-        <li>Rock &amp; Victor showed people a square through a lens that distorted it. They felt the shape they saw.</li>
-        <li>Seeing a rubber hand stroked shifts where people feel their own hand.</li>
-        <li>Ernst &amp; Banks explained why. Each sense is weighted by how reliable it is, and vision is usually the most precise.</li>
+        <li>Ernst &amp; Banks showed the brain settles it the Bayesian way. Each sense is weighted by how reliable it is.</li>
+        <li>Vision is usually the most precise, so it usually wins. Blur it and touch takes over.</li>
         <li>Pseudo-haptics creates this conflict on purpose. The hand moves the same, the cursor slows, and the brain explains the difference as resistance.</li>
       </ul>
       <div class="ctrl" style="font-size:15px;color:#5a63b5;max-width:30em"><label for="rel" style="display:flex;justify-content:space-between">How noisy is vision? <output id="rel-o" style="font-weight:700;color:#000fa1">low</output></label><input type="range" id="rel" min="0.4" max="3" step="0.1" value="0.6" style="width:100%;accent-color:#000fa1"></div>
@@ -233,7 +249,7 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
       <svg class="fig" id="ernst" viewBox="0 0 520 260" role="img" aria-label="Vision, touch and the combined estimate as probability curves"></svg>
     </figure>
   </div>
-  <p class="cite">Rock &amp; Victor 1964 · Botvinick &amp; Cohen 1998 · Ernst &amp; Banks 2002 · Lécuyer 2009</p>
+  <p class="cite">Ernst &amp; Banks 2002 · Lécuyer 2009</p>
   <details class="notes"><summary>Notes</summary><p>Drag the slider. When vision is precise, the combined estimate sits on the visual value. Blur vision and touch takes over. On a screen the cursor is precise and the hand’s sense of its own movement is not, so vision wins the conflict.</p></details>
 </section>
 
@@ -457,6 +473,7 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
   <ol class="refs">
     <li>Abtahi, P., &amp; Follmer, S. (2018). Visuo-haptic illusions for improving the perceived performance of shape displays. CHI.</li>
     <li>Afzaal, H., &amp; Alim, U. (2024). Evaluating force-based haptics for immersive tangible interactions with surface visualizations. IEEE VIS.</li>
+    <li>Alais, D., &amp; Burr, D. (2004). The ventriloquist effect results from near-optimal bimodal integration. Current Biology 14(3).</li>
     <li>Bae, S. S., et al. (2022). Making data tangible, a cross-disciplinary design space for data physicalization. CHI.</li>
     <li>Bae, S. S., Fujiwara, T., Ynnerman, A., Do, E. Y.-L., Rivera, M. L., &amp; Szafir, D. A. (2023). A computational design pipeline to fabricate sensing network physicalizations. IEEE TVCG.</li>
     <li>Bertin, J. (1967). Sémiologie graphique. Gauthier-Villars.</li>
@@ -481,6 +498,7 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
     <li>Lécuyer, A., Burkhardt, J.-M., &amp; Etienne, L. (2004). Feeling bumps and holes without a haptic interface. CHI.</li>
     <li>Lécuyer, A. (2009). Simulating haptic feedback using vision, a survey of research and applications of pseudo-haptic feedback. Presence 18(1).</li>
     <li>Ledo, D., et al. (2018). Evaluation strategies for HCI toolkit research. CHI.</li>
+    <li>McGurk, H., &amp; MacDonald, J. (1976). Hearing lips and seeing voices. Nature 264.</li>
     <li>Mueller, S., et al. (2014). WirePrint, 3D printed previews for fast prototyping. UIST.</li>
     <li>Ondov, B. D., et al. (2020). Revealing perceptual proxies with adversarial examples. IEEE VIS.</li>
     <li>Rock, I., &amp; Victor, J. (1964). Vision and touch, an experimentally created conflict between the two senses. Science 143.</li>
