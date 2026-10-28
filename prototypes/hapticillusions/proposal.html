@@ -215,98 +215,97 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
   <details class="notes"><summary>Notes</summary><p>Go back to the grid. Contrast and café wall are the eye. The size illusions are the brain applying a rule that is usually right. Bayesian perception is the modern way to say this, and the next slide uses the same weighting for when two senses disagree.</p></details>
 </section>
 
-<!-- 4 -->
 <section class="step" data-sec="why" id="senses" hidden>
-  <p class="eyebrow">Theory</p>
+<p class="eyebrow">Theory</p>
   <h2>Separate senses, one percept</h2>
-  <div class="grid2">
-    <div class="card"><span class="k">Studied apart</span><h3>Each sense has its own field</h3><p>Vision, hearing and touch have their own receptors, brain areas and research communities.</p></div>
-    <div class="card"><span class="k">Perceived together</span><h3>The brain merges them</h3><p>We experience one world, and one sense can change what another reports.</p></div>
-  </div>
+  <p class="lede">Each sense is studied in its own field, yet one sense can change what another reports.</p>
   <div class="grid4">
-    <div class="card"><span class="k">Sight changes hearing</span><h3>McGurk effect</h3><p>Seeing lips say “ga” while hearing “ba” makes people hear “da”.</p><p class="cite" style="margin-top:auto">McGurk &amp; MacDonald 1976</p></div>
-    <div class="card"><span class="k">Sight moves sound</span><h3>Ventriloquism</h3><p>A voice seems to come from the puppet’s moving mouth.</p><p class="cite" style="margin-top:auto">Alais &amp; Burr 2004</p></div>
-    <div class="card"><span class="k">Sight changes the body</span><h3>Rubber hand</h3><p>Watching a rubber hand being stroked makes people feel it as their own.</p><p class="cite" style="margin-top:auto">Botvinick &amp; Cohen 1998</p></div>
-    <div class="card"><span class="k">Sight changes touch</span><h3>Visual capture</h3><p>Through a lens that distorts a square, people feel the shape they see.</p><p class="cite" style="margin-top:auto">Rock &amp; Victor 1964</p></div>
+    <div class="card"><h3>McGurk effect</h3><p>Seeing lips say “ga” while hearing “ba” makes people hear “da”.</p></div>
+    <div class="card"><h3>Ventriloquism</h3><p>A voice seems to come from the puppet’s moving mouth.</p></div>
+    <div class="card"><h3>Rubber hand</h3><p>Watching a rubber hand being stroked makes people feel it as their own.</p></div>
+    <div class="card"><h3>Visual capture</h3><p>Through a lens that distorts a square, people feel the shape they see.</p></div>
   </div>
-  <p class="plain">When the senses disagree, the brain has to settle the conflict.</p>
-  <details class="notes"><summary>Notes</summary><p>Each of these is studied in its own field, yet none of them makes sense with one sense alone. Ask if anyone has tried the McGurk effect. It works even when you know about it.</p></details>
+  <p class="cite">McGurk &amp; MacDonald 1976 · Alais &amp; Burr 2004 · Botvinick &amp; Cohen 1998 · Rock &amp; Victor 1964</p>
+  <details class="notes"><summary>Notes</summary><p>Vision, hearing and touch each have their own receptors, brain areas and research communities. None of these effects makes sense with one sense alone.</p></details>
 </section>
 
 <section class="step" data-sec="why" id="multisensory" hidden>
-  <p class="eyebrow">Theory</p>
-  <h2>Multisensory conflict</h2>
-  <div class="cols">
-    <div style="display:flex;flex-direction:column;gap:14px">
-      <ul class="bul sm">
-        <li>Ernst &amp; Banks showed the brain settles it the Bayesian way. Each sense is weighted by how reliable it is.</li>
-        <li>Vision is usually the most precise, so it usually wins. Blur it and touch takes over.</li>
-        <li>Pseudo-haptics creates this conflict on purpose. The hand moves the same, the cursor slows, and the brain explains the difference as resistance.</li>
-      </ul>
-      <div class="ctrl" style="font-size:15px;color:#5a63b5;max-width:30em"><label for="rel" style="display:flex;justify-content:space-between">How noisy is vision? <output id="rel-o" style="font-weight:700;color:#000fa1">low</output></label><input type="range" id="rel" min="0.4" max="3" step="0.1" value="0.6" style="width:100%;accent-color:#000fa1"></div>
-    </div>
+<p class="eyebrow">Theory</p>
+  <h2>When senses conflict, vision usually wins</h2>
+  <div class="cols" style="align-items:center">
+    <ul class="bul">
+      <li>The brain weights each sense by how reliable it is (Ernst &amp; Banks 2002).</li>
+      <li>Vision is usually the most precise, so it usually wins.</li>
+    </ul>
     <figure>
-      <svg class="fig" id="ernst" viewBox="0 0 520 260" role="img" aria-label="Vision, touch and the combined estimate as probability curves"></svg>
+      <svg class="fig" id="ernst" viewBox="0 0 520 260" role="img" aria-label="Vision, touch and the combined estimate as probability curves; the combined estimate sits near vision"></svg>
     </figure>
   </div>
-  <p class="cite">Ernst &amp; Banks 2002 · Lécuyer 2009</p>
-  <details class="notes"><summary>Notes</summary><p>Drag the slider. When vision is precise, the combined estimate sits on the visual value. Blur vision and touch takes over. On a screen the cursor is precise and the hand’s sense of its own movement is not, so vision wins the conflict.</p></details>
+  <p class="cite">Ernst &amp; Banks 2002</p>
+  <details class="notes"><summary>Notes</summary><p>Vision is sharp and touch is broad, so what you perceive lands close to what you see. This is the Bayesian weighting from the illusions slide, applied across senses.</p></details>
 </section>
 
-<!-- 5 -->
-<section class="step" data-sec="why" id="assumption" hidden>
-<p class="eyebrow">Theory</p>
-  <h2>What visualization assumed</h2>
-  <div class="cols">
-    <div><h3 class="colh">Mostly bottom-up</h3>
-      <ul class="bul sm">
-        <li>Bertin’s visual variables and Cleveland &amp; McGill’s graphical perception measure how accurately people decode a visual signal.</li>
-        <li>Preattentive features decide which encodings pop out (Healey &amp; Enns 2012).</li>
-      </ul></div>
-    <div><h3 class="colh">Top-down gets in</h3>
-      <ul class="bul sm">
-        <li>What people already know changes what they see in a chart (Xiong et al. 2020).</li>
-        <li>People compare charts through shortcuts such as average length, and these can be fooled on purpose (Jardine et al. 2020, Ondov et al. 2020).</li>
-      </ul></div>
+<section class="step" data-sec="why" id="design" hidden>
+<p class="eyebrow">Motivation</p>
+  <h2>Can we design illusions that create other perceptions?</h2>
+  <div class="grid2">
+    <div class="card"><span class="k">Found</span><h3>Illusions we notice</h3><p>Lines that look longer, squares that look lighter. They expose how perception works.</p></div>
+    <div class="card"><span class="k">Designed</span><h3>Illusions we build</h3><p>If vision usually wins, a visual signal can be designed on purpose to make people perceive something through another sense.</p></div>
   </div>
-  <p class="plain">Pseudo-haptics uses both. A bottom-up conflict between hand and eye is resolved top-down into a sense of touch.</p>
-  <p class="cite">Bertin 1967 · Cleveland &amp; McGill 1984 · Healey &amp; Enns 2012 · Xiong et al. 2020 · Jardine et al. 2020 · Ondov et al. 2020</p>
+  <details class="notes"><summary>Notes</summary><p>This is the turn of the talk. So far illusions were things that happen to us. Now we use them as a design material.</p></details>
 </section>
 
-<!-- 6 -->
+<section class="step" data-sec="why" id="pseudo" hidden>
+<p class="eyebrow">Background</p>
+  <h2>Pseudo-haptics</h2>
+  <div class="cols" style="align-items:center">
+    <ul class="bul sm">
+      <li>Lécuyer and colleagues changed how far the cursor moves for the same hand movement, the control/display ratio.</li>
+      <li>When the cursor slows down, people feel friction or resistance, with no force feedback device (Lécuyer et al. 2000).</li>
+      <li>With only a mouse, people felt bumps and holes on a flat image (Lécuyer et al. 2004).</li>
+    </ul>
+    <figure>
+      <svg class="fig" viewBox="0 0 520 230" role="img" aria-label="The hand moves the same distance; over a sticky region the cursor moves less">
+        <text x="20" y="44" font-size="15" fill="#5a63b5">hand</text>
+        <line x1="90" y1="40" x2="480" y2="40" stroke="#000fa1" stroke-width="3" marker-end="url(#ph1)"/>
+        <text x="20" y="134" font-size="15" fill="#5a63b5">cursor</text>
+        <rect x="220" y="104" width="130" height="56" rx="6" fill="#f3f4fb" stroke="#dcdff0"/>
+        <text x="285" y="182" text-anchor="middle" font-size="14" fill="#5a63b5">sticky region</text>
+        <line x1="90" y1="130" x2="220" y2="130" stroke="#e8710a" stroke-width="3"/>
+        <line x1="220" y1="130" x2="262" y2="130" stroke="#e8710a" stroke-width="3" stroke-dasharray="3 4"/>
+        <circle cx="262" cy="130" r="8" fill="#e8710a"/>
+        <text x="262" y="96" text-anchor="middle" font-size="14" fill="#b85a07">cursor slows, hand feels resistance</text>
+        <defs><marker id="ph1" viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#000fa1"/></marker></defs>
+      </svg>
+    </figure>
+  </div>
+  <p class="plain">It needs only a mouse and a screen.</p>
+  <p class="cite">Lécuyer et al. 2000 · Lécuyer et al. 2004 · Lécuyer 2009</p>
+</section>
+
 <section class="step" data-sec="why" id="feel" hidden>
 <p class="eyebrow">Live demo</p>
   <h2>Feel it yourself</h2>
   <div class="cols" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
-    <canvas id="mini" class="feelcv" style="--ar:2.31" aria-label="Feel it yourself. Click to lock the pointer, Esc releases it."></canvas>
+    <canvas id="mini" class="feelcv" style="--ar:1.76" aria-label="Checkerboard you can feel. Click to lock the pointer, Esc releases it."></canvas>
     <div style="display:flex;flex-direction:column;gap:12px">
-      <p class="lede" style="font-size:18px">Click the chart and move across the bars. Taller bars slow the cursor down.</p>
-      <div class="demo-steps"><button data-act="on" aria-pressed="false">Illusion on</button><button data-act="data" aria-pressed="false">Hide bars</button><button data-act="conflict" aria-pressed="false">Conflict</button><button data-act="cursor" aria-pressed="false">Hide cursor</button><button data-act="new" aria-pressed="false">New data</button></div>
-      <ul class="bul sm"><li><b>Hide bars.</b> Only the motion is left. Can you still find the tallest one?</li><li><b>Conflict.</b> The feel now follows other data than what you see. Which one wins?</li><li><b>Hide cursor.</b> No visual signal, so no feeling. The mouse itself never changes.</li></ul>
+      <p class="lede" style="font-size:18px">Click the board and move across it. The dark squares are sticky.</p>
+      <div class="demo-steps"><button data-act="on" aria-pressed="false">Illusion on</button><button data-act="data" aria-pressed="false">Hide pattern</button><button data-act="cursor" aria-pressed="false">Hide cursor</button></div>
+      <ul class="bul sm"><li><b>Hide pattern.</b> Can you still feel where the squares are?</li><li><b>Hide cursor.</b> No visual signal, so no feeling. The mouse itself never changes.</li></ul>
       <p class="cite">Esc releases the pointer.</p>
     </div>
   </div>
-  <p class="cite">Lécuyer et al. 2004 · Lécuyer 2009</p>
-  <details class="notes"><summary>Notes</summary><p>Let someone try it and call out a letter. The hand moves the same everywhere. Only what the eye sees changes.</p></details>
+  <details class="notes"><summary>Notes</summary><p>Let someone try it. The hand moves the same everywhere. Only what the eye sees changes.</p></details>
 </section>
 
-<!-- 7 -->
-<section class="step" data-sec="why" id="tension" hidden>
-  <p class="eyebrow">Motivation</p>
-  <h2>An apparent paradox</h2>
-  <div class="grid2">
-    <div class="card main"><span class="k">The design goal</span><h3>Lower cognitive load</h3><p>Visualization moves work from thinking to seeing.</p></div>
-    <div class="card warm"><span class="k">The capability</span><h3>Load vision more</h3><p>Pseudo-haptics adds a touch channel by putting more work on vision, the sense we usually add touch to relieve.</p></div>
-  </div>
+<section class="step" data-sec="why" id="channels" hidden>
+<p class="eyebrow">Motivation</p>
+  <h2>If we can engineer touch, what can it carry?</h2>
   <div class="cols">
-    <ul class="bul sm">
-      <li>Separate senses usually draw on separate resources, which is why touch normally helps (Wickens 2008).</li>
-      <li>Pseudo-haptic touch arrives through vision, so it may not get that benefit.</li>
-      <li>But perceptual load is not cognitive load (Lavie et al. 2004). Extra seeing does not have to mean extra thinking.</li>
-    </ul>
-    <div class="card"><span class="k">Everyday example</span><h3>Subtitles</h3><p>Many viewers prefer reading subtitles to hearing a dub. They take on more visual work to avoid a mismatch between lips and voice, and to keep the original.</p></div>
+    <div><h3 class="colh">Channels to encode</h3><ul class="bul sm"><li>Friction, where values feel sticky</li><li>Weight, where heavier items move slower</li><li>Stiffness, how hard something pushes back</li><li>Roughness, small catches along a path</li><li>Snapping, a pull toward a target</li><li>Slope, easier downhill than uphill</li></ul></div>
+    <div><h3 class="colh">Applications to build</h3><ul class="bul sm"><li>Finding a pattern in a heatmap</li><li>Selecting a community in a network</li><li>Reading the peaks of a terrain</li><li>Reshaping data and replaying the history</li></ul></div>
   </div>
-  <details class="notes"><summary>Notes</summary><p>It only looks like a paradox from visualization’s side. Whether the extra load is perceptual and cheap, or cognitive and costly, is a question this tool can study.</p></details>
+  <p class="plain">Answering this needs a way to try encodings quickly, which motivates a prototyping tool.</p>
 </section>
 
 <!-- 8 -->
@@ -495,6 +494,7 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
     <li>Knill, D. C., &amp; Pouget, A. (2004). The Bayesian brain, the role of uncertainty in neural coding and computation. Trends in Neurosciences 27(12).</li>
     <li>Kosara, R. (2016). An empire built on sand, reexamining what we think we know about visualization. BELIV.</li>
     <li>Lavie, N., Hirst, A., de Fockert, J. W., &amp; Viding, E. (2004). Load theory of selective attention and cognitive control. JEP General.</li>
+    <li>Lécuyer, A., Coquillart, S., Kheddar, A., Richard, P., &amp; Coiffet, P. (2000). Pseudo-haptic feedback, can isometric input devices simulate force feedback? IEEE Virtual Reality.</li>
     <li>Lécuyer, A., Burkhardt, J.-M., &amp; Etienne, L. (2004). Feeling bumps and holes without a haptic interface. CHI.</li>
     <li>Lécuyer, A. (2009). Simulating haptic feedback using vision, a survey of research and applications of pseudo-haptic feedback. Presence 18(1).</li>
     <li>Ledo, D., et al. (2018). Evaluation strategies for HCI toolkit research. CHI.</li>
@@ -509,11 +509,50 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
   </ol>
 </section>
 
+<!-- 5 -->
+<section class="step" data-sec="backup" id="assumption" hidden>
+<p class="eyebrow">Theory</p>
+  <h2>What visualization assumed</h2>
+  <div class="cols">
+    <div><h3 class="colh">Mostly bottom-up</h3>
+      <ul class="bul sm">
+        <li>Bertin’s visual variables and Cleveland &amp; McGill’s graphical perception measure how accurately people decode a visual signal.</li>
+        <li>Preattentive features decide which encodings pop out (Healey &amp; Enns 2012).</li>
+      </ul></div>
+    <div><h3 class="colh">Top-down gets in</h3>
+      <ul class="bul sm">
+        <li>What people already know changes what they see in a chart (Xiong et al. 2020).</li>
+        <li>People compare charts through shortcuts such as average length, and these can be fooled on purpose (Jardine et al. 2020, Ondov et al. 2020).</li>
+      </ul></div>
+  </div>
+  <p class="plain">Pseudo-haptics uses both. A bottom-up conflict between hand and eye is resolved top-down into a sense of touch.</p>
+  <p class="cite">Bertin 1967 · Cleveland &amp; McGill 1984 · Healey &amp; Enns 2012 · Xiong et al. 2020 · Jardine et al. 2020 · Ondov et al. 2020</p>
+</section>
+
+<!-- 7 -->
+<section class="step" data-sec="backup" id="tension" hidden>
+  <p class="eyebrow">Motivation</p>
+  <h2>An apparent paradox</h2>
+  <div class="grid2">
+    <div class="card main"><span class="k">The design goal</span><h3>Lower cognitive load</h3><p>Visualization moves work from thinking to seeing.</p></div>
+    <div class="card warm"><span class="k">The capability</span><h3>Load vision more</h3><p>Pseudo-haptics adds a touch channel by putting more work on vision, the sense we usually add touch to relieve.</p></div>
+  </div>
+  <div class="cols">
+    <ul class="bul sm">
+      <li>Separate senses usually draw on separate resources, which is why touch normally helps (Wickens 2008).</li>
+      <li>Pseudo-haptic touch arrives through vision, so it may not get that benefit.</li>
+      <li>But perceptual load is not cognitive load (Lavie et al. 2004). Extra seeing does not have to mean extra thinking.</li>
+    </ul>
+    <div class="card"><span class="k">Everyday example</span><h3>Subtitles</h3><p>Many viewers prefer reading subtitles to hearing a dub. They take on more visual work to avoid a mismatch between lips and voice, and to keep the original.</p></div>
+  </div>
+  <details class="notes"><summary>Notes</summary><p>It only looks like a paradox from visualization’s side. Whether the extra load is perceptual and cheap, or cognitive and costly, is a question this tool can study.</p></details>
+</section>
+
 </main>
 
 <script>
 (() => {
-const SECTIONS = [{ id: "why", name: "Motivation and theory" }, { id: "what", name: "Project and demos" }, { id: "eval", name: "Evaluation and plan" }];
+const SECTIONS = [{ id: "why", name: "Motivation and theory" }, { id: "what", name: "Project and demos" }, { id: "eval", name: "Evaluation and plan" }, { id: "backup", name: "Backup" }];
 const steps = [...document.querySelectorAll(".step")], tabs = document.getElementById("tabs");
 let cur = 0;
 SECTIONS.forEach(s => { const b = document.createElement("button"); b.className = "tab"; b.dataset.sec = s.id; b.textContent = s.name; b.onclick = () => show(steps.findIndex(st => st.dataset.sec === s.id)); tabs.appendChild(b); });
@@ -546,7 +585,7 @@ document.addEventListener("keydown", e => {
 });
 
 // ---------- slide 4: reliability weighting (Ernst and Banks) ----------
-const ernst = document.getElementById("ernst"), rel = document.getElementById("rel");
+const ernst = document.getElementById("ernst"), rel = { value: "0.6" };
 function drawErnst() {
   const sv = +rel.value, sh = 1.4, mv = 4, mh = 6, w = (1 / sv ** 2) / (1 / sv ** 2 + 1 / sh ** 2), mc = w * mv + (1 - w) * mh, sc = Math.sqrt(1 / (1 / sv ** 2 + 1 / sh ** 2));
   const X = x => 40 + (x - 0) / 10 * 440, Y = p => 210 - p * 150;
@@ -560,9 +599,8 @@ function drawErnst() {
     <text x="${X(mc)}" y="235" text-anchor="middle" font-size="14" fill="#b85a07" font-weight="700">what you perceive</text>
     <line x1="${X(mc)}" y1="210" x2="${X(mc)}" y2="218" stroke="#e8710a" stroke-width="3"/>
     <text x="40" y="256" font-size="12" fill="#5a63b5">Each sense is weighted by its reliability (1 / variance). Vision weight ${Math.round(w * 100)}%.</text>`;
-  document.getElementById("rel-o").textContent = sv < 1 ? "low" : sv < 1.8 ? "medium" : "high";
 }
-rel.oninput = drawErnst; drawErnst();
+drawErnst();
 
 const VOLCANO = { w: 87, h: 61, v: [103,104,104,105,105,106,106,106,107,107,106,106,105,105,104,104,104,104,105,107,107,106,105,105,107,108,109,110,110,110,110,110,110,109,109,109,109,109,109,108,107,107,107,107,106,106,105,104,104,104,104,104,104,104,103,103,103,103,102,102,101,101,100,100,100,100,100,99,98,97,97,96,96,96,96,96,96,96,95,95,95,94,94,94,94,94,94,104,104,105,105,106,106,107,107,107,107,107,107,107,106,106,106,106,106,106,108,108,108,106,106,108,109,110,110,112,112,113,112,111,110,110,110,110,109,109,109,108,107,107,107,107,106,106,105,104,104,104,104,104,104,104,103,103,103,103,102,102,101,101,100,100,100,100,99,99,98,97,97,96,96,96,96,96,96,96,95,95,95,94,94,94,94,94,104,105,105,106,106,107,107,108,108,108,108,108,108,108,108,108,108,108,108,108,110,110,110,110,110,110,110,111,113,115,116,115,113,112,110,110,110,110,110,110,109,108,108,108,108,107,106,105,105,105,105,105,105,104,104,104,104,103,103,103,102,102,102,101,100,100,100,99,99,98,97,97,96,96,96,96,96,96,96,96,95,95,94,94,94,94,94,105,105,106,106,107,107,108,108,109,109,109,109,109,110,110,110,110,110,110,110,111,112,115,115,115,115,115,116,116,117,119,118,117,116,114,113,112,110,110,110,110,110,110,109,109,108,107,106,106,106,106,106,105,105,105,104,104,104,103,103,103,102,102,102,101,100,100,99,99,98,97,97,96,96,96,96,96,96,96,96,95,95,94,94,94,94,94,105,106,106,107,107,108,108,109,109,110,110,110,110,111,110,110,110,110,111,114,115,116,121,121,121,121,121,122,123,124,124,123,121,119,118,117,115,114,112,111,110,110,110,110,110,110,109,109,108,109,107,107,106,106,105,105,104,104,104,104,103,103,102,102,102,101,100,100,99,99,98,97,96,96,96,96,96,96,96,96,95,95,94,94,94,94,94,106,106,107,107,107,108,109,109,110,110,111,111,112,113,112,111,111,112,115,118,118,119,126,128,128,127,128,128,129,130,129,128,127,125,122,120,118,117,115,114,112,110,110,110,110,110,111,110,110,110,109,109,108,107,106,105,105,105,104,104,104,103,103,102,102,102,101,100,99,99,98,97,96,96,96,96,96,96,96,96,95,95,94,94,94,94,94,106,107,107,108,108,108,109,110,110,111,112,113,114,115,114,115,116,116,119,123,125,130,133,134,134,134,134,135,135,136,135,134,132,130,128,124,121,119,118,116,114,112,111,111,111,112,112,111,110,110,110,109,108,108,107,108,107,106,105,104,104,104,103,103,103,102,101,100,99,99,98,97,96,96,96,96,96,96,96,96,95,95,95,94,94,94,94,107,107,108,108,109,109,110,110,112,113,114,115,116,117,117,120,120,121,123,129,134,136,138,139,139,139,140,142,142,141,141,140,137,134,131,127,124,122,120,118,117,115,113,114,113,114,114,113,112,111,110,110,109,108,107,106,105,105,105,104,104,104,103,103,103,101,100,100,99,99,98,97,96,96,96,96,96,96,96,96,96,95,95,94,94,94,94,107,108,108,109,109,110,111,112,114,115,116,117,118,119,121,125,125,127,131,136,140,141,142,144,144,145,148,149,148,147,146,144,140,138,136,130,127,125,123,121,119,118,117,117,116,116,116,115,114,113,113,111,110,109,108,107,106,105,105,103,103,102,102,102,103,101,100,100,100,99,98,98,97,96,96,96,96,96,96,96,96,95,95,95,94,94,94,107,108,109,109,110,110,110,113,115,117,118,119,120,123,126,129,131,134,139,142,144,145,147,148,150,152,154,154,153,154,151,149,146,143,140,136,130,128,126,124,122,121,120,119,118,117,117,117,116,116,115,113,112,110,109,108,107,106,106,105,104,103,102,101,101,100,100,100,100,99,99,98,97,96,96,96,96,96,96,96,96,95,95,95,94,94,94,107,108,109,109,110,110,110,112,115,117,119,122,125,127,130,133,137,141,143,145,148,149,152,155,157,159,160,160,161,162,159,156,153,149,146,142,139,134,130,128,126,125,122,120,120,120,119,119,119,118,117,115,113,111,110,110,109,108,107,106,106,105,104,104,103,102,100,100,100,99,99,98,97,96,96,96,96,96,96,96,96,95,95,95,95,94,94,108,108,109,109,110,110,110,112,115,118,121,125,128,131,134,138,141,145,147,149,152,157,160,161,163,166,169,170,170,171,168,162,158,155,152,148,144,140,136,132,129,127,124,122,121,120,120,120,120,120,119,117,115,113,110,110,110,110,109,108,108,107,107,106,105,104,102,100,100,100,99,98,97,96,96,96,96,96,96,96,96,96,95,95,95,94,94,108,109,109,110,110,111,112,114,117,120,124,128,131,135,138,142,145,149,152,155,158,163,166,167,170,173,175,175,175,173,171,169,164,160,156,153,149,144,140,136,131,129,126,124,123,123,122,121,120,120,120,119,117,115,111,110,110,110,110,110,109,109,110,109,108,106,103,101,100,100,100,98,97,96,96,96,96,96,96,96,96,96,95,95,95,95,94,108,109,110,110,110,113,114,116,119,122,126,131,134,138,141,145,149,152,156,160,164,169,171,174,177,175,178,179,177,175,174,172,168,163,160,157,151,147,143,138,133,130,128,125,125,124,123,122,121,121,120,120,118,116,115,111,110,110,110,110,113,114,113,112,110,107,105,102,100,100,100,98,97,96,96,96,96,96,96,96,96,96,96,95,95,95,94,108,109,110,110,112,115,116,118,122,125,129,133,137,140,144,149,152,157,161,165,169,173,176,179,179,180,180,180,178,178,176,175,171,165,163,160,153,148,143,139,135,132,129,128,127,125,124,124,123,123,122,122,120,118,117,118,115,117,118,118,119,117,116,115,112,109,107,105,100,100,100,100,97,96,96,96,96,96,96,96,96,96,96,95,95,95,95,108,109,110,111,114,116,118,122,127,130,133,136,140,144,148,153,157,161,165,169,173,177,180,180,180,180,181,180,180,180,179,178,173,168,165,161,156,149,143,139,136,133,130,129,128,126,126,125,125,125,125,124,122,121,120,120,120,120,121,122,123,122,120,117,114,111,108,106,105,100,100,100,100,96,96,96,96,96,96,96,96,96,96,96,95,95,95,107,108,110,113,115,118,121,126,131,134,137,140,143,148,152,157,162,165,169,173,177,181,181,181,180,181,181,181,180,180,180,178,176,170,167,163,158,152,145,140,137,134,132,130,129,127,127,126,127,128,128,126,125,125,125,123,126,128,129,130,130,125,124,119,116,114,112,110,107,106,105,100,100,100,96,96,96,96,96,96,96,96,96,96,96,95,95,107,109,111,116,119,122,125,130,135,137,140,144,148,152,156,161,165,168,172,177,181,184,181,181,181,180,180,180,180,180,180,178,178,173,168,163,158,152,146,141,138,136,134,132,130,129,128,128,130,130,130,129,128,129,129,130,132,133,133,134,134,132,128,122,119,116,114,112,108,106,105,105,100,100,100,97,97,97,97,97,97,97,96,96,96,96,95,108,110,112,117,122,126,129,135,139,141,144,149,153,156,160,165,168,171,177,181,184,185,182,180,180,179,178,178,180,179,179,178,176,173,168,163,157,152,148,143,139,137,135,133,131,130,130,131,132,132,132,131,132,132,133,134,136,137,137,137,136,134,131,124,121,118,116,114,111,109,107,106,105,100,100,100,97,97,97,97,97,97,97,96,96,96,96,108,110,114,120,126,129,134,139,142,144,146,152,158,161,164,168,171,175,181,184,186,186,183,179,178,178,177,175,178,177,177,176,175,173,168,162,156,153,149,145,142,140,138,136,133,132,132,132,134,134,134,134,135,136,137,138,140,140,140,140,139,137,133,127,123,120,118,115,112,108,108,106,106,105,100,100,100,98,98,98,98,98,98,97,96,96,96,108,110,116,122,128,133,137,141,143,146,149,154,161,165,168,172,175,180,184,188,189,187,182,178,176,176,175,173,174,173,175,174,173,171,168,161,157,154,150,148,145,143,141,138,135,135,134,135,135,136,136,137,138,139,140,140,140,140,140,140,140,139,135,130,126,123,120,117,114,111,109,108,107,106,105,100,100,100,99,99,98,98,98,98,97,97,96,110,112,118,124,130,135,139,142,145,148,151,157,163,169,172,176,179,183,187,190,190,186,180,177,175,173,170,169,169,170,171,172,170,170,167,163,160,157,154,152,149,147,144,140,137,137,136,137,138,138,139,140,141,140,140,140,140,140,140,140,140,138,134,131,128,124,121,118,115,112,110,109,108,107,106,105,100,100,100,99,99,99,98,98,98,97,97,110,114,120,126,131,136,140,143,146,149,154,159,166,171,177,180,182,186,190,190,190,185,179,174,171,168,166,163,164,163,166,169,170,170,168,164,162,161,158,155,153,150,147,143,139,139,139,139,140,141,141,142,142,141,140,140,140,140,140,140,140,137,134,131,128,125,122,119,116,114,112,110,109,109,108,107,105,100,100,100,99,99,99,98,98,97,97,110,115,121,127,132,136,140,144,148,151,157,162,169,174,178,181,186,188,190,191,190,184,177,172,168,165,162,159,158,158,159,161,166,167,169,166,164,163,161,159,156,153,149,146,142,142,141,142,143,143,143,143,144,142,141,140,140,140,140,140,140,138,134,131,128,125,123,120,117,116,114,112,110,109,108,107,106,105,102,101,100,99,99,99,98,98,97,110,116,121,127,132,136,140,144,148,154,160,166,171,176,180,184,189,190,191,191,191,183,176,170,166,163,159,156,154,155,155,158,161,165,170,167,166,165,163,161,158,155,152,150,146,145,145,145,146,146,144,145,145,144,142,141,140,140,140,140,138,136,134,131,128,125,123,121,119,117,115,113,112,111,111,110,108,106,105,102,100,100,99,99,99,98,98,110,114,119,126,131,135,140,144,149,158,164,168,172,176,183,184,189,190,191,191,190,183,174,169,165,161,158,154,150,151,152,155,159,164,168,168,168,167,165,163,160,158,155,153,150,148,148,148,148,148,147,146,146,145,143,142,141,140,139,138,136,134,132,131,128,126,124,122,120,118,116,114,113,113,112,111,108,107,106,105,104,102,100,99,99,99,99,110,113,119,125,131,136,141,145,150,158,164,168,172,177,183,187,189,191,192,191,190,183,174,168,164,160,157,153,150,149,150,154,158,162,166,170,170,168,166,164,162,160,158,155,152,151,151,151,151,151,149,148,147,146,145,143,142,140,139,137,135,134,132,131,129,127,125,123,121,119,117,116,114,114,113,112,110,108,107,105,103,100,100,100,100,99,99,110,112,118,124,130,136,142,146,151,157,163,168,174,178,183,187,189,190,191,192,189,182,174,168,164,160,157,153,149,148,149,153,157,161,167,170,170,170,168,166,165,163,159,156,154,153,155,155,155,155,152,150,149,147,145,143,141,140,139,138,136,134,133,131,130,128,126,124,122,120,119,117,116,115,114,113,111,110,107,106,105,105,102,101,100,100,100,110,111,116,122,129,137,142,146,151,158,164,168,172,179,183,186,189,190,192,193,188,182,174,168,164,161,157,154,151,149,151,154,158,161,167,170,170,170,170,169,168,166,160,157,156,156,157,158,159,159,156,153,150,148,146,144,141,140,140,138,136,135,134,133,131,129,127,125,123,122,120,118,117,116,115,114,112,111,110,108,107,106,105,104,102,100,100,108,110,115,121,131,137,142,147,152,159,163,167,170,177,182,184,187,189,192,194,189,183,174,169,165,161,158,156,154,153,154,157,160,164,167,171,172,174,174,173,171,168,161,159,158,158,159,161,161,160,158,155,151,149,147,144,142,141,140,138,137,136,135,134,132,130,128,126,125,123,121,119,118,117,116,115,113,112,112,111,110,109,108,107,105,101,100,108,110,114,120,128,134,140,146,152,158,162,166,169,175,180,183,186,189,193,195,190,184,176,171,167,163,160,158,157,156,157,159,163,166,170,174,176,178,178,176,172,167,164,161,161,160,161,163,163,163,160,157,153,150,148,146,144,142,141,140,139,138,136,135,134,133,129,127,126,124,122,121,119,118,117,116,114,113,112,111,110,110,109,109,107,104,100,107,110,115,119,123,129,135,141,146,156,161,165,168,173,179,182,186,189,193,194,191,184,179,175,170,166,162,161,160,160,161,162,165,169,172,176,178,179,179,176,172,168,165,163,163,163,163,165,166,164,161,158,155,152,150,147,146,144,143,142,141,139,139,138,137,135,131,128,127,125,124,122,121,119,118,116,115,113,112,111,111,110,110,109,109,105,100,107,110,114,117,121,126,130,135,142,151,159,163,167,171,177,182,185,189,192,193,191,187,183,179,174,169,167,166,164,164,165,166,169,171,174,178,179,180,180,178,173,169,166,165,165,166,165,168,169,166,163,159,157,154,152,149,148,147,146,145,143,142,141,140,139,138,133,130,128,127,125,124,122,120,118,117,115,112,111,111,111,111,110,109,108,106,100,107,109,113,118,122,126,129,134,139,150,156,160,165,170,175,181,184,188,191,192,192,189,185,181,177,173,171,169,168,167,169,170,172,174,176,178,179,180,180,179,175,170,168,166,166,168,168,170,170,168,164,160,158,155,152,151,150,149,149,148,147,145,144,143,142,141,136,133,130,129,127,125,123,120,119,118,115,112,111,111,111,110,109,109,109,105,100,105,107,111,117,121,124,127,131,137,148,154,159,164,168,174,181,184,187,190,191,191,190,187,184,180,178,175,174,172,171,173,173,173,176,178,179,180,180,180,179,175,170,168,166,168,169,170,170,170,170,166,161,158,156,154,153,151,150,150,150,150,148,147,146,145,143,139,135,133,131,129,126,124,121,120,118,114,111,111,111,110,110,109,107,106,104,100,104,106,110,114,118,121,125,129,135,142,150,157,162,167,173,180,183,186,188,190,190,190,189,184,183,181,180,179,179,176,177,176,176,177,178,179,180,180,179,177,173,169,167,166,167,169,170,170,170,170,167,161,159,157,155,153,151,150,150,150,150,150,150,149,147,145,141,138,135,133,130,127,125,123,121,118,113,111,110,110,109,109,107,106,105,103,100,104,106,108,111,115,119,123,128,134,141,148,154,161,166,172,179,182,184,186,189,190,190,190,187,185,183,180,180,180,179,179,177,176,177,178,178,178,177,176,174,171,168,166,164,166,168,170,170,170,170,168,162,159,157,155,153,151,150,150,150,150,150,150,150,150,148,144,140,137,134,132,129,127,125,122,117,111,110,107,107,106,105,104,103,102,101,100,103,105,107,110,114,118,122,127,132,140,146,153,159,165,171,176,180,183,185,186,189,190,188,187,184,182,180,180,180,179,178,176,176,176,176,174,174,173,172,170,168,167,165,163,164,165,169,170,170,170,166,162,159,157,155,153,151,150,150,150,150,150,150,150,150,150,146,142,139,136,133,131,128,125,122,117,110,108,106,105,104,103,103,101,101,101,101,102,103,106,108,112,116,121,125,130,138,145,151,157,163,170,174,178,181,181,184,186,186,187,186,184,181,180,180,180,179,178,174,173,173,171,170,170,169,168,167,166,164,163,162,161,164,167,169,170,168,164,160,158,157,155,153,151,150,150,150,150,150,150,150,150,150,147,144,141,138,135,133,128,125,122,116,109,107,104,104,103,102,101,101,101,101,101,101,102,105,107,110,115,120,124,129,136,143,149,155,162,168,170,174,176,178,179,181,182,184,184,183,181,180,180,179,177,174,172,170,168,166,165,164,164,164,164,162,160,159,159,158,160,162,164,166,166,163,159,157,156,155,153,151,150,150,150,150,150,150,150,150,150,149,146,143,140,137,133,129,124,119,112,108,105,103,103,102,101,101,101,101,100,100,101,102,104,106,109,113,118,122,127,133,141,149,155,161,165,168,170,172,175,176,177,179,181,181,181,180,180,179,177,174,171,167,165,163,161,160,160,160,160,160,157,155,155,154,154,155,157,159,161,161,161,159,156,154,154,153,151,150,150,150,150,150,150,150,150,150,149,147,144,141,137,133,129,123,116,110,107,104,102,102,101,101,101,100,100,100,100,102,103,104,106,108,112,116,120,125,129,137,146,154,161,163,165,166,169,172,173,174,175,177,178,178,178,178,177,174,171,168,164,160,158,157,157,156,156,156,155,152,151,150,150,151,151,152,154,156,157,157,156,155,153,152,152,151,150,150,150,150,150,150,150,150,150,150,147,144,141,138,133,127,120,113,109,106,103,101,101,101,100,100,100,100,100,100,103,104,105,106,108,110,114,118,123,127,133,143,150,156,160,160,161,162,167,170,171,172,173,175,175,174,174,173,171,168,164,160,156,155,154,153,153,152,152,150,149,148,148,148,148,148,149,149,150,152,152,152,152,151,150,150,150,150,150,150,150,150,150,150,150,150,149,147,144,141,138,132,125,118,111,108,105,103,102,101,101,101,100,100,100,100,100,104,105,106,107,108,110,113,117,120,125,129,138,145,151,156,156,157,158,160,164,166,168,170,171,172,171,171,169,166,163,160,156,153,151,150,150,149,149,149,148,146,146,146,146,146,146,146,147,148,148,149,149,149,148,148,148,148,149,149,150,150,150,150,150,150,150,148,146,143,141,136,129,123,117,110,108,105,104,103,102,102,101,101,100,100,100,100,103,104,105,106,107,109,111,115,118,122,127,133,140,143,150,152,153,155,157,159,162,164,167,168,168,168,167,166,163,160,157,153,150,148,148,147,147,147,145,145,144,143,143,143,144,144,144,144,145,145,145,145,146,146,146,146,146,147,147,148,149,150,150,150,150,149,147,145,143,141,134,127,123,117,111,108,105,105,104,104,103,103,102,101,100,100,100,102,103,104,105,106,107,109,113,116,120,125,129,133,137,143,147,149,151,152,154,158,161,164,165,164,164,163,163,160,157,154,151,149,147,145,145,144,143,141,140,141,141,141,141,141,142,142,142,142,142,142,142,143,143,143,144,144,145,146,146,146,147,148,148,148,148,145,143,142,140,134,128,123,117,112,108,106,105,105,104,104,103,102,101,100,100,99,102,103,104,105,105,106,108,110,113,118,123,127,129,132,137,141,142,142,145,150,154,157,161,161,160,160,160,159,157,154,151,148,146,145,143,142,142,139,137,136,137,137,138,138,139,139,139,139,139,139,139,139,140,140,141,142,142,143,144,144,144,145,145,145,145,145,144,142,140,139,136,129,124,119,113,109,106,106,105,104,103,102,101,101,100,99,99,102,103,104,104,105,106,107,108,111,116,121,124,126,128,131,134,135,137,139,143,147,152,156,157,157,157,156,155,153,151,148,146,143,142,141,140,138,135,133,132,132,133,133,133,134,135,135,135,135,136,136,137,137,138,138,139,140,141,141,142,142,143,142,142,141,141,140,139,137,134,133,129,125,121,114,110,107,106,106,104,103,102,101,100,99,99,99,102,103,104,104,105,105,106,108,110,113,118,121,124,126,128,130,132,134,136,139,143,147,150,154,154,154,153,151,149,148,146,143,141,139,137,136,132,130,128,128,128,129,129,130,130,131,132,132,132,133,134,134,135,135,136,137,138,139,139,140,140,140,139,139,138,137,137,135,132,130,129,127,124,120,116,112,109,106,105,103,102,101,101,100,99,99,99,101,102,103,104,104,105,106,107,108,110,114,119,121,124,126,128,129,132,134,137,140,143,147,149,151,151,151,149,147,145,143,141,138,136,134,131,128,126,124,125,125,126,126,127,128,128,129,129,130,130,131,131,132,132,133,134,135,135,136,136,137,137,136,136,135,134,133,131,129,128,127,126,123,119,115,111,109,107,105,104,103,102,101,100,100,100,99,101,102,103,103,104,104,105,106,108,110,112,116,119,121,124,125,127,130,132,135,137,140,143,147,149,149,149,147,145,143,141,139,136,133,131,128,125,122,121,122,122,122,123,125,125,126,127,127,127,128,128,128,129,129,130,131,131,132,132,133,133,133,132,132,131,131,130,129,128,126,125,124,121,117,111,109,108,106,105,104,103,102,101,101,100,100,100,100,101,102,103,103,104,105,106,107,108,110,114,117,119,121,123,126,128,130,133,136,139,141,144,146,147,146,145,143,141,138,136,133,130,127,124,121,120,120,120,120,120,121,122,123,124,124,125,125,126,126,125,126,126,126,125,126,127,128,128,129,129,128,128,128,128,128,128,126,125,123,122,119,114,109,108,107,106,105,104,103,103,102,102,101,100,100,100,101,102,103,104,105,106,107,108,109,110,112,115,117,120,122,125,127,130,132,135,137,139,142,144,144,144,142,140,138,136,132,129,126,123,120,120,119,119,118,119,119,120,120,120,121,122,122,123,123,123,123,122,123,122,122,121,122,122,122,123,123,123,124,125,125,126,126,125,124,122,120,116,113,109,107,106,105,104,104,103,102,102,101,101,100,100,100,101,102,103,104,105,106,107,108,109,110,112,114,117,119,122,124,127,129,131,134,136,138,140,142,142,142,140,138,136,133,129,125,122,120,119,118,118,117,116,117,117,118,119,119,120,120,120,121,121,121,122,121,120,120,120,119,119,120,120,120,120,120,120,123,123,124,124,124,123,121,119,114,112,108,106,106,104,104,103,102,102,101,101,100,100,99,101,102,103,104,105,106,107,108,109,110,111,113,114,116,119,121,124,126,128,130,133,135,137,138,140,140,139,137,135,133,131,127,122,120,118,118,117,117,116,115,116,116,117,118,118,118,119,119,120,120,121,121,120,119,119,118,117,117,118,119,118,118,118,119,120,122,123,123,123,122,120,117,113,110,108,106,105,104,103,103,102,101,101,100,100,99,99,101,102,103,104,105,106,107,108,109,110,111,111,113,115,118,121,123,125,127,129,131,133,135,137,138,138,137,134,132,130,127,122,120,118,116,116,116,116,115,113,114,115,116,117,117,118,118,119,119,119,120,120,119,118,117,117,116,116,117,117,117,118,119,119,119,120,121,121,121,121,119,116,113,110,107,105,105,103,103,103,102,101,100,100,99,99,99,101,102,103,104,105,106,107,108,109,110,111,112,114,116,117,120,122,124,126,129,130,132,133,135,136,136,134,132,129,126,122,120,118,116,114,114,114,114,114,113,113,114,115,116,116,117,117,117,118,118,119,119,118,117,116,116,115,115,116,116,116,117,117,118,118,119,120,120,120,120,119,116,113,109,106,104,104,103,102,102,101,101,100,99,99,99,98,101,102,103,104,105,106,107,108,109,110,111,113,115,117,117,118,121,123,126,128,130,130,131,132,133,134,131,129,125,122,120,118,116,114,113,112,112,113,112,112,111,112,113,113,114,115,116,116,117,117,118,118,116,116,115,115,115,114,114,115,116,116,117,117,118,118,119,119,120,120,117,115,112,108,106,104,103,102,102,102,101,100,99,99,99,98,98,101,102,103,104,105,105,106,107,108,109,110,111,113,115,117,118,120,122,125,126,127,128,129,130,131,131,128,125,121,120,118,116,114,113,113,111,111,111,111,110,109,110,111,112,113,113,114,115,115,116,117,117,116,115,114,114,113,113,114,114,115,115,116,116,117,118,118,119,119,118,116,114,112,108,105,103,103,102,101,101,100,100,99,99,98,98,97,100,101,102,103,104,105,106,107,108,109,110,110,111,113,115,118,120,121,122,124,125,125,126,127,128,127,124,121,120,118,116,114,113,112,112,110,109,109,108,108,108,109,110,111,112,112,113,114,114,115,116,116,115,114,113,112,112,113,113,114,114,115,115,116,116,117,117,118,118,117,115,113,111,107,105,103,102,101,101,100,100,100,99,99,98,98,97,100,101,102,103,104,105,105,106,107,108,109,110,110,111,114,116,118,120,120,121,122,122,123,124,123,123,120,118,117,115,114,115,113,111,110,109,108,108,107,107,107,108,109,110,111,111,112,113,113,114,115,115,114,113,112,111,111,112,112,112,113,114,114,115,115,116,116,117,117,116,114,112,109,106,104,102,101,100,100,99,99,99,99,98,98,97,97] };
 
@@ -607,25 +645,20 @@ function wire(slide, d, acts, state) {
 }
 const common = d => ({ on: () => (d.st.on = !d.st.on), data: () => (d.st.hideData = !d.st.hideData), cursor: () => (d.st.hideCursor = !d.st.hideCursor) });
 
-// slide 6, bars: the feel can follow the bars, or other data (conflict)
+// checkerboard: dark squares are sticky
 const bars = (() => {
-  let V = [30, 70, 45, 90, 20, 60, 80, 35], conflict = false;
-  const x0 = 40, bw = 520 / 8, PT = 20, BASE = 220, PLOT = 200;
-  const FV = () => conflict ? V.slice().reverse() : V;
-  const idx = px => { const i = Math.floor((px - x0) / bw); return i >= 0 && i < V.length ? i : -1; };
-  const d = feel("mini", { W: 600, H: 260, box: { x0, x1: x0 + 520, y0: PT, y1: BASE },
-    gain: x => { const i = idx(x); return i >= 0 ? 1 - .85 * FV()[i] / 100 : 1; },
+  const C = 8, R = 5, B = { x0: 20, y0: 20, x1: 580, y1: 320 }, cw = (B.x1 - B.x0) / C, ch = (B.y1 - B.y0) / R;
+  const dark = (x, y) => (Math.floor((x - B.x0) / cw) + Math.floor((y - B.y0) / ch)) % 2 === 0;
+  const d = feel("mini", { W: 600, H: 340, box: B, gain: (x, y) => dark(Math.min(x, B.x1 - .01), Math.min(y, B.y1 - .01)) ? .2 : 1,
     paint(ctx, st) {
-      V.forEach((v, i) => {
-        const bx = x0 + i * bw + 6, w = bw - 12;
-        if (st.hideData) { ctx.fillStyle = "#f3f4fb"; ctx.fillRect(bx, PT, w, PLOT); ctx.setLineDash([4, 4]); ctx.strokeStyle = "#dcdff0"; ctx.strokeRect(bx + .5, PT + .5, w - 1, PLOT - 1); ctx.setLineDash([]); }
-        else { ctx.fillStyle = "#000fa1"; ctx.fillRect(bx, BASE - PLOT * v / 100, w, PLOT * v / 100); }
-        ctx.fillStyle = "#5a63b5"; ctx.font = "600 14px 'DM Sans', sans-serif"; ctx.textAlign = "center"; ctx.fillText("ABCDEFGH"[i], bx + w / 2, BASE + 22); ctx.textAlign = "start";
-      });
-      ctx.strokeStyle = "#5a63b5"; ctx.beginPath(); ctx.moveTo(20, BASE + .5); ctx.lineTo(580, BASE + .5); ctx.stroke();
+      for (let j = 0; j < R; j++) for (let i = 0; i < C; i++) {
+        const x = B.x0 + i * cw, y = B.y0 + j * ch, k = (i + j) % 2 === 0;
+        if (st.hideData) { ctx.fillStyle = "#f3f4fb"; ctx.fillRect(x, y, cw, ch); }
+        else { ctx.fillStyle = k ? "#000fa1" : "#ffffff"; ctx.fillRect(x, y, cw + .5, ch + .5); }
+      }
+      ctx.strokeStyle = "#dcdff0"; ctx.strokeRect(B.x0 + .5, B.y0 + .5, B.x1 - B.x0 - 1, B.y1 - B.y0 - 1);
     } });
-  wire("feel", d, { ...common(d), conflict: () => (conflict = !conflict), new: () => { V = V.map(() => Math.round(10 + Math.random() * 85)); } },
-    () => ({ on: [d.st.on, d.st.on ? "Illusion on" : "Illusion off"], data: d.st.hideData, cursor: d.st.hideCursor, conflict }));
+  wire("feel", d, common(d), () => ({ on: [d.st.on, d.st.on ? "Illusion on" : "Illusion off"], data: d.st.hideData, cursor: d.st.hideCursor }));
   return d;
 })();
 
