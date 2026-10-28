@@ -166,17 +166,13 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 
 <!-- 3 -->
 <section class="step" data-sec="why" id="theory" hidden>
-<p class="eyebrow">Theory</p>
+  <p class="eyebrow">Theory</p>
   <h2>Bottom-up and top-down</h2>
-  <div class="grid2">
-    <div class="card"><span class="k">Bottom-up</span><h3>From the signal</h3><p>Perception built from what the receptors register. Features such as colour, size and motion are picked up before attention (Treisman &amp; Gelade 1980).</p></div>
-    <div class="card main"><span class="k">Top-down</span><h3>From what we expect</h3><p>Perception shaped by knowledge, context and goals. Helmholtz called it unconscious inference, and Gregory called perceptions hypotheses.</p></div>
-  </div>
-  <div class="cols">
-    <ul class="bul">
-      <li>Every percept mixes both.</li>
-      <li>Illusions expose the top-down part. The brain settles on the most likely cause of a signal, and sometimes it is wrong.</li>
-    </ul>
+  <div class="cols" style="align-items:center">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card"><span class="k">Bottom-up</span><h3>Driven by the signal</h3><p>What the eye or the skin registers.</p></div>
+      <div class="card main"><span class="k">Top-down</span><h3>Driven by expectation</h3><p>What knowledge and context say the signal means.</p></div>
+    </div>
     <figure>
       <svg class="fig" viewBox="0 0 480 220" role="img" aria-label="Two equal lines look unequal because of their arrowheads">
         <g stroke="#000fa1" stroke-width="4" fill="none" stroke-linecap="round">
@@ -187,8 +183,9 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
       </svg>
     </figure>
   </div>
-  <p class="cite">Treisman &amp; Gelade 1980 · Helmholtz 1867 · Gregory 1980 · Goldstein, Sensation and Perception</p>
-  <details class="notes"><summary>Notes</summary><p>Ask the room which line is longer. The signal is identical, so the difference comes from top-down interpretation. Pseudo-haptics lives in the same gap.</p></details>
+  <p class="plain">Every percept mixes both. Illusions show the top-down side, where the signal stays the same and the brain settles on a different cause.</p>
+  <p class="cite">Helmholtz 1867 · Gregory 1980 · Goldstein, Sensation and Perception</p>
+  <details class="notes"><summary>Notes</summary><p>Ask the room which line is longer. The signal is identical, so the difference comes from top-down interpretation. Helmholtz called this unconscious inference, and Gregory called perceptions hypotheses. Pseudo-haptics lives in the same gap.</p></details>
 </section>
 
 <!-- 4 -->
@@ -459,7 +456,6 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
     <li>Ondov, B. D., et al. (2020). Revealing perceptual proxies with adversarial examples. IEEE VIS.</li>
     <li>Rock, I., &amp; Victor, J. (1964). Vision and touch, an experimentally created conflict between the two senses. Science 143.</li>
     <li>Shneiderman, B. (1983). Direct manipulation, a step beyond programming languages. IEEE Computer 16(8).</li>
-    <li>Treisman, A. M., &amp; Gelade, G. (1980). A feature-integration theory of attention. Cognitive Psychology 12(1).</li>
     <li>Wickens, C. D. (2008). Multiple resources and mental workload. Human Factors.</li>
     <li>Xiong, C., Van Weelden, L., &amp; Franconeri, S. (2020). The curse of knowledge in visual data communication. IEEE TVCG 26(10).</li>
     <li>Xu, Z., Williams, K., &amp; Wall, E. (2023). Let’s get vysical, perceptual accuracy in visual and tactile encodings.</li>
