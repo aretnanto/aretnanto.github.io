@@ -187,18 +187,21 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 <!-- illusions above, theory below -->
 <section class="step" data-sec="why" id="theory" hidden>
   <p class="eyebrow">Theory</p>
-  <h2>Bottom-up and top-down</h2>
-  <div class="grid2">
-    <div class="card"><span class="k">Bottom-up</span><h3>Driven by the signal</h3><p>What the eye registers.</p></div>
-    <div class="card"><span class="k">Top-down</span><h3>Driven by expectation</h3><p>What knowledge and context say the signal means.</p></div>
-  </div>
+  <h2>Why do illusions happen?</h2>
   <div class="cols" style="align-items:center">
+    <ul class="bul sm">
+      <li>The image on the retina is ambiguous. Many different worlds could produce the same image.</li>
+      <li><b>Bottom-up.</b> Some illusions come from the wiring of the eye itself, such as simultaneous contrast and café wall.</li>
+      <li><b>Top-down.</b> Most come from expectation. The brain picks the most likely cause of the image (Helmholtz, Gregory).</li>
+      <li>Depth cues make the brain enlarge what looks farther away, which explains Müller-Lyer, Ponzo and the vanishing point (Gregory 1968).</li>
+      <li><b>Bayesian perception</b> puts both together. What we see is the signal weighted by a prior, the brain’s expectation of what is likely (Knill &amp; Pouget 2004).</li>
+    </ul>
     <figure style="max-width:520px">
       <svg class="fig" viewBox="0 0 480 240" role="img" aria-label="The signal rises into perception from below while expectation shapes it from above">
         <rect x="160" y="96" width="160" height="48" rx="8" fill="#f3f4fb" stroke="#000fa1" stroke-width="2"/>
         <text x="240" y="126" text-anchor="middle" font-size="16" font-weight="700" fill="#000fa1">perception</text>
-        <text x="240" y="28" text-anchor="middle" font-size="15" fill="#000fa1">knowledge, context, goals</text>
-        <text x="240" y="226" text-anchor="middle" font-size="15" fill="#000fa1">light on the retina</text>
+        <text x="240" y="28" text-anchor="middle" font-size="15" fill="#000fa1">prior expectation</text>
+        <text x="240" y="226" text-anchor="middle" font-size="15" fill="#000fa1">signal on the retina</text>
         <path d="M240 40 L240 88" stroke="#e8710a" stroke-width="3" marker-end="url(#td)"/>
         <path d="M240 208 L240 152" stroke="#000fa1" stroke-width="3" marker-end="url(#bu)"/>
         <text x="252" y="70" font-size="14" fill="#b85a07">top-down</text>
@@ -207,10 +210,9 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
           <marker id="bu" viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#000fa1"/></marker></defs>
       </svg>
     </figure>
-    <p class="plain">Every percept mixes both. Illusions show the top-down side, where the signal stays the same and the brain settles on a different cause.</p>
   </div>
-  <p class="cite">Helmholtz 1867 · Gregory 1980 · Goldstein, Sensation and Perception</p>
-  <details class="notes"><summary>Notes</summary><p>The illusions on the last slide come from the top-down arrow. Helmholtz called this unconscious inference, and Gregory called perceptions hypotheses. Pseudo-haptics lives in the same gap.</p></details>
+  <p class="cite">Helmholtz 1867 · Gregory 1968, 1980 · Knill &amp; Pouget 2004</p>
+  <details class="notes"><summary>Notes</summary><p>Go back to the grid. Contrast and café wall are the eye. The size illusions are the brain applying a rule that is usually right. Bayesian perception is the modern way to say this, and the next slide uses the same weighting for when two senses disagree.</p></details>
 </section>
 
 <!-- 4 -->
@@ -466,12 +468,14 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
     <li>Ernst, M. O., &amp; Banks, M. S. (2002). Humans integrate visual and haptic information in a statistically optimal fashion. Nature 415.</li>
     <li>Follmer, S., et al. (2013). inFORM, dynamic physical affordances and constraints through shape and object actuation. UIST.</li>
     <li>Goldstein, E. B., &amp; Brockmole, J. R. Sensation and perception. Cengage.</li>
+    <li>Gregory, R. L. (1968). Visual illusions. Scientific American 219(5).</li>
     <li>Gregory, R. L. (1980). Perceptions as hypotheses. Philosophical Transactions of the Royal Society B.</li>
     <li>Healey, C. G., &amp; Enns, J. T. (2012). Attention and visual memory in visualization and computer graphics. IEEE TVCG 18(7).</li>
     <li>Helmholtz, H. von (1867). Handbuch der physiologischen Optik.</li>
     <li>Herman, B., Jackson, C. D., &amp; Keefe, D. F. (2024). Touching the ground. IEEE TVCG.</li>
     <li>Jansen, Y., et al. (2015). Opportunities and challenges for data physicalization. CHI.</li>
     <li>Jardine, N., Ondov, B. D., Elmqvist, N., &amp; Franconeri, S. (2020). The perceptual proxies of visual comparison. IEEE TVCG.</li>
+    <li>Knill, D. C., &amp; Pouget, A. (2004). The Bayesian brain, the role of uncertainty in neural coding and computation. Trends in Neurosciences 27(12).</li>
     <li>Kosara, R. (2016). An empire built on sand, reexamining what we think we know about visualization. BELIV.</li>
     <li>Lavie, N., Hirst, A., de Fockert, J. W., &amp; Viding, E. (2004). Load theory of selective attention and cognitive control. JEP General.</li>
     <li>Lécuyer, A., Burkhardt, J.-M., &amp; Etienne, L. (2004). Feeling bumps and holes without a haptic interface. CHI.</li>
