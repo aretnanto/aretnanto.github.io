@@ -374,6 +374,33 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 </section>
 
 <!-- 10 -->
+<section class="step" data-sec="what" id="approach" hidden>
+  <p class="eyebrow">Technical approach</p>
+  <h2>How the tool works</h2>
+  <figure style="width:100%;max-width:1100px;margin:0 auto">
+    <svg class="fig" viewBox="0 0 1100 170" role="img" aria-label="Data goes through a feel mapping into the cursor engine and onto the screen; the cursor position feeds back into the mapping">
+      <g font-size="16" text-anchor="middle">
+        <rect x="10" y="40" width="200" height="70" rx="8" fill="#f3f4fb" stroke="#000fa1" stroke-width="2"/><text x="110" y="70" font-weight="700" fill="#000fa1">Data</text><text x="110" y="92" font-size="13" fill="#5a63b5">grid, network, terrain</text>
+        <rect x="290" y="40" width="220" height="70" rx="8" fill="#f3f4fb" stroke="#000fa1" stroke-width="2"/><text x="400" y="70" font-weight="700" fill="#000fa1">Feel mapping</text><text x="400" y="92" font-size="13" fill="#5a63b5">value to cursor gain, per channel</text>
+        <rect x="590" y="40" width="220" height="70" rx="8" fill="#fdf1e6" stroke="#e8710a" stroke-width="2"/><text x="700" y="70" font-weight="700" fill="#b85a07">Cursor engine</text><text x="700" y="92" font-size="13" fill="#b85a07">raw mouse movement × gain</text>
+        <rect x="890" y="40" width="200" height="70" rx="8" fill="#f3f4fb" stroke="#000fa1" stroke-width="2"/><text x="990" y="70" font-weight="700" fill="#000fa1">Display</text><text x="990" y="92" font-size="13" fill="#5a63b5">chart and drawn cursor</text>
+      </g>
+      <g stroke="#000fa1" stroke-width="2.5" fill="none"><path d="M212 75 L284 75" marker-end="url(#ta1)"/><path d="M512 75 L584 75" marker-end="url(#ta1)"/><path d="M812 75 L884 75" marker-end="url(#ta1)"/>
+      <path d="M700 112 C700 160 400 160 400 116" stroke="#e8710a" stroke-dasharray="6 5" marker-end="url(#ta2)"/></g>
+      <text x="550" y="165" text-anchor="middle" font-size="13" fill="#b85a07">cursor position looks up the next value</text>
+      <defs><marker id="ta1" viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#000fa1"/></marker>
+        <marker id="ta2" viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#e8710a"/></marker></defs>
+    </svg>
+  </figure>
+  <div class="grid3">
+    <div class="card"><span class="k">Computation</span><h3>Mapping and analysis</h3><p>Each channel is a function from value to cursor gain, such as 1 − k·v for friction. Terrain is simplified with persistent homology before it is felt. Every brush stroke is logged, so a session replays exactly.</p></div>
+    <div class="card"><span class="k">Visualization</span><h3>Show, hide or conflict</h3><p>Heatmaps, contour maps and node-link views on canvas. The visual encoding can be shown, hidden, or set against the feel.</p></div>
+    <div class="card"><span class="k">Interaction</span><h3>The tool owns the cursor</h3><p>Pointer lock reads raw mouse movement and keeps the cursor inside the chart. Lasso, snap, sculpt and replay sit on top.</p></div>
+  </div>
+  <p class="plain">The same mapping drives what is seen and what is felt, so every task can be tried by sight, by feel, or both.</p>
+  <p class="cite">Lécuyer 2009 · Edelsbrunner et al. 2002</p>
+</section>
+
 <section class="step" data-sec="what" id="demo-heat" hidden>
 <p class="eyebrow">Live demo · find a pattern</p>
   <h2>Find a pattern by feel</h2>
@@ -443,24 +470,38 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 </section>
 
 <!-- 14 -->
-<section class="step" data-sec="eval" id="evaluation" hidden>
-  <p class="eyebrow">Data and evaluation</p>
-  <h2>Datasets and how to evaluate</h2>
+<section class="step" data-sec="eval" id="datasets" hidden>
+  <p class="eyebrow">Data</p>
+  <h2>Datasets</h2>
   <div class="tablewrap"><table class="today">
-    <thead><tr><th>Dataset</th><th>What it is</th><th>Source</th></tr></thead>
+    <thead><tr><th>Dataset</th><th>What it is</th><th>Used for</th><th>Source and availability</th></tr></thead>
     <tbody>
-      <tr><td>Maunga Whau</td><td>Volcano elevation, 87 × 61 points at 10 m</td><td>R’s volcano dataset, public</td></tr>
-      <tr><td>Your own elevation</td><td>Any grayscale image, for example a USGS 3DEP tile</td><td>Public</td></tr>
-      <tr><td>Les Misérables</td><td>77 characters, 254 links</td><td>Knuth 1993, public</td></tr>
-      <tr><td>Test patterns</td><td>Gradient, hot spot, checkerboard</td><td>Generated, so the answer is known</td></tr>
+      <tr><td>Test patterns</td><td>Gradient, hot spot, ring, checkerboard</td><td>Finding a pattern</td><td>Generated, so the right answer is known</td></tr>
+      <tr><td>Les Misérables</td><td>77 characters, 254 co-occurrence links, communities</td><td>Selecting a community</td><td>Knuth 1993, public, via vega-datasets</td></tr>
+      <tr><td>Maunga Whau</td><td>Volcano elevation, 87 × 61 points at 10 m</td><td>Reading peaks, sculpting</td><td>R’s volcano dataset, public</td></tr>
+      <tr><td>Your own elevation</td><td>Any grayscale height image, for example a USGS 3DEP tile</td><td>Terrain tasks on real places</td><td>USGS, public</td></tr>
     </tbody>
   </table></div>
-  <div class="grid3">
-    <div class="card"><span class="k">Demonstration</span><h3>What it can express</h3><p>One set of channels and controls produces every prototype.</p></div>
-    <div class="card"><span class="k">Technical checks</span><h3>Does the feel match the data?</h3><p>Scripted cursor sweeps compare the felt signal with the true values. Replay must rebuild a session exactly.</p></div>
-    <div class="card"><span class="k">Usage scenarios</span><h3>Herman et al.’s tasks</h3><p>Trace a path downhill, compare two heights, find the extremes, felt on Maunga Whau.</p></div>
+  <p class="lede">All data is public or generated, and none of it is about people.</p>
+</section>
+
+<section class="step" data-sec="eval" id="evaluation" hidden>
+  <p class="eyebrow">Expected results and evaluation</p>
+  <h2>What I expect and how I will check it</h2>
+  <div class="cols">
+    <div><h3 class="colh">Expected results</h3><ul class="bul sm">
+      <li>A browser tool where every prototype shares one set of channels and controls.</li>
+      <li>The four applications running on the datasets.</li>
+      <li>A catalogue of channel and task pairings, with notes on which ones come across.</li>
+    </ul></div>
+    <div><h3 class="colh">Evaluation</h3><ul class="bul sm">
+      <li><b>Demonstration.</b> Show the range of prototypes one tool can express.</li>
+      <li><b>Technical checks.</b> Scripted cursor sweeps compare the felt signal with the true values, and replay must rebuild a session exactly.</li>
+      <li><b>Usage scenarios.</b> Herman et al.’s terrain tasks, done by feel on Maunga Whau.</li>
+    </ul></div>
   </div>
-  <p class="cite">No study with participants, so no human-subjects review is needed. Toolkit evaluation strategies, Ledo et al. 2018.</p>
+  <p class="plain">Question 1 is answered by the tool and the scenarios. Question 2 needs people, so this project prepares that study and leaves running it to future work.</p>
+  <p class="cite">No participants, so no human-subjects review is needed. Toolkit evaluation strategies, Ledo et al. 2018.</p>
 </section>
 
 <!-- 15 -->
