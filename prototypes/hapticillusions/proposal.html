@@ -236,12 +236,13 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
     <ul class="bul">
       <li>The brain weights each sense by how reliable it is (Ernst &amp; Banks 2002).</li>
       <li>Vision is usually the most precise, so it usually wins.</li>
+      <li>This fits how visualization is defined. It amplifies cognition through vision, the sense the brain trusts most (Card et al. 1999).</li>
     </ul>
     <figure>
       <svg class="fig" id="ernst" viewBox="0 0 520 260" role="img" aria-label="Vision, touch and the combined estimate as probability curves; the combined estimate sits near vision"></svg>
     </figure>
   </div>
-  <p class="cite">Ernst &amp; Banks 2002</p>
+  <p class="cite">Ernst &amp; Banks 2002 · Card, Mackinlay &amp; Shneiderman 1999</p>
   <details class="notes"><summary>Notes</summary><p>Vision is sharp and touch is broad, so what you perceive lands close to what you see. This is the Bayesian weighting from the illusions slide, applied across senses.</p></details>
 </section>
 
@@ -259,7 +260,7 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 
 <section class="step" data-sec="why" id="pseudo" hidden>
 <p class="eyebrow">Background</p>
-  <h2>Pseudo-haptics</h2>
+  <h2>How pseudo-haptics works</h2>
   <div class="cols" style="align-items:center">
     <ul class="bul sm">
       <li>Lécuyer and colleagues changed how far the cursor moves for the same hand movement, the control/display ratio.</li>
@@ -300,21 +301,33 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
   <details class="notes"><summary>Notes</summary><p>Let someone try it. The hand moves the same everywhere. Only what the eye sees changes.</p></details>
 </section>
 
+<section class="step" data-sec="why" id="provocation" hidden>
+  <p class="eyebrow">Motivation</p>
+  <h2>A provocation</h2>
+  <p class="lede">If vision dominates the other senses, vision can also deliver them. That raises two questions for visual analytics.</p>
+  <div class="grid2">
+    <div class="card"><span class="k">Question 1 · Interaction</span><h3>What can felt data bring to visual analytics?</h3><p>Which felt encodings and interaction techniques help people explore, select and compare data?</p></div>
+    <div class="card"><span class="k">Question 2 · Trade-off</span><h3>What does it cost cognition?</h3><p>Pseudo-haptics renders instantly on any computer, but it sends touch through the eyes, the sense visualization already relies on.</p></div>
+  </div>
+  <p class="plain">Exploring both quickly calls for a prototyping tool.</p>
+  <details class="notes"><summary>Notes</summary><p>Vision dominating is usually treated as a fact about perception. Here it becomes a design opportunity, and a cost we need to measure.</p></details>
+</section>
+
 <section class="step" data-sec="why" id="channels" hidden>
-<p class="eyebrow">Motivation</p>
-  <h2>If we can engineer touch, what can it carry?</h2>
+<p class="eyebrow">Question 1 · Interaction</p>
+  <h2>What can felt data bring to visual analytics?</h2>
   <div class="cols">
     <div><h3 class="colh">Channels to encode</h3><ul class="bul sm"><li>Friction, where values feel sticky</li><li>Weight, where heavier items move slower</li><li>Stiffness, how hard something pushes back</li><li>Roughness, small catches along a path</li><li>Snapping, a pull toward a target</li><li>Slope, easier downhill than uphill</li></ul></div>
-    <div><h3 class="colh">Applications to build</h3><ul class="bul sm"><li>Finding a pattern in a heatmap</li><li>Selecting a community in a network</li><li>Reading the peaks of a terrain</li><li>Reshaping data and replaying the history</li></ul></div>
+    <div><h3 class="colh">Visual analytics tasks</h3><ul class="bul sm"><li>Finding a pattern in a heatmap</li><li>Selecting a community in a network</li><li>Reading the peaks of a terrain</li><li>Reshaping data and replaying the history</li></ul></div>
   </div>
-  <p class="plain">Answering this needs a way to try encodings quickly, which motivates a prototyping tool.</p>
+  <p class="plain">Each pairing of a channel and a task is a prototype to try.</p>
 </section>
 
 <!-- 8 -->
 <section class="step" data-sec="why" id="spectrum" hidden>
-<p class="eyebrow">Motivation</p>
-  <h2>Touch costs time and hardware</h2>
-  <figure style="width:100%;max-width:calc((100vh - 520px) * 2.7);margin:0 auto">
+<p class="eyebrow">Question 2 · Trade-off</p>
+  <h2>Rendering speed and cognition</h2>
+  <figure style="width:100%;max-width:calc((100vh - 560px) * 2.7);margin:0 auto">
     <svg class="fig" viewBox="0 0 1000 370" role="img" aria-label="Rendering speed against tactile perception. Pseudo-haptics is instant and simulated, shape displays take seconds, 3D printing takes hours and gives real touch.">
       <line x1="90" y1="300" x2="960" y2="300" stroke="#000fa1" stroke-width="3" marker-end="url(#sp1)"/>
       <line x1="90" y1="300" x2="90" y2="30" stroke="#000fa1" stroke-width="3" marker-end="url(#sp1)"/>
@@ -339,8 +352,8 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
       <defs><marker id="sp1" viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#000fa1"/></marker></defs>
     </svg>
   </figure>
-  <p class="plain">Almost everyone has a computer and a mouse. Few people have a printer.</p>
-  <p class="cite">Jansen et al. 2015 · Follmer et al. 2013 · Bae et al. 2022, 2023 · Mueller et al. 2014 · Lécuyer 2009</p>
+  <p class="plain">Pseudo-haptics is the fastest and runs on any computer, but its touch arrives through vision. Whether that adds load to the eyes or to thinking is open (Wickens 2008, Lavie et al. 2004).</p>
+  <p class="cite">Jansen et al. 2015 · Follmer et al. 2013 · Bae et al. 2022, 2023 · Mueller et al. 2014 · Wickens 2008 · Lavie et al. 2004</p>
   <details class="notes"><summary>Notes</summary><p>Physicalizations give real touch, and Bae et al. showed prints can even sense touch, but only when sensing is designed into the print. A print takes minutes to overnight, so designers iterate about once a day. Pseudo-haptics is the fast, low-fidelity end, and the cursor already knows where the hand is.</p></details>
 </section>
 
@@ -348,7 +361,7 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 <section class="step" data-sec="what" id="project" hidden>
 <p class="eyebrow">The project</p>
   <h2>A pseudo-haptic prototyping tool for vis</h2>
-  <p class="lede">A browser tool where designers map data to a feel, test whether it comes across without vision, and decide what is worth fabricating.</p>
+  <p class="lede">A browser tool for exploring both questions. Designers map data to a feel, try it in an analysis task, and decide what is worth fabricating.</p>
   <div class="grid2">
     <div class="card main"><span class="k">Understand</span><h3>What touch can carry</h3><p>Measure which felt differences people tell apart, and turn them into design requirements such as tactile palettes, before anything is printed.</p></div>
     <div class="card main"><span class="k">Realize</span><h3>A new display medium</h3><p>The cursor itself becomes a way to display data through touch on a common computer.</p></div>
