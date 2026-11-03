@@ -327,13 +327,19 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 <!-- 8 -->
 <section class="step" data-sec="why" id="compare" hidden>
   <p class="eyebrow">Question 2 · Trade-off</p>
-  <h2>Three ways to render touch</h2>
+  <h2>Ways to create something that can be felt</h2>
   <div class="grid3">
-    <div class="card" style="border-color:#e8710a"><h3 style="color:#b85a07">Pseudo-haptics</h3><p class="cite" style="margin:0">This project</p><ul class="bul sm" style="padding-left:20px"><li><b>Speed.</b> Instant.</li><li><b>Hardware.</b> Any computer and mouse.</li><li><b>Touch.</b> Simulated by vision.</li><li><b>Interactivity.</b> Senses through the cursor.</li><li><b>Cost.</b> Adds work for the eyes, and how much is open (Wickens 2008, Lavie et al. 2004).</li></ul></div>
-    <div class="card"><h3>Novel engineered devices</h3><p class="cite" style="margin:0">Shape displays, swarm robots, Cardinality</p><ul class="bul sm" style="padding-left:20px"><li><b>Speed.</b> Seconds.</li><li><b>Hardware.</b> Custom, built in a lab.</li><li><b>Touch.</b> Real, at the resolution of the device.</li><li><b>Interactivity.</b> Senses and responds to touch.</li></ul></div>
-    <div class="card"><h3>3D printing</h3><p class="cite" style="margin:0">Data physicalization</p><ul class="bul sm" style="padding-left:20px"><li><b>Speed.</b> Minutes to overnight.</li><li><b>Hardware.</b> A printer.</li><li><b>Touch.</b> Real and detailed.</li><li><b>Interactivity.</b> Limited. Sensing is work in progress (Retnanto).</li></ul></div>
+    <div class="card" style="border-color:#e8710a"><h3 style="color:#b85a07">Pseudo-haptics</h3><p class="cite" style="margin:0">Cursor illusions · this project</p>
+      <span class="k" style="margin-top:6px">Pros</span><ul class="bul sm" style="padding-left:20px"><li>Instant to render and to change.</li><li>Runs on any computer with a mouse.</li><li>Senses the hand through the cursor.</li></ul>
+      <span class="k" style="margin-top:6px">Cons</span><ul class="bul sm" style="padding-left:20px"><li>Touch is simulated by vision.</li><li>Adds work for the eyes, and how much is open (Wickens 2008, Lavie et al. 2004).</li></ul></div>
+    <div class="card"><h3>Novel engineered devices</h3><p class="cite" style="margin:0">Shape displays, swarm robots, Cardinality (Retnanto)</p>
+      <span class="k" style="margin-top:6px">Pros</span><ul class="bul sm" style="padding-left:20px"><li>Real touch that changes in seconds.</li><li>Senses and responds to touch.</li></ul>
+      <span class="k" style="margin-top:6px">Cons</span><ul class="bul sm" style="padding-left:20px"><li>Each one has to be custom made.</li><li>Few people have access to one.</li></ul></div>
+    <div class="card"><h3>3D printing</h3><p class="cite" style="margin:0">Printed objects</p>
+      <span class="k" style="margin-top:6px">Pros</span><ul class="bul sm" style="padding-left:20px"><li>Real and detailed touch.</li><li>An object people can keep and hold.</li></ul>
+      <span class="k" style="margin-top:6px">Cons</span><ul class="bul sm" style="padding-left:20px"><li>Minutes to overnight for each print.</li><li>Limited interactivity. Sensing is work in progress (Retnanto).</li></ul></div>
   </div>
-  <p class="cite">Lécuyer 2009 · Follmer et al. 2013 · Le Goc et al. 2016 · Retnanto, Cardinality · Jansen et al. 2015 · Bae et al. 2022, 2023 · Mueller et al. 2014</p>
+  <p class="cite">Lécuyer 2009 · Follmer et al. 2013 · Le Goc et al. 2016 · Retnanto, Cardinality · Bae et al. 2022, 2023 · Mueller et al. 2014</p>
 </section>
 
 <section class="step" data-sec="why" id="spectrum" hidden>
@@ -348,19 +354,11 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
       <text x="60" y="170" text-anchor="middle" font-size="17" fill="#000fa1" font-weight="700" transform="rotate(-90 60 170)">tactile perception</text>
       <text x="104" y="290" font-size="13" fill="#5a63b5">simulated by vision</text><text x="104" y="50" font-size="13" fill="#5a63b5">real touch</text>
       <circle cx="190" cy="250" r="15" fill="#e8710a"/>
-      <text x="215" y="236" font-size="19" font-weight="700" fill="#b85a07">pseudo-haptics</text>
-      <text x="215" y="258" font-size="14" fill="#b85a07">instant · any computer</text>
-      <text x="215" y="277" font-size="14" fill="#b85a07">senses through the cursor</text>
+      <text x="215" y="257" font-size="19" font-weight="700" fill="#b85a07">pseudo-haptics</text>
       <circle cx="520" cy="165" r="15" fill="#000fa1"/>
-      <text x="545" y="151" font-size="19" font-weight="700" fill="#000fa1">novel engineered devices</text>
-      <text x="545" y="173" font-size="14" fill="#5a63b5">shape displays, swarm robots, Cardinality</text>
-      <text x="545" y="192" font-size="14" fill="#5a63b5">seconds · custom hardware · sense and respond to touch</text>
-      <circle cx="850" cy="75" r="15" fill="#ffffff" stroke="#000fa1" stroke-width="3"/>
-      <text x="825" y="61" text-anchor="end" font-size="19" font-weight="700" fill="#000fa1">3D printing</text>
-      <text x="825" y="83" text-anchor="end" font-size="14" fill="#5a63b5">minutes to overnight · a printer</text>
-      <text x="825" y="102" text-anchor="end" font-size="14" fill="#5a63b5">limited interactivity · sensing is work in progress (Retnanto)</text>
-      <circle cx="700" cy="255" r="8" fill="#000fa1"/><text x="714" y="260" font-size="14" fill="#5a63b5">senses touch</text>
-      <circle cx="830" cy="255" r="8" fill="#ffffff" stroke="#000fa1" stroke-width="2"/><text x="844" y="260" font-size="14" fill="#5a63b5">limited interactivity</text>
+      <text x="545" y="172" font-size="19" font-weight="700" fill="#000fa1">novel engineered devices</text>
+      <circle cx="850" cy="75" r="15" fill="#000fa1"/>
+      <text x="825" y="82" text-anchor="end" font-size="19" font-weight="700" fill="#000fa1">3D printing</text>
       <defs><marker id="sp1" viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#000fa1"/></marker></defs>
     </svg>
   </figure>
