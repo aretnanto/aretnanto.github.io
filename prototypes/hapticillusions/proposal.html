@@ -325,9 +325,20 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 </section>
 
 <!-- 8 -->
+<section class="step" data-sec="why" id="compare" hidden>
+  <p class="eyebrow">Question 2 · Trade-off</p>
+  <h2>Three ways to render touch</h2>
+  <div class="grid3">
+    <div class="card" style="border-color:#e8710a"><h3 style="color:#b85a07">Pseudo-haptics</h3><p class="cite" style="margin:0">This project</p><ul class="bul sm" style="padding-left:20px"><li><b>Speed.</b> Instant.</li><li><b>Hardware.</b> Any computer and mouse.</li><li><b>Touch.</b> Simulated by vision.</li><li><b>Interactivity.</b> Senses through the cursor.</li><li><b>Cost.</b> Adds work for the eyes, and how much is open (Wickens 2008, Lavie et al. 2004).</li></ul></div>
+    <div class="card"><h3>Novel engineered devices</h3><p class="cite" style="margin:0">Shape displays, swarm robots, Cardinality</p><ul class="bul sm" style="padding-left:20px"><li><b>Speed.</b> Seconds.</li><li><b>Hardware.</b> Custom, built in a lab.</li><li><b>Touch.</b> Real, at the resolution of the device.</li><li><b>Interactivity.</b> Senses and responds to touch.</li></ul></div>
+    <div class="card"><h3>3D printing</h3><p class="cite" style="margin:0">Data physicalization</p><ul class="bul sm" style="padding-left:20px"><li><b>Speed.</b> Minutes to overnight.</li><li><b>Hardware.</b> A printer.</li><li><b>Touch.</b> Real and detailed.</li><li><b>Interactivity.</b> Limited. Sensing is work in progress (Retnanto).</li></ul></div>
+  </div>
+  <p class="cite">Lécuyer 2009 · Follmer et al. 2013 · Le Goc et al. 2016 · Retnanto, Cardinality · Jansen et al. 2015 · Bae et al. 2022, 2023 · Mueller et al. 2014</p>
+</section>
+
 <section class="step" data-sec="why" id="spectrum" hidden>
-<p class="eyebrow">Question 2 · Trade-off</p>
-  <h2>Rendering speed and cognition</h2>
+<p class="eyebrow">Opportunity</p>
+  <h2>What opportunities does this layout open?</h2>
   <figure style="width:100%;max-width:calc((100vh - 560px) * 2.7);margin:0 auto">
     <svg class="fig" viewBox="0 0 1000 370" role="img" aria-label="Rendering speed against tactile perception. Pseudo-haptics is instant and simulated, engineered devices take seconds, 3D printing takes hours and gives real touch.">
       <line x1="90" y1="300" x2="960" y2="300" stroke="#000fa1" stroke-width="3" marker-end="url(#sp1)"/>
@@ -353,8 +364,8 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
       <defs><marker id="sp1" viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#000fa1"/></marker></defs>
     </svg>
   </figure>
-  <p class="plain">Pseudo-haptics is the fastest and runs on any computer, but its touch arrives through vision. Whether that adds load to the eyes or to thinking is open (Wickens 2008, Lavie et al. 2004).</p>
-  <p class="cite">Jansen et al. 2015 · Follmer et al. 2013 · Le Goc et al. 2016 · Retnanto, Cardinality · Bae et al. 2022, 2023 · Mueller et al. 2014 · Wickens 2008 · Lavie et al. 2004</p>
+  <p class="plain">Pseudo-haptics fills the instant, any-computer corner. A felt encoding can be sketched there before anyone builds a device or prints an object, which calls for a prototyping tool.</p>
+  <p class="cite">Positions are qualitative.</p>
   <details class="notes"><summary>Notes</summary><p>Physicalizations give real touch, and Bae et al. showed prints can even sense touch, but only when sensing is designed into the print. A print takes minutes to overnight, so designers iterate about once a day. Pseudo-haptics is the fast, low-fidelity end, and the cursor already knows where the hand is.</p></details>
 </section>
 
