@@ -68,6 +68,7 @@ main { padding: 20px 20px 28px }
 .colh { font-size: 14px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 14px; font-weight: 400 }
 .bul { margin: 0; padding-left: 26px; display: flex; flex-direction: column; gap: 12px; font-size: clamp(17px, 1.5vw, 21px); line-height: 1.4 }
 .bul.sm { font-size: 17px; gap: 8px }
+.bul ul { margin: 6px 0 0; padding-left: 22px; display: flex; flex-direction: column; gap: 4px; font-size: .95em }
 .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px }
 .grid4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px }
 .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px }
@@ -89,8 +90,8 @@ table.today td { padding: 10px 12px; border-bottom: 1px solid var(--border); ver
 table.today td:first-child { font-weight: 700 }
 table.today tr.me td { background: var(--navy-soft) }
 .tablewrap { overflow-x: auto }
-ol.refs { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; columns: 2; column-gap: 40px }
-ol.refs li { break-inside: avoid; margin-bottom: 6px }
+ol.refs { margin: 0; padding-left: 22px; display: block; font-size: 12.5px; line-height: 1.35; columns: 3; column-gap: 32px }
+ol.refs li { break-inside: avoid; margin-bottom: 4px }
 ol.qs { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; counter-reset: q }
 ol.qs li { counter-increment: q; display: grid; grid-template-columns: 52px minmax(0,1fr); gap: 4px 14px; font-size: 19px }
 ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; color: var(--text-muted); padding-top: 4px }
@@ -219,12 +220,12 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 <p class="eyebrow">Theory</p>
   <h2>Separate senses, one percept</h2>
   <p class="lede">Each sense is studied in its own field, yet one sense can change what another reports.</p>
-  <div class="grid4">
-    <div class="card"><h3>McGurk effect</h3><p>Seeing lips say “ga” while hearing “ba” makes people hear “da”.</p></div>
-    <div class="card"><h3>Ventriloquism</h3><p>A voice seems to come from the puppet’s moving mouth.</p></div>
-    <div class="card"><h3>Rubber hand</h3><p>Watching a rubber hand being stroked makes people feel it as their own.</p></div>
-    <div class="card"><h3>Visual capture</h3><p>Through a lens that distorts a square, people feel the shape they see.</p></div>
-  </div>
+  <ul class="bul">
+      <li><b>McGurk effect.</b> Seeing lips say “ga” while hearing “ba” makes people hear “da”.</li>
+      <li><b>Ventriloquism.</b> A voice seems to come from the puppet’s moving mouth.</li>
+      <li><b>Rubber hand.</b> Watching a rubber hand being stroked makes people feel it as their own.</li>
+      <li><b>Visual capture.</b> Through a lens that distorts a square, people feel the shape they see.</li>
+    </ul>
   <p class="cite">McGurk &amp; MacDonald 1976 · Alais &amp; Burr 2004 · Botvinick &amp; Cohen 1998 · Rock &amp; Victor 1964</p>
   <details class="notes"><summary>Notes</summary><p>Vision, hearing and touch each have their own receptors, brain areas and research communities. None of these effects makes sense with one sense alone.</p></details>
 </section>
@@ -305,10 +306,10 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
   <p class="eyebrow">Motivation</p>
   <h2>A provocation</h2>
   <p class="lede">If vision dominates the other senses, vision can also deliver them. That raises two questions for visual analytics.</p>
-  <div class="grid2">
-    <div class="card"><span class="k">Question 1 · Interaction</span><h3>What can felt data bring to visual analytics?</h3><p>Which felt encodings and interaction techniques help people explore, select and compare data?</p></div>
-    <div class="card"><span class="k">Question 2 · Trade-off</span><h3>What does it cost cognition?</h3><p>Pseudo-haptics renders instantly on any computer, but it sends touch through the eyes, the sense visualization already relies on.</p></div>
-  </div>
+  <ul class="bul">
+      <li><b>Question 1 · Interaction.</b> What can felt data bring to visual analytics? Which felt encodings and interaction techniques help people explore, select and compare data?</li>
+      <li><b>Question 2 · Trade-off.</b> What does it cost cognition? Pseudo-haptics renders instantly on any computer, but it sends touch through the eyes, the sense visualization already relies on.</li>
+    </ul>
   <p class="plain">Exploring both quickly calls for a prototyping tool.</p>
   <details class="notes"><summary>Notes</summary><p>Vision dominating is usually treated as a fact about perception. Here it becomes a design opportunity, and a cost we need to measure.</p></details>
 </section>
@@ -362,14 +363,12 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 <p class="eyebrow">The project</p>
   <h2>A pseudo-haptic prototyping tool for vis</h2>
   <p class="lede">A browser tool for exploring both questions. Designers map data to a feel, try it in an analysis task, and decide what is worth fabricating.</p>
-  <div class="grid2">
-    <div class="card main"><span class="k">Understand</span><h3>What touch can carry</h3><p>Measure which felt differences people tell apart, and turn them into design requirements such as tactile palettes, before anything is printed.</p></div>
-    <div class="card main"><span class="k">Realize</span><h3>A new display medium</h3><p>The cursor itself becomes a way to display data through touch on a common computer.</p></div>
-  </div>
-  <div class="cols">
-    <div><h3 class="colh">Users</h3><ul class="bul sm"><li>Visualization and physicalization designers and researchers</li></ul></div>
-    <div><h3 class="colh">Analytical tasks</h3><ul class="bul sm"><li>Find a pattern by feel</li><li>Separate significant structure from noise</li><li>Reshape data and review how it changed</li><li>Compare the same data on screen and in print</li></ul></div>
-  </div>
+  <ul class="bul">
+      <li><b>Understand.</b> Find which felt differences come across, and turn them into design requirements such as tactile palettes, before anything is printed.</li>
+      <li><b>Realize.</b> The cursor itself becomes a display for data through touch, on a common computer.</li>
+      <li><b>Users.</b> Visualization and physicalization designers and researchers.</li>
+      <li><b>Analytical tasks.</b><ul><li>Find a pattern by feel</li><li>Separate significant structure from noise</li><li>Reshape data and review how it changed</li><li>Compare the same data on screen and in print</li></ul></li>
+    </ul>
   <p class="cite">Course directions · new visual analytics approach, and advanced analysis environments (multimodal interface)</p>
 </section>
 
@@ -392,11 +391,11 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
         <marker id="ta2" viewBox="0 0 10 10" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#e8710a"/></marker></defs>
     </svg>
   </figure>
-  <div class="grid3">
-    <div class="card"><span class="k">Computation</span><h3>Mapping and analysis</h3><p>Each channel is a function from value to cursor gain, such as 1 − k·v for friction. Terrain is simplified with persistent homology before it is felt. Every brush stroke is logged, so a session replays exactly.</p></div>
-    <div class="card"><span class="k">Visualization</span><h3>Show, hide or conflict</h3><p>Heatmaps, contour maps and node-link views on canvas. The visual encoding can be shown, hidden, or set against the feel.</p></div>
-    <div class="card"><span class="k">Interaction</span><h3>The tool owns the cursor</h3><p>Pointer lock reads raw mouse movement and keeps the cursor inside the chart. Lasso, snap, sculpt and replay sit on top.</p></div>
-  </div>
+  <ul class="bul">
+      <li><b>Computation.</b> Each channel is a function from value to cursor gain, such as 1 − k·v for friction. Terrain is simplified with persistent homology before it is felt. Every brush stroke is logged, so a session replays exactly.</li>
+      <li><b>Visualization.</b> Heatmaps, contour maps and node-link views on canvas. The visual encoding can be shown, hidden, or set against the feel.</li>
+      <li><b>Interaction.</b> Pointer lock reads raw mouse movement and keeps the cursor inside the chart. Lasso, snap, sculpt and replay sit on top.</li>
+    </ul>
   <p class="plain">The same mapping drives what is seen and what is felt, so every task can be tried by sight, by feel, or both.</p>
   <p class="cite">Lécuyer 2009 · Edelsbrunner et al. 2002</p>
 </section>
@@ -455,34 +454,27 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 <section class="step" data-sec="what" id="related" hidden>
   <p class="eyebrow">Related work</p>
   <h2>Where this sits</h2>
-  <div class="tablewrap"><table class="today">
-    <thead><tr><th>Work</th><th>Touch through</th><th>For data?</th><th>Hardware</th></tr></thead>
-    <tbody>
-      <tr><td>Lécuyer et al. 2004, Costes et al. 2019</td><td>Pseudo-haptics (cursor)</td><td>No, surfaces and textures</td><td>Mouse, touchscreen</td></tr>
-      <tr><td>Afzaal &amp; Alim, VIS 2024</td><td>Force feedback, snapping</td><td>Yes, surface peaks and curves</td><td>Haptic stylus, VR</td></tr>
-      <tr><td>Xu, Williams &amp; Wall 2023</td><td>Raised tactile prints</td><td>Yes, Cleveland and McGill tasks</td><td>Thermoform printer</td></tr>
-      <tr><td>Herman et al. 2024</td><td>3D-printed terrain</td><td>Yes, terrain tasks</td><td>3D printer</td></tr>
-      <tr><td>Bae et al. 2023</td><td>Printed networks that sense touch</td><td>Yes, networks</td><td>3D printer, electronics</td></tr>
-      <tr class="me"><td>This project</td><td>Pseudo-haptics (cursor)</td><td>Yes</td><td>Mouse or trackpad</td></tr>
-    </tbody>
-  </table></div>
-  <p class="lede">VIS has studied touch for data with devices and prints. Pseudo-haptics research has shown vision can create touch, but not for data. This project sits between them.</p>
+  <ul class="bul">
+      <li><b>Pseudo-haptics</b> (Lécuyer et al. 2000, 2004, Costes et al. 2019). Vision creates touch on a mouse or touchscreen, for surfaces and textures. This project applies it to data.</li>
+      <li><b>Force feedback for data</b> (Afzaal &amp; Alim 2024). Snapping and force on surface visualizations with a haptic stylus in VR. This project needs only a mouse.</li>
+      <li><b>Tactile charts</b> (Xu, Williams &amp; Wall 2023). Visual and raised tactile encodings compared on Cleveland and McGill tasks. This project renders touch instantly instead of printing it.</li>
+      <li><b>Printed terrain</b> (Herman et al. 2024). Terrain tasks on 3D-printed models. This project borrows those tasks for its usage scenarios.</li>
+      <li><b>Sensing physicalizations</b> (Bae et al. 2023). Printed networks that sense touch. This project is a fast sketch before such a print.</li>
+    </ul>
+  <p class="plain">VIS has studied touch for data with devices and prints. Pseudo-haptics has not yet been applied to data.</p>
 </section>
 
 <!-- 14 -->
 <section class="step" data-sec="eval" id="datasets" hidden>
   <p class="eyebrow">Data</p>
   <h2>Datasets</h2>
-  <div class="tablewrap"><table class="today">
-    <thead><tr><th>Dataset</th><th>What it is</th><th>Used for</th><th>Source and availability</th></tr></thead>
-    <tbody>
-      <tr><td>Test patterns</td><td>Gradient, hot spot, ring, checkerboard</td><td>Finding a pattern</td><td>Generated, so the right answer is known</td></tr>
-      <tr><td>Les Misérables</td><td>77 characters, 254 co-occurrence links, communities</td><td>Selecting a community</td><td>Knuth 1993, public, via vega-datasets</td></tr>
-      <tr><td>Maunga Whau</td><td>Volcano elevation, 87 × 61 points at 10 m</td><td>Reading peaks, sculpting</td><td>R’s volcano dataset, public</td></tr>
-      <tr><td>Your own elevation</td><td>Any grayscale height image, for example a USGS 3DEP tile</td><td>Terrain tasks on real places</td><td>USGS, public</td></tr>
-    </tbody>
-  </table></div>
-  <p class="lede">All data is public or generated, and none of it is about people.</p>
+  <ul class="bul">
+      <li><b>Test patterns.</b> Gradient, hot spot, ring and checkerboard, generated so the right answer is known. Used for finding a pattern.</li>
+      <li><b>Les Misérables.</b> 77 characters, 254 co-occurrence links and their communities. Public, from Knuth 1993 via vega-datasets. Used for selecting a community.</li>
+      <li><b>Maunga Whau.</b> Volcano elevation, 87 × 61 points at 10 m. Public, from R’s volcano dataset. Used for reading peaks and sculpting.</li>
+      <li><b>Your own elevation.</b> Any grayscale height image, for example a USGS 3DEP tile. Public. Used for terrain tasks on real places.</li>
+      <li>All data is public or generated, and none of it is about people.</li>
+    </ul>
 </section>
 
 <section class="step" data-sec="eval" id="evaluation" hidden>
@@ -508,15 +500,12 @@ ol.qs li::before { content: "Q" counter(q); font-size: 13px; font-weight: 700; c
 <section class="step" data-sec="eval" id="plan" hidden>
   <p class="eyebrow">Plan and feedback</p>
   <h2>Timeline</h2>
-  <div class="tablewrap"><table class="today">
-    <thead><tr><th>Date</th><th>Milestone</th></tr></thead>
-    <tbody>
-      <tr><td>Nov 4 to 5</td><td>Proposal presentation and report</td></tr>
-      <tr><td>Nov 23</td><td>Interim. Shared channels across prototypes, a real elevation tile, scripted checks running</td></tr>
-      <tr><td>Dec 9</td><td>Final presentation and live demo</td></tr>
-      <tr><td>Dec 10</td><td>Final report, system and code</td></tr>
-    </tbody>
-  </table></div>
+  <ul class="bul">
+      <li><b>Nov 4 to 5.</b> Proposal presentation and report.</li>
+      <li><b>Nov 23.</b> Interim. Shared channels across prototypes, a real elevation tile, scripted checks running.</li>
+      <li><b>Dec 9.</b> Final presentation and live demo.</li>
+      <li><b>Dec 10.</b> Final report, system and code.</li>
+    </ul>
   <h3 class="colh" style="margin-top:8px">Questions for you</h3>
   <ol class="qs">
     <li>Is a prototyping tool the right frame for a visual analytics project, or does it need a stronger analysis task?</li>
