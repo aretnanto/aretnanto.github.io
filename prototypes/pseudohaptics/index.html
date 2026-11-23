@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pseudo-haptics Use Cases</title>
+<style>
+:root { --bg:#fafaf8; --surface:#fff; --text:#1a1a18; --muted:#6b6a65; --border:#d9d8d2 }
+* { box-sizing:border-box }
+body { margin:0; font:16px/1.5 system-ui, sans-serif; background:var(--bg); color:var(--text) }
+main { max-width:860px; margin:0 auto; padding:28px 20px 48px }
+h1 { font-size:26px; margin:0 0 6px }
+.lead { color:var(--muted); margin:0 0 24px }
+.case { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 18px; margin-bottom:14px }
+.case h2 { font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px }
+.case p { margin:0 0 8px }
+.case .links { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px }
+.case a { font-size:14px; padding:5px 12px; border:1px solid var(--border); border-radius:6px; color:var(--text); text-decoration:none; background:#f3f2ee }
+.case a:hover { background:#1a1a18; color:#fff; border-color:#1a1a18 }
+.foot { font-size:13px; color:var(--muted); margin-top:20px }
+</style>
+</head>
+<body>
+<main>
+  <h1>Pseudo-haptics for data visualization</h1>
+  <p class="lead">The cursor is scaled by g = 1 − k·v, where v is a data value scaled to 0–1, so the pointer feels sticky or slippery over data. CSC 596 interim demo.</p>
+
+  <section class="case"><h2>Use case 1</h2>
+    <p>Rank several friction settings from lightest to heaviest, with the cursor shown and hidden. People can tell friction levels apart by feel alone, and the visible cursor changes how heavy it seems.</p>
+    <div class="links"><a href="interim1.html">Open C/D exploration</a></div></section>
+
+  <section class="case"><h2>Use case 2</h2>
+    <p>Colour already shows a value, and friction adds how much of each cell is filled in or how few reads back it (World Bank, gene expression). People find the unreliable cells faster and more accurately with friction than with colour alone.</p>
+    <div class="links"><a href="scenario-imputed.html">World Bank</a><a href="scenario-gene.html">Gene expression</a></div></section>
+
+  <section class="case"><h2>Use case 3</h2>
+    <p>Drag items into a bowl with tongs, where heavier items drag slower. Colour is food type, and size is not tied to weight. People hit about 12 oz at the lowest price more accurately when they feel the weight than when they only see size and colour.</p>
+    <div class="links"><a href="scenario-malatang.html">Open mala tang game</a></div></section>
+
+  <section class="case"><h2>Use case 4</h2>
+    <p>Feel a dataset's surface with friction, tune the height mapping, then export an STL to print. Feeling the printed height on screen first lets people choose a mapping with fewer reprints.</p>
+    <div class="links"><a href="scenario-physicalize.html">Open physicalization tool</a><a href="volcano-terrain.stl" download>Download sample STL</a></div></section>
+
+  <p class="foot">These describe cursor motion only, not perception. No user study has been run, so all four hypotheses are untested. Nothing is logged.</p>
+</main>
+</body>
+</html>

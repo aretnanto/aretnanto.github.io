@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gene Expression Touch Grid</title>
+<style>
+:root { --bg:#fafaf8; --surface:#fff; --text:#1a1a18; --muted:#6b6a65; --border:#d9d8d2 }
+* { box-sizing:border-box }
+body { margin:0; font:15px/1.45 system-ui, sans-serif; background:var(--bg); color:var(--text) }
+main { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:16px; padding:16px 20px; max-width:1500px; margin:0 auto }
+@media (max-width:900px) { main { grid-template-columns:1fr } }
+canvas { width:100%; height:auto; display:block; background:#fff; border:1px solid var(--border); border-radius:8px; cursor:pointer }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:12px }
+.card h3 { margin:0 0 8px; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted) }
+.preset { display:flex; width:100%; align-items:center; gap:10px; text-align:left; font:inherit; padding:8px 10px; margin-bottom:6px; border:1px solid var(--border); border-radius:6px; background:var(--surface); cursor:pointer }
+.preset kbd { font:600 12px ui-monospace, monospace; border:1px solid var(--border); border-radius:4px; padding:1px 6px; background:#f3f2ee }
+.preset[aria-pressed="true"] { background:#1a1a18; color:#fff; border-color:#1a1a18 }
+.preset[aria-pressed="true"] kbd { background:#3a3a36; border-color:#555; color:#fff }
+.ctrl { display:flex; flex-direction:column; gap:2px; margin-bottom:6px; font-size:13px }
+.ctrl label { display:flex; justify-content:space-between; color:var(--muted) }
+.ctrl output { color:var(--text); font-weight:600; font-variant-numeric:tabular-nums }
+.status { font-size:13px; color:var(--muted); margin:0 0 6px }
+.note { font-size:12px; color:var(--muted); margin:6px 0 0 }
+.name { font-size:22px; font-weight:700; margin:0 }
+.legend { height:10px; border-radius:3px; margin-top:4px; background:linear-gradient(90deg,#3168ab,#f7f7f7,#d6603c) }
+.legend-l { display:flex; justify-content:space-between; font-size:11px; color:var(--muted) }
+.ro { display:grid; grid-template-columns:1fr auto; gap:2px 10px; font-size:13px; font-variant-numeric:tabular-nums }
+.ro b { text-align:right }
+</style>
+</head>
+<body>
+<main>
+  <section>
+    <p class="status" id="status">Click the grid to lock the pointer. Esc releases it.</p>
+    <canvas id="cv" width="900" height="740" aria-label="Gene expression heat map"></canvas>
+    <p class="note" id="lockNote" hidden>Raw movement is not available in this browser, so standard pointer lock is used.</p>
+  </section>
+  <aside>
+    <div class="card"><h3>View</h3><p class="name" id="vname"></p><p class="note" id="vwhat" style="margin-top:2px"></p></div>
+    <div class="card"><h3>Presets</h3><div id="presets"></div><p class="note">Keys 1–4 · C toggles the cursor</p></div>
+    <div class="card"><h3>Task</h3><p class="note" style="margin-top:0;color:var(--text)">Find the unreliable rows. A gene whose treated and untreated columns look strongly different may rest on only a handful of sequencing reads. Strong colour that feels <b>smooth</b> is a measured difference; strong colour that feels <b>sticky</b> is probably noise.</p></div>
+    <div class="card"><h3>Colour scale</h3><div class="legend"></div><div class="legend-l"><span>−2 (low)</span><span>z-score across the 7 samples</span><span>+2 (high)</span></div></div>
+    <div class="card"><h3>Friction</h3>
+      <div class="ctrl"><label for="k">k (friction strength) <output id="kout">0.85</output></label><input type="range" id="k" min="0" max="0.95" step="0.05" value="0.85"></div>
+    </div>
+    <div class="card"><h3>Under the cursor</h3><div class="ro" id="ro"></div></div>
+    <div class="card"><h3>About the data</h3>
+      <p class="note" style="margin-top:0">Fruit-fly cell RNA-seq (the pasilla knockdown experiment) from the Bioconductor <i>pasilla</i> package v1.40.0: 4 untreated and 3 treated samples. 40 genes: 18 with the most consistent treated-versus-untreated difference among well-measured genes (mean at least 150 normalised reads) and 22 with the largest raw fold changes among poorly measured genes (mean 3–20 reads). Rows are sorted by raw treated/untreated fold change. Colour = log2 of the size-normalised count, converted to a z-score within the gene. Friction = Poisson uncertainty from the raw read count in that cell: v = 0 at 500 reads or more, v = 1 at 5 reads or fewer, on a log scale; g = 1 − k·v. Cursor motion only, not perception. Nothing is logged.</p>
+    </div>
+  </aside>
+</main>
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+const cv = $("cv"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const DATA = {"cols":["untreated1","untreated2","untreated3","untreated4","treated1","treated2","treated3"],"rows":[{"g":"FBgn0037191","c":[0,0,2,0,14,8,8],"z":[-1.11,-1.11,0.18,-1.11,0.96,1.13,1.05],"lfc":2.99,"m":4.5},{"g":"FBgn0025111","c":[451,653,279,306,4186,2381,2686],"z":[-0.87,-0.95,-0.79,-0.84,1.01,1.21,1.24],"lfc":2.89,"m":1501.4},{"g":"FBgn0063667","c":[4,7,1,4,34,20,25],"z":[-0.79,-0.7,-1.4,-0.43,0.9,1.14,1.28],"lfc":2.69,"m":13.1},{"g":"FBgn0029728","c":[0,5,0,0,21,2,3],"z":[-1.04,0.39,-1.04,-1.04,1.78,0.34,0.6],"lfc":2.52,"m":3.1},{"g":"FBgn0082931","c":[0,5,0,0,28,1,0],"z":[-0.71,0.6,-0.71,-0.71,2.14,0.11,-0.71],"lfc":2.47,"m":3.0},{"g":"FBgn0051092","c":[64,103,38,39,436,220,243],"z":[-0.86,-0.83,-0.81,-0.96,1.08,1.18,1.19],"lfc":2.32,"m":153.1},{"g":"FBgn0035710","c":[2,19,3,6,55,25,25],"z":[-1.68,-0.11,-0.9,-0.39,1.08,1.05,0.96],"lfc":2.28,"m":17.3},{"g":"FBgn0039178","c":[3,13,3,4,27,31,17],"z":[-1.35,-0.33,-0.81,-0.66,0.61,1.69,0.86],"lfc":2.27,"m":13.9},{"g":"FBgn0032436","c":[6,12,6,3,50,35,16],"z":[-0.95,-0.69,-0.33,-1.24,1.09,1.59,0.53],"lfc":2.25,"m":17.3},{"g":"FBgn0043550","c":[2,2,1,1,15,7,6],"z":[-0.67,-1.06,-0.79,-0.91,1.25,1.25,0.93],"lfc":2.22,"m":4.5},{"g":"FBgn0051528","c":[0,1,2,0,5,3,9],"z":[-1.22,-0.7,0.42,-1.22,0.41,0.64,1.66],"lfc":2.19,"m":3.1},{"g":"FBgn0037170","c":[1,3,0,1,1,6,8],"z":[-0.54,-0.11,-1.31,-0.27,-0.73,1.37,1.58],"lfc":2.15,"m":3.1},{"g":"FBgn0053318","c":[1,4,1,1,8,5,11],"z":[-1.18,-0.38,-0.73,-0.86,0.5,0.87,1.79],"lfc":2.13,"m":4.4},{"g":"FBgn0036560","c":[9,17,4,5,74,14,32],"z":[-0.73,-0.51,-1.03,-0.94,1.54,0.34,1.32],"lfc":2.1,"m":18.9},{"g":"FBgn0038282","c":[1,1,1,2,11,5,7],"z":[-1.09,-1.37,-0.65,-0.11,0.99,0.96,1.28],"lfc":2.02,"m":3.9},{"g":"FBgn0051909","c":[3,0,1,1,20,5,2],"z":[0.03,-1.64,-0.44,-0.55,1.69,0.97,-0.06],"lfc":2.01,"m":3.8},{"g":"FBgn0051195","c":[783,1325,445,520,1990,943,1012],"z":[-0.93,-0.67,-0.94,-0.91,1.13,1.19,1.13],"lfc":0.8,"m":924.9},{"g":"FBgn0033095","c":[1267,2152,758,829,3265,1483,1579],"z":[-0.97,-0.68,-0.79,-1.0,1.24,1.15,1.05],"lfc":0.76,"m":1489.1},{"g":"FBgn0030037","c":[628,1022,366,407,1465,731,761],"z":[-0.9,-0.77,-0.81,-0.97,1.03,1.31,1.11],"lfc":0.73,"m":713.8},{"g":"FBgn0032820","c":[297,480,177,212,671,311,354],"z":[-1.03,-0.91,-0.83,-0.67,1.1,1.08,1.27],"lfc":0.61,"m":332.4},{"g":"FBgn0011710","c":[2611,3985,1482,1692,4785,2334,2469],"z":[-0.76,-0.99,-0.8,-0.9,1.0,1.34,1.1],"lfc":0.4,"m":2572.2},{"g":"FBgn0037239","c":[1022,1632,604,735,822,389,420],"z":[0.75,0.8,0.87,1.03,-1.17,-1.12,-1.16],"lfc":-0.88,"m":747.7},{"g":"FBgn0050147","c":[1354,2169,805,957,996,478,557],"z":[0.77,0.82,0.89,0.97,-1.28,-1.18,-0.99],"lfc":-0.95,"m":973.9},{"g":"FBgn0039419","c":[2310,3552,1441,1482,1490,693,773],"z":[0.84,0.78,1.06,0.77,-1.17,-1.17,-1.12],"lfc":-1.16,"m":1564.3},{"g":"FBgn0027279","c":[4288,7357,2601,2782,2931,1280,1362],"z":[0.78,0.99,0.93,0.74,-1.02,-1.18,-1.25],"lfc":-1.19,"m":2955.0},{"g":"FBgn0040091","c":[1891,2570,905,1278,849,413,413],"z":[1.0,0.73,0.67,1.04,-1.14,-1.06,-1.23],"lfc":-1.57,"m":1106.5},{"g":"FBgn0010387","c":[14,19,2,8,2,1,2],"z":[1.23,1.05,-0.37,1.05,-1.2,-1.14,-0.62],"lfc":-2.17,"m":5.9},{"g":"FBgn0034898","c":[6,20,10,7,1,2,2],"z":[0.07,0.94,1.33,0.72,-1.7,-0.64,-0.72],"lfc":-2.18,"m":6.7},{"g":"FBgn0029167","c":[6272,9801,3843,4063,2050,973,927],"z":[0.85,0.84,0.94,0.82,-1.11,-1.08,-1.27],"lfc":-2.2,"m":3706.1},{"g":"FBgn0034636","c":[13,47,21,18,12,1,3],"z":[0.09,0.94,1.16,0.85,-0.34,-1.72,-0.98],"lfc":-2.39,"m":15.2},{"g":"FBgn0029896","c":[739,1460,539,544,246,96,113],"z":[0.69,0.96,0.98,0.82,-1.04,-1.25,-1.16],"lfc":-2.45,"m":489.9},{"g":"FBgn0035085","c":[1176,1579,651,785,245,135,150],"z":[0.91,0.73,0.88,0.93,-1.28,-1.09,-1.07],"lfc":-2.55,"m":638.2},{"g":"FBgn0035789","c":[11,92,12,5,9,1,2],"z":[0.19,1.82,0.81,-0.15,-0.32,-1.38,-0.98],"lfc":-2.62,"m":13.6},{"g":"FBgn0259236","c":[8,20,8,8,5,0,0],"z":[0.48,0.87,0.95,0.83,-0.16,-1.48,-1.48],"lfc":-2.83,"m":6.3},{"g":"FBgn0030634","c":[13,38,6,8,4,1,0],"z":[0.72,1.28,0.53,0.65,-0.53,-0.92,-1.73],"lfc":-2.96,"m":8.0},{"g":"FBgn0003360","c":[9518,13588,3744,4790,1282,608,618],"z":[1.03,0.94,0.69,0.78,-1.14,-1.12,-1.19],"lfc":-3.18,"m":4343.0},{"g":"FBgn0034736","c":[366,645,286,271,47,27,29],"z":[0.75,0.84,1.01,0.85,-1.26,-1.09,-1.1],"lfc":-3.47,"m":225.9},{"g":"FBgn0053498","c":[0,0,29,0,0,0,0],"z":[-0.41,-0.41,2.45,-0.41,-0.41,-0.41,-0.41],"lfc":-4.54,"m":6.4},{"g":"FBgn0039155","c":[1527,2220,741,931,70,38,52],"z":[0.92,0.86,0.81,0.86,-1.26,-1.17,-1.03],"lfc":-4.57,"m":730.6},{"g":"FBgn0030880","c":[103,1,0,0,0,0,0],"z":[2.44,-0.17,-0.45,-0.45,-0.45,-0.45,-0.45],"lfc":-5.54,"m":13.0}]};
+const P = DATA.rows, COLS = DATA.cols, NR = P.length, NC = COLS.length;
+const LM = 120, TM = 44, RM = 10, BM = 10, CW = (W - LM - RM) / NC, RH = (H - TM - BM) / NR;
+const cellAt = (x, y) => { const c = Math.floor((x - LM) / CW), r = Math.floor((y - TM) / RH); return c < 0 || r < 0 || c >= NC || r >= NR ? null : [r, c]; };
+const LO = [49,104,171], MID = [247,247,247], HI = [214,96,60];
+const shade = z => { const t = clamp(z / 2, -1, 1), a = t < 0 ? LO : HI, u = Math.abs(t); return MID.map((m, i) => Math.round(m + (a[i] - m) * u)); };
+const L5 = Math.log10(5.5), L500 = Math.log10(500.5);
+const unc = c => clamp((L500 - Math.log10(c + 0.5)) / (L500 - L5), 0, 1);
+const vOf = (r, c, kind) => kind === "unc" ? unc(P[r].c[c]) : kind === "zz" ? clamp(Math.abs(P[r].z[c]) / 2, 0, 1) : 0;
+
+const S = { x: LM + CW * 3, y: TM + RH * 10, locked: false, cursor: true, k: 0.85, fric: "none", colour: true };
+const gain = () => { const rc = cellAt(S.x, S.y); return 1 - S.k * (rc ? vOf(rc[0], rc[1], S.fric) : 0); };
+
+async function lock() {
+  try { const r = cv.requestPointerLock({ unadjustedMovement: true }); if (r && r.then) await r; $("lockNote").hidden = true; }
+  catch (e) { try { const r = cv.requestPointerLock(); if (r && r.then) await r; $("lockNote").hidden = false; } catch (e2) { $("status").textContent = "Pointer lock was blocked. Wait a second and click again."; } }
+}
+cv.addEventListener("click", () => { if (!S.locked) lock(); });
+document.addEventListener("pointerlockchange", () => { S.locked = document.pointerLockElement === cv; $("status").textContent = S.locked ? "Esc to release" : "Click the grid to lock the pointer. Esc releases it."; render(); });
+document.addEventListener("mousemove", e => {
+  if (!S.locked || Math.abs(e.movementX) > 200 || Math.abs(e.movementY) > 200) return;
+  const s = W / cv.getBoundingClientRect().width, g = gain();
+  S.x = clamp(S.x + e.movementX * s * g, 0, W - 1); S.y = clamp(S.y + e.movementY * s * g, 0, H - 1);
+  render();
+});
+
+function render() {
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H);
+  ctx.font = "11px system-ui"; ctx.fillStyle = "#6b6a65"; ctx.textAlign = "center";
+  COLS.forEach((n, c) => ctx.fillText(n, LM + (c + .5) * CW, TM - 8));
+  ctx.fillText("untreated", LM + CW * 2, 14); ctx.fillText("treated", LM + CW * 5.5, 14);
+  ctx.strokeStyle = "#d9d8d2"; ctx.beginPath(); ctx.moveTo(LM + CW * 4, 4); ctx.lineTo(LM + CW * 4, H - BM); ctx.stroke();
+  ctx.textAlign = "right"; ctx.font = "10px ui-monospace, monospace"; for (let r = 0; r < NR; r++) ctx.fillText(P[r].g, LM - 8, TM + (r + .5) * RH + 3);
+  for (let r = 0; r < NR; r++) for (let c = 0; c < NC; c++) {
+    const rgb = S.colour ? shade(P[r].z[c]) : [244, 244, 244];
+    ctx.fillStyle = `rgb(${rgb})`; ctx.fillRect(LM + c * CW + 1, TM + r * RH + 1, CW - 2, RH - 2);
+  }
+  if (S.locked && S.cursor) { ctx.fillStyle = "#e8710a"; ctx.beginPath(); ctx.arc(S.x, S.y, 6, 0, 7); ctx.fill(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 2.5; ctx.stroke(); }
+  const rc = cellAt(S.x, S.y);
+  $("ro").innerHTML = S.locked && !S.cursor ? "<span>Hidden while the cursor is hidden</span><b></b>" :
+    !rc ? "<span>Cell</span><b>–</b>" :
+    (() => { const g = P[rc[0]], n = g.c[rc[1]]; return `<span>Gene</span><b>${g.g}</b><span>Sample</span><b>${COLS[rc[1]]}</b><span>Raw reads</span><b>${n}</b><span>Relative error</span><b>${n > 0 ? "±" + Math.min(999, 100 / Math.sqrt(n)).toFixed(0) + "%" : "undefined"}</b><span>z-score</span><b>${g.z[rc[1]] > 0 ? "+" : ""}${g.z[rc[1]].toFixed(1)}</b><span>Gene: treated vs untreated</span><b>${g.lfc > 0 ? "+" : ""}${g.lfc.toFixed(1)} log2</b><span>Gene: mean normalised reads</span><b>${g.m}</b><span>Gain g</span><b>${gain().toFixed(2)}</b>`; })();
+}
+const PRESETS = [
+  { key: "1", name: "Colour only: expression", colour: true,  fric: "none", what: "Cells coloured by relative expression. Nothing shows how many reads stand behind each one." },
+  { key: "2", name: "Complement: expression + read depth", colour: true, fric: "unc", what: "Same colours. Friction rises where a cell rests on few reads. Strong colour and sticky = probably noise." },
+  { key: "3", name: "Friction only: read depth",   colour: false, fric: "unc",  what: "Blank cells. Find the thinly measured genes by feel alone." },
+  { key: "4", name: "Reinforce: expression + expression", colour: true,  fric: "zz",  what: "For contrast: friction repeats the colour (extreme is sticky). It says nothing about reliability." },
+];
+function choose(p) {
+  S.colour = p.colour; S.fric = p.fric; $("vname").textContent = p.name; $("vwhat").textContent = p.what;
+  [...$("presets").children].forEach((b, i) => b.setAttribute("aria-pressed", PRESETS[i] === p)); render();
+}
+PRESETS.forEach(p => { const b = document.createElement("button"); b.className = "preset"; b.innerHTML = `<kbd>${p.key}</kbd>${p.name}`; b.onclick = () => choose(p); $("presets").appendChild(b); });
+$("k").oninput = e => { S.k = +e.target.value; $("kout").textContent = S.k.toFixed(2); };
+document.addEventListener("keydown", e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const p = PRESETS.find(p => p.key === e.key); if (p) choose(p);
+  if (e.key === "c" || e.key === "C") { S.cursor = !S.cursor; render(); }
+});
+choose(PRESETS[0]);
+})();
+</script>
+</body>
+</html>

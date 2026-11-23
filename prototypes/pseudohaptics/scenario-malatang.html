@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mala Tang Weight Game</title>
+<style>
+:root { --bg:#fafaf8; --surface:#fff; --text:#1a1a18; --muted:#6b6a65; --border:#d9d8d2 }
+* { box-sizing:border-box }
+body { margin:0; font:15px/1.45 system-ui, sans-serif; background:var(--bg); color:var(--text) }
+main { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:16px; padding:16px 20px; max-width:1500px; margin:0 auto }
+@media (max-width:900px) { main { grid-template-columns:1fr } }
+canvas { width:100%; height:auto; display:block; background:#fff; border:1px solid var(--border); border-radius:8px; cursor:pointer }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:12px }
+.card h3 { margin:0 0 8px; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted) }
+.preset { display:flex; width:100%; align-items:center; gap:10px; text-align:left; font:inherit; padding:8px 10px; margin-bottom:6px; border:1px solid var(--border); border-radius:6px; background:var(--surface); cursor:pointer }
+.preset kbd { font:600 12px ui-monospace, monospace; border:1px solid var(--border); border-radius:4px; padding:1px 6px; background:#f3f2ee }
+.preset[aria-pressed="true"] { background:#1a1a18; color:#fff; border-color:#1a1a18 }
+.preset[aria-pressed="true"] kbd { background:#3a3a36; border-color:#555; color:#fff }
+.ctrl { display:flex; flex-direction:column; gap:2px; margin-bottom:6px; font-size:13px }
+.ctrl label { display:flex; justify-content:space-between; color:var(--muted) }
+.ctrl output { color:var(--text); font-weight:600; font-variant-numeric:tabular-nums }
+.status { font-size:13px; color:var(--muted); margin:0 0 6px }
+.note { font-size:12px; color:var(--muted); margin:6px 0 0 }
+.name { font-size:22px; font-weight:700; margin:0 }
+.ro { display:grid; grid-template-columns:1fr auto; gap:2px 10px; font-size:13px; font-variant-numeric:tabular-nums }
+.ro b { text-align:right }
+.key { display:flex; flex-direction:column; gap:4px; font-size:13px }
+.key span i { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:8px; vertical-align:-1px }
+button.act { font:inherit; padding:6px 10px; border:1px solid var(--border); border-radius:6px; background:#fff; cursor:pointer; margin-right:6px }
+</style>
+</head>
+<body>
+<main>
+  <section>
+    <p class="status" id="status">Click the counter to lock the pointer. Esc releases it. Hold the mouse button to pick up one item with the tongs, release it over the bowl.</p>
+    <canvas id="cv" width="1000" height="640" aria-label="Mala tang counter and bowl"></canvas>
+    <p class="note" id="lockNote" hidden>Raw movement is not available in this browser, so standard pointer lock is used.</p>
+  </section>
+  <aside>
+    <div class="card"><h3>View</h3><p class="name" id="vname"></p><p class="note" id="vwhat" style="margin-top:2px"></p></div>
+    <div class="card"><h3>Presets</h3><div id="presets"></div><p class="note">Keys 1–4 · C toggles the tongs</p></div>
+    <div class="card"><h3>Task</h3><p class="note" style="margin-top:0;color:var(--text)">Mala tang is paid by weight. Build a bowl of about <b>12 oz</b> with at least one protein and one vegetable, as cheaply as you can. The counter never runs out. You are not told the weights, and <b>size is not weight</b>: a big-looking item can be light and a small one heavy. Pick an item up and feel it. A heavy item drags slowly, a light one moves freely.</p></div>
+    <div class="card"><h3>Colour = type (price per pound) · size = look only</h3><div class="key" id="key"></div></div>
+    <div class="card"><h3>Friction</h3>
+      <div class="ctrl"><label for="k">k (friction strength) <output id="kout">0.80</output></label><input type="range" id="k" min="0" max="0.95" step="0.05" value="0.80"></div>
+    </div>
+    <div class="card"><h3>Bowl</h3>
+      <div class="ro" id="bowl"></div>
+      <p style="margin:8px 0 0"><button class="act" id="weigh">Weigh (Enter)</button><button class="act" id="reset">Empty (R)</button></p>
+    </div>
+    <div class="card"><h3>Under the tongs</h3><div class="ro" id="ro"></div></div>
+    <div class="card"><h3>About</h3>
+      <p class="note" style="margin-top:0">Illustrative weights (ounces) and prices per pound, not market data. One item per grab. Friction applies only while an item is held: v = (weight − lightest) ÷ (heaviest − lightest), g = 1 − k·v. Grab an item in the bowl to take it back out. The bowl is full at about 40 items. Cursor motion only, not perception. Nothing is logged.</p>
+    </div>
+  </aside>
+</main>
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+const cv = $("cv"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const TYPES = { P: { name: "Protein", price: 9.0, col: "#c4452f", tint: "#f6d9d3" }, V: { name: "Vegetable", price: 2.5, col: "#4f9a46", tint: "#dcecd8" }, N: { name: "Starch", price: 3.0, col: "#d9a62b", tint: "#f6ebcb" } };
+// size = how big the item looks (0.5 to 1). Chosen so it is unrelated to weight (correlation about −0.1): big does not mean heavy.
+const ITEMS = [
+  ["Beef slices","🥩","P",3.0,.65],["Fish balls","🍥","P",2.2,.6],["Quail eggs","🥚","P",1.0,.7],["Shrimp","🦐","P",1.6,.8],
+  ["Bok choy","🥬","V",1.4,1.0],["Broccoli","🥦","V",3.6,1.0],["Corn","🌽","V",3.0,.8],["Carrot","🥕","V",0.6,.75],
+  ["Glass noodles","🍜","N",2.0,.9],["Wide noodles","🍝","N",3.4,.85],["Potato slices","🥔","N",4.0,.6],["Rice cake","🍙","N",2.8,.6],
+].map(([n, e, t, w, sz]) => ({ n, e, t, w, sz }));
+const WMIN = Math.min(...ITEMS.map(i => i.w)), WMAX = Math.max(...ITEMS.map(i => i.w));
+ITEMS.forEach(i => i.v = (i.w - WMIN) / (WMAX - WMIN));
+const COLS = 4, TW = 138, TH = 112, GX0 = 30, GY0 = 40, GAPX = 160, GAPY = 148;
+ITEMS.forEach((it, k) => { it.x = GX0 + (k % COLS) * GAPX; it.y = GY0 + Math.floor(k / COLS) * GAPY; });
+const BOWL = { x: 690, y: 150, w: 290, h: 360 }, CX = 835, RIM_Y = 200, RX = 138, RY = 30, BOT_Y = 470, FOOT = 62, DISC = 46, STEP = 50;
+const hwAt = y => FOOT + (RX - FOOT) * Math.sqrt(Math.max(0, 1 - Math.pow((y - RIM_Y) / (BOT_Y - RIM_Y), 2)));
+const SLOTS = [];   // pile positions, filled from the bottom of the bowl upward
+for (let y = BOT_Y - 34, r = 0; y > RIM_Y - 8; y -= 44, r++) {
+  const n = Math.max(1, Math.floor(2 * (hwAt(y) - 14) / STEP));
+  for (let c = 0; c < n; c++) SLOTS.push([CX + (c - (n - 1) / 2) * STEP, y]);
+}
+const MAXB = SLOTS.length;
+
+const S = { x: 400, y: 320, locked: false, cursor: true, k: 0.8, colour: true, fric: true, labels: false, held: null, weighed: false, bowl: [] };
+const inBox = (px, py, x, y, w, h) => px >= x && px <= x + w && py >= y && py <= y + h;
+const counterAt = (px, py) => ITEMS.findIndex(it => inBox(px, py, it.x, it.y, TW, TH));
+function bowlAt(px, py) { for (let n = S.bowl.length - 1; n >= 0; n--) { const [x, y] = SLOTS[n]; if (Math.hypot(px - x, py - y) <= DISC / 2) return n; } return -1; }
+
+async function lock() {
+  try { const r = cv.requestPointerLock({ unadjustedMovement: true }); if (r && r.then) await r; $("lockNote").hidden = true; }
+  catch (e) { try { const r = cv.requestPointerLock(); if (r && r.then) await r; $("lockNote").hidden = false; } catch (e2) { $("status").textContent = "Pointer lock was blocked. Wait a second and click again."; } }
+}
+cv.addEventListener("click", () => { if (!S.locked) lock(); });
+document.addEventListener("pointerlockchange", () => { S.locked = document.pointerLockElement === cv; if (!S.locked) S.held = null; $("status").textContent = S.locked ? "Esc to release. Hold the mouse button to pick up one item, release over the bowl." : "Click the counter to lock the pointer. Esc releases it."; render(); });
+const gain = () => S.held !== null && S.fric ? 1 - S.k * ITEMS[S.held].v : 1;
+document.addEventListener("mousemove", e => {
+  if (!S.locked || Math.abs(e.movementX) > 200 || Math.abs(e.movementY) > 200) return;
+  const s = W / cv.getBoundingClientRect().width, g = gain();
+  S.x = clamp(S.x + e.movementX * s * g, 0, W - 1); S.y = clamp(S.y + e.movementY * s * g, 0, H - 1);
+  render();
+});
+document.addEventListener("mousedown", e => {
+  if (!S.locked || e.button !== 0 || S.held !== null) return;
+  const n = bowlAt(S.x, S.y);
+  if (n >= 0) { S.held = S.bowl.splice(n, 1)[0]; S.weighed = false; render(); return; }
+  const i = counterAt(S.x, S.y); if (i >= 0) { S.held = i; S.weighed = false; render(); }   // unlimited supply: one copy per grab
+});
+function drop() {
+  if (S.held === null) return;
+  if (inBox(S.x, S.y, BOWL.x, BOWL.y, BOWL.w, BOWL.h) && S.bowl.length < MAXB) S.bowl.push(S.held);
+  S.held = null; render();
+}
+document.addEventListener("mouseup", e => { if (e.button === 0) drop(); });
+
+function disc(it, x, y, r) {
+  ctx.fillStyle = S.colour ? TYPES[it.t].col : "#bdbcb6"; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+  ctx.font = Math.round(r * (0.7 + 0.8 * it.sz)) + "px serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = "#000"; ctx.fillText(it.e, x, y + 2); ctx.textBaseline = "alphabetic";
+}
+function tongs(x, y, closed) {
+  // tips at (x, y); arms rise to a pivot up and to the right
+  const px = x + 52, py = y - 96, open = closed ? 2 : 12;
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+  for (const sgn of [-1, 1]) {
+    const tx = x + sgn * open, ty = y;
+    ctx.strokeStyle = "rgba(0,0,0,.28)"; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(tx, ty); ctx.stroke();
+    ctx.strokeStyle = "#c9ccd1"; ctx.lineWidth = 5.5; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(tx, ty); ctx.stroke();
+    ctx.strokeStyle = "#8d929a"; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(tx, ty - 8); ctx.lineTo(tx, ty); ctx.stroke();
+  }
+  ctx.fillStyle = "#8d929a"; ctx.beginPath(); ctx.arc(px, py, 5, 0, 7); ctx.fill();
+}
+function render() {
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "#f4f3ee"; ctx.fillRect(10, 10, 670, 480);
+  ctx.fillStyle = "#6b6a65"; ctx.font = "12px system-ui"; ctx.textAlign = "left"; ctx.fillText("Counter (unlimited)", 22, 28);
+  // bowl: foot, body, rim, broth
+  ctx.fillStyle = "#d8d3c8"; ctx.beginPath(); ctx.ellipse(CX, BOT_Y + 10, FOOT + 8, 9, 0, 0, 7); ctx.fill();
+  ctx.fillStyle = "#f3efe6"; ctx.strokeStyle = "#8f877a"; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(CX - RX, RIM_Y); ctx.bezierCurveTo(CX - RX, RIM_Y + 215, CX - FOOT - 28, BOT_Y - 4, CX - FOOT, BOT_Y);
+  ctx.lineTo(CX + FOOT, BOT_Y); ctx.bezierCurveTo(CX + FOOT + 28, BOT_Y - 4, CX + RX, RIM_Y + 215, CX + RX, RIM_Y); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.strokeStyle = "#c9a35a"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(CX - RX + 4, RIM_Y + 46); ctx.bezierCurveTo(CX - RX / 2, RIM_Y + 92, CX + RX / 2, RIM_Y + 92, CX + RX - 4, RIM_Y + 46); ctx.stroke();
+  ctx.fillStyle = "#f8f5ee"; ctx.strokeStyle = "#8f877a"; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(CX, RIM_Y, RX, RY, 0, 0, 7); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#c8532b"; ctx.beginPath(); ctx.ellipse(CX, RIM_Y + 2, RX - 12, RY - 8, 0, 0, 7); ctx.fill();
+  ctx.fillStyle = "#6b6a65"; ctx.font = "12px system-ui"; ctx.textAlign = "left"; ctx.fillText("Your bowl", BOWL.x, BOWL.y + 10);
+  ITEMS.forEach(it => {
+    ctx.fillStyle = S.colour ? TYPES[it.t].tint : "#ebeae6"; ctx.strokeStyle = S.colour ? TYPES[it.t].col : "#bdbcb6"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(it.x, it.y, TW, TH, 12) : ctx.rect(it.x, it.y, TW, TH); ctx.fill(); ctx.stroke();
+    ctx.font = Math.round(26 + 34 * it.sz) + "px serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = "#000"; ctx.fillText(it.e, it.x + TW / 2, it.y + 42); ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = "#1a1a18"; ctx.font = "600 13px system-ui"; ctx.fillText(it.n, it.x + TW / 2, it.y + 84);
+    if (S.labels) { ctx.fillStyle = "#6b6a65"; ctx.font = "12px system-ui"; ctx.fillText(it.w.toFixed(1) + " oz", it.x + TW / 2, it.y + 102); }
+  });
+  S.bowl.forEach((i, n) => { const [x, y] = SLOTS[n]; disc(ITEMS[i], x, y, DISC / 2 - 1); });
+  if (S.held !== null) disc(ITEMS[S.held], S.x, S.y + 8, 26);
+  if (S.locked && S.cursor) tongs(S.x, S.y, S.held !== null);
+  const bi = bowlAt(S.x, S.y), hi = S.held !== null ? S.held : bi >= 0 ? S.bowl[bi] : counterAt(S.x, S.y), it = hi >= 0 ? ITEMS[hi] : null;
+  $("ro").innerHTML = S.locked && !S.cursor ? "<span>Hidden while the tongs are hidden</span><b></b>" :
+    !it ? "<span>Item</span><b>none</b>" :
+    `<span>Item</span><b>${it.e} ${it.n}</b><span>Type</span><b>${TYPES[it.t].name}</b><span>Price per lb</span><b>$${TYPES[it.t].price.toFixed(2)}</b><span>Looks (size)</span><b>${it.sz >= .9 ? "large" : it.sz >= .7 ? "medium" : "small"}</b>${S.weighed || S.labels ? `<span>Weight</span><b>${it.w.toFixed(1)} oz</b>` : ""}<span>Gain g</span><b>${(S.held === hi && S.fric ? 1 - S.k * it.v : 1).toFixed(2)}</b>`;
+  const inb = S.bowl.map(i => ITEMS[i]);
+  const hasP = inb.some(i => i.t === "P"), hasV = inb.some(i => i.t === "V");
+  let html = `<span>Items</span><b>${inb.length}${inb.length >= MAXB ? " (full)" : ""}</b><span>Protein + vegetable</span><b>${hasP && hasV ? "yes" : "not yet"}</b>`;
+  if (S.weighed) { const wt = inb.reduce((s, i) => s + i.w, 0), cost = inb.reduce((s, i) => s + i.w / 16 * TYPES[i.t].price, 0); html += `<span>Weight</span><b>${wt.toFixed(1)} oz</b><span>Target 12 oz</span><b>${(wt - 12 > 0 ? "+" : "") + (wt - 12).toFixed(1)} oz</b><span>Cost</span><b>$${cost.toFixed(2)}</b>`; }
+  $("bowl").innerHTML = html;
+}
+const PRESETS = [
+  { key: "1", name: "Colour only: type", colour: true,  fric: false, labels: false, what: "Tiles and bowl discs coloured by type. Every item drags the same, so weight is invisible." },
+  { key: "2", name: "Complement: type + weight friction", colour: true, fric: true, labels: false, what: "Same colours. A held item drags slower the heavier it is. Colour tells you the price per lb, touch tells you the weight." },
+  { key: "3", name: "Friction only: weight", colour: false, fric: true, labels: false, what: "Grey tiles. Choose by emoji, name and feel." },
+  { key: "4", name: "Printed weights (baseline)", colour: true, fric: false, labels: true, what: "Weights printed on each tile and no friction. The ordinary visual way to show the same variable." },
+];
+function choose(p) {
+  S.colour = p.colour; S.fric = p.fric; S.labels = p.labels; $("vname").textContent = p.name; $("vwhat").textContent = p.what;
+  [...$("presets").children].forEach((b, i) => b.setAttribute("aria-pressed", PRESETS[i] === p)); render();
+}
+PRESETS.forEach(p => { const b = document.createElement("button"); b.className = "preset"; b.innerHTML = `<kbd>${p.key}</kbd>${p.name}`; b.onclick = () => choose(p); $("presets").appendChild(b); });
+$("key").innerHTML = Object.values(TYPES).map(t => `<span><i style="background:${t.col}"></i>${t.name} · $${t.price.toFixed(2)}/lb</span>`).join("");
+$("k").oninput = e => { S.k = +e.target.value; $("kout").textContent = S.k.toFixed(2); };
+function weigh() { S.weighed = true; render(); }
+function empty() { S.bowl = []; S.held = null; S.weighed = false; render(); }
+$("weigh").onclick = weigh; $("reset").onclick = empty;
+document.addEventListener("keydown", e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const p = PRESETS.find(p => p.key === e.key); if (p) choose(p);
+  if (e.key === "c" || e.key === "C") { S.cursor = !S.cursor; render(); }
+  if (e.key === "Enter") { weigh(); e.preventDefault(); }
+  if (e.key === "r" || e.key === "R") empty();
+});
+choose(PRESETS[1]);
+})();
+</script>
+</body>
+</html>
